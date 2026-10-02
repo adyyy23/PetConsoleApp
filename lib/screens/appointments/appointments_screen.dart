@@ -31,7 +31,7 @@ class AppointmentsScreen extends StatelessWidget {
           appBar: PawlyAppBar(
             title: 'Veterinary Visits',
             trailing: IconButton(
-              icon: const Icon(Icons.add, color: PawlyColors.black, size: 20),
+              icon:  const Icon(Icons.add, color: PawlyColors.black, size: 20),
               onPressed: () {
                 Navigator.push(
                   context,
@@ -61,7 +61,7 @@ class AppointmentsScreen extends StatelessWidget {
                 SliverFillRemaining(
                   hasScrollBody: false,
                   child: EmptyStateView(
-                    icon: Icons.calendar_today_rounded,
+                    
                     title: 'No Appointments Logged',
                     subtitle: 'Schedule routine exams, vaccinations, or dental checkups for ${pet?.name ?? 'your pet'}.',
                     actionLabel: 'Schedule Visit',
@@ -213,7 +213,7 @@ class _UpcomingVisitHeroCard extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(vertical: 8),
                 decoration: BoxDecoration(
                   color: PawlyColors.black,
-                  borderRadius: AppRadius.rSm,
+                  borderRadius: AppTokens.rSm,
                 ),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
@@ -256,7 +256,7 @@ class _UpcomingVisitHeroCard extends StatelessWidget {
                             color: PawlyColors.black,
                           ),
                         ),
-                        const PawlyBadge(label: 'Confirmed'),
+                        const StatusBadge(label: 'Confirmed'),
                       ],
                     ),
                     const SizedBox(height: 4),
@@ -267,7 +267,7 @@ class _UpcomingVisitHeroCard extends StatelessWidget {
                     const SizedBox(height: 2),
                     Text(
                       '${appointment.clinic} • ${appointment.vetName}',
-                      style: PawlyTypography.bodySmall,
+                      style: PawlyTypography.bodyMedium,
                     ),
                   ],
                 ),
@@ -280,7 +280,7 @@ class _UpcomingVisitHeroCard extends StatelessWidget {
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
                 color: PawlyColors.surfaceWarm,
-                borderRadius: AppRadius.rSm,
+                borderRadius: AppTokens.rSm,
                 border: Border.all(color: PawlyColors.border, width: 0.8),
               ),
               child: Row(
@@ -290,7 +290,7 @@ class _UpcomingVisitHeroCard extends StatelessWidget {
                   Expanded(
                     child: Text(
                       appointment.notes,
-                      style: PawlyTypography.bodySmall,
+                      style: PawlyTypography.bodyMedium,
                     ),
                   ),
                 ],
@@ -303,17 +303,17 @@ class _UpcomingVisitHeroCard extends StatelessWidget {
               Expanded(
                 child: PawlyButton(
                   text: 'Visit Prep Checklist',
-                  icon: Icons.checklist_rounded,
-                  variant: PawlyButtonVariant.secondary,
+                  
+                  isSecondary: true,
                   onPressed: onPrepTap,
                 ),
               ),
               const SizedBox(width: 8),
               IconButton(
                 style: IconButton.styleFrom(
-                  backgroundColor: PawlyColors.softGrey,
+                  backgroundColor: PawlyColors.border,
                   shape: RoundedRectangleBorder(
-                    borderRadius: AppRadius.rSm,
+                    borderRadius: AppTokens.rSm,
                     side: const BorderSide(color: PawlyColors.border),
                   ),
                   padding: const EdgeInsets.all(12),
@@ -351,12 +351,12 @@ class _AppointmentCard extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: appointment.isCompleted ? PawlyColors.softGrey : PawlyColors.black,
-              borderRadius: AppRadius.rSm,
+              color: appointment.isCompleted ? PawlyColors.border : PawlyColors.black,
+              borderRadius: AppTokens.rSm,
             ),
             child: Icon(
               appointment.isCompleted ? Icons.check : Icons.calendar_today_outlined,
-              color: appointment.isCompleted ? PawlyColors.textMuted : Colors.white,
+              color: appointment.isCompleted ? PawlyColors.tertiary : Colors.white,
               size: 16,
             ),
           ),
@@ -372,7 +372,7 @@ class _AppointmentCard extends StatelessWidget {
                       child: Text(
                         appointment.purpose,
                         style: PawlyTypography.titleSmall.copyWith(
-                          color: appointment.isCompleted ? PawlyColors.textMuted : PawlyColors.black,
+                          color: appointment.isCompleted ? PawlyColors.tertiary : PawlyColors.black,
                           decoration: appointment.isCompleted ? TextDecoration.lineThrough : null,
                         ),
                       ),
@@ -386,7 +386,7 @@ class _AppointmentCard extends StatelessWidget {
                 const SizedBox(height: 2),
                 Text(
                   '${appointment.clinic} • ${appointment.vetName}',
-                  style: PawlyTypography.bodySmall,
+                  style: PawlyTypography.bodyMedium,
                 ),
                 if (!appointment.isCompleted && onPrepTap != null) ...[
                   const SizedBox(height: 8),

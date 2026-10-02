@@ -29,7 +29,7 @@ class _WeightGrowthScreenState extends State<WeightGrowthScreen> {
       builder: (ctx) => Container(
         decoration: const BoxDecoration(
           color: PawlyColors.surface,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadius.xl)),
+          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
         ),
         padding: EdgeInsets.only(
           left: 20,
@@ -71,9 +71,9 @@ class _WeightGrowthScreenState extends State<WeightGrowthScreen> {
                 filled: true,
                 fillColor: PawlyColors.surfaceWarm,
                 contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-                border: OutlineInputBorder(borderRadius: AppRadius.rMd, borderSide: const BorderSide(color: PawlyColors.border)),
-                enabledBorder: OutlineInputBorder(borderRadius: AppRadius.rMd, borderSide: const BorderSide(color: PawlyColors.border)),
-                focusedBorder: OutlineInputBorder(borderRadius: AppRadius.rMd, borderSide: const BorderSide(color: PawlyColors.black, width: 1.5)),
+                border: OutlineInputBorder(borderRadius: AppTokens.rMd, borderSide: const BorderSide(color: PawlyColors.border)),
+                enabledBorder: OutlineInputBorder(borderRadius: AppTokens.rMd, borderSide: const BorderSide(color: PawlyColors.border)),
+                focusedBorder: OutlineInputBorder(borderRadius: AppTokens.rMd, borderSide: const BorderSide(color: PawlyColors.black, width: 1.5)),
               ),
             ),
             const SizedBox(height: 14),
@@ -87,16 +87,15 @@ class _WeightGrowthScreenState extends State<WeightGrowthScreen> {
                 filled: true,
                 fillColor: PawlyColors.surfaceWarm,
                 contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-                border: OutlineInputBorder(borderRadius: AppRadius.rMd, borderSide: const BorderSide(color: PawlyColors.border)),
-                enabledBorder: OutlineInputBorder(borderRadius: AppRadius.rMd, borderSide: const BorderSide(color: PawlyColors.border)),
-                focusedBorder: OutlineInputBorder(borderRadius: AppRadius.rMd, borderSide: const BorderSide(color: PawlyColors.black, width: 1.5)),
+                border: OutlineInputBorder(borderRadius: AppTokens.rMd, borderSide: const BorderSide(color: PawlyColors.border)),
+                enabledBorder: OutlineInputBorder(borderRadius: AppTokens.rMd, borderSide: const BorderSide(color: PawlyColors.border)),
+                focusedBorder: OutlineInputBorder(borderRadius: AppTokens.rMd, borderSide: const BorderSide(color: PawlyColors.black, width: 1.5)),
               ),
             ),
             const SizedBox(height: 20),
-            PawlyButton(
-              label: 'Save Weigh-in',
-              isFullWidth: true,
-              variant: PawlyButtonVariant.primary,
+            PawlyButton(text: 'Save Weigh-in',
+              
+              
               onPressed: () {
                 final w = double.tryParse(weightController.text.trim());
                 if (w != null && w > 0) {
@@ -134,7 +133,7 @@ class _WeightGrowthScreenState extends State<WeightGrowthScreen> {
       appBar: PawlyAppBar(
         title: '${pet.name}’s Growth',
         trailing: IconButton(
-          icon: const Icon(Icons.add, color: PawlyColors.black, size: 20),
+          icon:  const Icon(Icons.add, color: PawlyColors.black, size: 20),
           onPressed: _openAddWeightDialog,
         ),
       ),
@@ -178,7 +177,7 @@ class _WeightGrowthScreenState extends State<WeightGrowthScreen> {
                               style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w700,
-                                color: PawlyColors.textMuted,
+                                color: PawlyColors.tertiary,
                               ),
                             ),
                           ],
@@ -186,8 +185,8 @@ class _WeightGrowthScreenState extends State<WeightGrowthScreen> {
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                           decoration: BoxDecoration(
-                            color: PawlyColors.softGrey,
-                            borderRadius: AppRadius.rSm,
+                            color: PawlyColors.border,
+                            borderRadius: AppTokens.rSm,
                             border: Border.all(color: PawlyColors.border, width: 0.8),
                           ),
                           child: Text(
@@ -274,11 +273,10 @@ class _WeightGrowthScreenState extends State<WeightGrowthScreen> {
 
               const SizedBox(height: 16),
 
-              PawlyButton(
-                label: 'Record New Weight',
-                icon: Icons.add,
-                isFullWidth: true,
-                variant: PawlyButtonVariant.primary,
+              PawlyButton(text: 'Record New Weight',
+                
+                
+                
                 onPressed: _openAddWeightDialog,
               ),
               const SizedBox(height: 20),

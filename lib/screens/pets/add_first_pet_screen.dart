@@ -61,7 +61,7 @@ class _AddFirstPetScreenState extends State<AddFirstPetScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: PawlyColors.creamBg,
+      backgroundColor: PawlyColors.background,
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
@@ -98,7 +98,7 @@ class _AddFirstPetScreenState extends State<AddFirstPetScreen> {
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(18),
                           border: Border.all(
-                            color: isSelected ? PawlyColors.forest : PawlyColors.border,
+                            color: isSelected ? PawlyColors.black : PawlyColors.border,
                             width: isSelected ? 3 : 1.2,
                           ),
                         ),
@@ -306,11 +306,10 @@ class _AddFirstPetScreenState extends State<AddFirstPetScreen> {
 
               const SizedBox(height: 32),
 
-              PawlyButton(
-                label: 'Enter Pawly with My Pet',
-                icon: Icons.pets_rounded,
-                isFullWidth: true,
-                variant: PawlyButtonVariant.primary,
+              PawlyButton(text: 'Enter Pawly with My Pet',
+                
+                
+                
                 onPressed: _submit,
               ),
               const SizedBox(height: 20),

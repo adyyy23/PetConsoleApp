@@ -41,7 +41,7 @@ class _ProfileSettingsScreenState extends State<ProfileSettingsScreen> {
         builder: (ctx, setModalState) => Container(
           decoration: const BoxDecoration(
             color: PawlyColors.surface,
-            borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadius.xl)),
+            borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
           ),
           padding: EdgeInsets.fromLTRB(20, 16, 20, MediaQuery.of(ctx).viewInsets.bottom + 24),
           child: Column(
@@ -76,15 +76,15 @@ class _ProfileSettingsScreenState extends State<ProfileSettingsScreen> {
                   filled: true,
                   fillColor: PawlyColors.surfaceWarm,
                   border: OutlineInputBorder(
-                    borderRadius: AppRadius.rMd,
+                    borderRadius: AppTokens.rMd,
                     borderSide: const BorderSide(color: PawlyColors.border),
                   ),
                   enabledBorder: OutlineInputBorder(
-                    borderRadius: AppRadius.rMd,
+                    borderRadius: AppTokens.rMd,
                     borderSide: const BorderSide(color: PawlyColors.border),
                   ),
                   focusedBorder: OutlineInputBorder(
-                    borderRadius: AppRadius.rMd,
+                    borderRadius: AppTokens.rMd,
                     borderSide: const BorderSide(color: PawlyColors.black, width: 1.5),
                   ),
                 ),
@@ -100,15 +100,15 @@ class _ProfileSettingsScreenState extends State<ProfileSettingsScreen> {
                   filled: true,
                   fillColor: PawlyColors.surfaceWarm,
                   border: OutlineInputBorder(
-                    borderRadius: AppRadius.rMd,
+                    borderRadius: AppTokens.rMd,
                     borderSide: const BorderSide(color: PawlyColors.border),
                   ),
                   enabledBorder: OutlineInputBorder(
-                    borderRadius: AppRadius.rMd,
+                    borderRadius: AppTokens.rMd,
                     borderSide: const BorderSide(color: PawlyColors.border),
                   ),
                   focusedBorder: OutlineInputBorder(
-                    borderRadius: AppRadius.rMd,
+                    borderRadius: AppTokens.rMd,
                     borderSide: const BorderSide(color: PawlyColors.black, width: 1.5),
                   ),
                 ),
@@ -126,7 +126,7 @@ class _ProfileSettingsScreenState extends State<ProfileSettingsScreen> {
                       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                       decoration: BoxDecoration(
                         color: isSelected ? PawlyColors.black : Colors.white,
-                        borderRadius: AppRadius.rSm,
+                        borderRadius: AppTokens.rSm,
                         border: Border.all(
                           color: isSelected ? PawlyColors.black : PawlyColors.border,
                           width: 1.0,
@@ -202,8 +202,8 @@ class _ProfileSettingsScreenState extends State<ProfileSettingsScreen> {
                         width: 44,
                         height: 44,
                         decoration: BoxDecoration(
-                          color: PawlyColors.softGrey,
-                          borderRadius: AppRadius.rSm,
+                          color: PawlyColors.border,
+                          borderRadius: AppTokens.rSm,
                           border: Border.all(color: PawlyColors.border),
                         ),
                         child: const Icon(Icons.person_rounded, color: PawlyColors.black, size: 24),
@@ -219,7 +219,7 @@ class _ProfileSettingsScreenState extends State<ProfileSettingsScreen> {
                           ],
                         ),
                       ),
-                      const PawlyBadge(label: 'Owner'),
+                      const StatusBadge(label: 'Owner'),
                     ],
                   ),
                 ),
@@ -299,8 +299,8 @@ class _ProfileSettingsScreenState extends State<ProfileSettingsScreen> {
                               width: 36,
                               height: 36,
                               decoration: BoxDecoration(
-                                color: PawlyColors.softGrey,
-                                borderRadius: AppRadius.rSm,
+                                color: PawlyColors.border,
+                                borderRadius: AppTokens.rSm,
                                 border: Border.all(color: PawlyColors.border, width: 0.8),
                               ),
                               clipBehavior: Clip.antiAlias,
@@ -338,7 +338,7 @@ class _ProfileSettingsScreenState extends State<ProfileSettingsScreen> {
                                 ],
                               ),
                             ),
-                            PawlyBadge(
+                            StatusBadge(
                               label: member.role == 'Owner' ? 'Owner' : 'Co-care',
                             ),
                           ],
@@ -386,7 +386,7 @@ class _ProfileSettingsScreenState extends State<ProfileSettingsScreen> {
                       ),
                       const Divider(height: 1, indent: 52, color: PawlyColors.border),
                       _SettingsRow(
-                        icon: Icons.pets_outlined,
+                        icon: Icons.favorite_border_rounded,
                         title: 'Adopt & Foster Discovery',
                         subtitle: 'Browse rescues and foster animals seeking homes',
                         onTap: () {
@@ -415,8 +415,8 @@ class _ProfileSettingsScreenState extends State<ProfileSettingsScreen> {
                         secondary: Container(
                           padding: const EdgeInsets.all(6),
                           decoration: BoxDecoration(
-                            color: PawlyColors.softGrey,
-                            borderRadius: AppRadius.rSm,
+                            color: PawlyColors.border,
+                            borderRadius: AppTokens.rSm,
                           ),
                           child: const Icon(Icons.notifications_active_outlined, color: PawlyColors.black, size: 18),
                         ),
@@ -431,8 +431,8 @@ class _ProfileSettingsScreenState extends State<ProfileSettingsScreen> {
                         secondary: Container(
                           padding: const EdgeInsets.all(6),
                           decoration: BoxDecoration(
-                            color: PawlyColors.softGrey,
-                            borderRadius: AppRadius.rSm,
+                            color: PawlyColors.border,
+                            borderRadius: AppTokens.rSm,
                           ),
                           child: const Icon(Icons.event_available_outlined, color: PawlyColors.black, size: 18),
                         ),
@@ -451,9 +451,9 @@ class _ProfileSettingsScreenState extends State<ProfileSettingsScreen> {
                 // Logout button
                 PawlyButton(
                   text: 'Log Out of Pawly',
-                  icon: Icons.logout_rounded,
-                  variant: PawlyButtonVariant.secondary,
-                  isFullWidth: true,
+                  
+                  isSecondary: true,
+                  
                   onPressed: widget.onLogout,
                 ),
 
@@ -494,14 +494,14 @@ class _SettingsRow extends StatelessWidget {
       leading: Container(
         padding: const EdgeInsets.all(6),
         decoration: BoxDecoration(
-          color: PawlyColors.softGrey,
-          borderRadius: AppRadius.rSm,
+          color: PawlyColors.border,
+          borderRadius: AppTokens.rSm,
         ),
         child: Icon(icon, color: PawlyColors.black, size: 18),
       ),
       title: Text(title, style: PawlyTypography.titleSmall),
       subtitle: Text(subtitle, style: PawlyTypography.caption),
-      trailing: const Icon(Icons.chevron_right_rounded, color: PawlyColors.textMuted, size: 18),
+      trailing: const Icon(Icons.chevron_right_rounded, color: PawlyColors.tertiary, size: 18),
       onTap: onTap,
     );
   }

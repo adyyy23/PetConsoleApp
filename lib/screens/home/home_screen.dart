@@ -54,7 +54,7 @@ class HomeScreen extends StatelessWidget {
         builder: (ctx, setModalState) => Container(
           decoration: const BoxDecoration(
             color: Colors.white,
-            borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadius.xl)),
+            borderRadius: BorderRadius.vertical(top: Radius.circular(AppTokens.xl)),
           ),
           padding: EdgeInsets.fromLTRB(20, 16, 20, MediaQuery.of(ctx).viewInsets.bottom + 24),
           child: Column(
@@ -67,7 +67,7 @@ class HomeScreen extends StatelessWidget {
                   height: 4,
                   decoration: BoxDecoration(
                     color: PawlyColors.border,
-                    borderRadius: AppRadius.rXs,
+                    borderRadius: AppTokens.rXs,
                   ),
                 ),
               ),
@@ -77,7 +77,7 @@ class HomeScreen extends StatelessWidget {
                 style: PawlyTypography.titleMedium,
               ),
               const SizedBox(height: 16),
-              const Text('Appetite', style: PawlyTypography.labelSmall),
+              const Text('Appetite', style: PawlyTypography.eyebrow),
               const SizedBox(height: 6),
               Wrap(
                 spacing: 8,
@@ -89,7 +89,7 @@ class HomeScreen extends StatelessWidget {
                     selectedColor: PawlyColors.black,
                     backgroundColor: Colors.white,
                     shape: RoundedRectangleBorder(
-                      borderRadius: AppRadius.rSm,
+                      borderRadius: AppTokens.rSm,
                       side: BorderSide(color: isSelected ? PawlyColors.black : PawlyColors.border),
                     ),
                     labelStyle: TextStyle(
@@ -102,7 +102,7 @@ class HomeScreen extends StatelessWidget {
                 }).toList(),
               ),
               const SizedBox(height: 12),
-              const Text('Energy Level', style: PawlyTypography.labelSmall),
+              const Text('Energy Level', style: PawlyTypography.eyebrow),
               const SizedBox(height: 6),
               Wrap(
                 spacing: 8,
@@ -114,7 +114,7 @@ class HomeScreen extends StatelessWidget {
                     selectedColor: PawlyColors.black,
                     backgroundColor: Colors.white,
                     shape: RoundedRectangleBorder(
-                      borderRadius: AppRadius.rSm,
+                      borderRadius: AppTokens.rSm,
                       side: BorderSide(color: isSelected ? PawlyColors.black : PawlyColors.border),
                     ),
                     labelStyle: TextStyle(
@@ -136,7 +136,7 @@ class HomeScreen extends StatelessWidget {
               const SizedBox(height: 18),
               PawlyButton(
                 text: 'Save Observation Note',
-                isFullWidth: true,
+                
                 onPressed: () {
                   repository.addSymptomNote(SymptomNote(
                     id: 'sym_${DateTime.now().millisecondsSinceEpoch}',
@@ -223,30 +223,30 @@ class HomeScreen extends StatelessWidget {
                             margin: const EdgeInsets.only(right: 8),
                             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                             decoration: BoxDecoration(
-                              color: PawlyColors.alertLight,
-                              borderRadius: AppRadius.rXs,
-                              border: Border.all(color: PawlyColors.alert),
+                              color: PawlyColors.border,
+                              borderRadius: AppTokens.rXs,
+                              border: Border.all(color: PawlyColors.error),
                             ),
                             child: const Row(
                               children: [
-                                Icon(Icons.warning_amber_rounded, size: 12, color: PawlyColors.alert),
+                                Icon(Icons.warning_amber_rounded, size: 12, color: PawlyColors.error),
                                 SizedBox(width: 4),
                                 Text(
                                   'LOST MODE',
-                                  style: TextStyle(fontSize: 10, fontWeight: FontWeight.w800, color: PawlyColors.alert),
+                                  style: TextStyle(fontSize: 10, fontWeight: FontWeight.w800, color: PawlyColors.error),
                                 ),
                               ],
                             ),
                           ),
                         IconButton(
-                          icon: const Icon(Icons.search_rounded, size: 22, color: PawlyColors.black),
+                          icon:  const Icon(Icons.search_rounded, size: 22, color: PawlyColors.black),
                           onPressed: onOpenSearch,
                           padding: EdgeInsets.zero,
                           constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
                         ),
                         const SizedBox(width: 6),
                         IconButton(
-                          icon: const Icon(Icons.calendar_month_outlined, size: 22, color: PawlyColors.black),
+                          icon:  const Icon(Icons.calendar_month_outlined, size: 22, color: PawlyColors.black),
                           onPressed: onOpenCalendar,
                           padding: EdgeInsets.zero,
                           constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
@@ -280,7 +280,7 @@ class HomeScreen extends StatelessWidget {
                     height: 260,
                     decoration: BoxDecoration(
                       color: PawlyColors.black,
-                      borderRadius: AppRadius.rLg,
+                      borderRadius: AppTokens.rLg,
                     ),
                     clipBehavior: Clip.antiAlias,
                     child: Stack(
@@ -291,7 +291,7 @@ class HomeScreen extends StatelessWidget {
                           activePet.imageUrl,
                           fit: BoxFit.cover,
                           errorBuilder: (_, __, ___) => Container(
-                            color: PawlyColors.softGrey,
+                            color: PawlyColors.border,
                             child: const Center(
                               child: Icon(Icons.pets, size: 48, color: PawlyColors.black),
                             ),
@@ -324,7 +324,7 @@ class HomeScreen extends StatelessWidget {
                             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                             decoration: BoxDecoration(
                               color: Colors.black.withOpacity(0.65),
-                              borderRadius: AppRadius.rXs,
+                              borderRadius: AppTokens.rXs,
                             ),
                             child: Text(
                               activePet.category.toUpperCase(),
@@ -346,7 +346,7 @@ class HomeScreen extends StatelessWidget {
                             padding: const EdgeInsets.all(6),
                             decoration: BoxDecoration(
                               color: Colors.black.withOpacity(0.65),
-                              borderRadius: AppRadius.rXs,
+                              borderRadius: AppTokens.rXs,
                             ),
                             child: const Icon(
                               Icons.arrow_outward_rounded,
@@ -390,7 +390,7 @@ class HomeScreen extends StatelessWidget {
                                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                                   decoration: BoxDecoration(
                                     color: Colors.white.withOpacity(0.18),
-                                    borderRadius: AppRadius.rXs,
+                                    borderRadius: AppTokens.rXs,
                                     border: Border.all(color: Colors.white24),
                                   ),
                                   child: Row(
@@ -482,7 +482,7 @@ class HomeScreen extends StatelessWidget {
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
                       color: Colors.white,
-                      borderRadius: AppRadius.rMd,
+                      borderRadius: AppTokens.rMd,
                       border: Border.all(color: PawlyColors.border),
                     ),
                     child: Row(
@@ -545,7 +545,7 @@ class HomeScreen extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   children: [
                     _ActionChip(
-                      icon: Icons.add,
+                      icon: Icons.add_circle_outline_rounded,
                       label: 'Add Care',
                       isPrimary: true,
                       onTap: onOpenAddCare,
@@ -591,7 +591,7 @@ class HomeScreen extends StatelessWidget {
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
                         color: Colors.white,
-                        borderRadius: AppRadius.rMd,
+                        borderRadius: AppTokens.rMd,
                         border: Border.all(color: PawlyColors.border, width: 1.0),
                       ),
                       child: Row(
@@ -619,7 +619,7 @@ class HomeScreen extends StatelessWidget {
                                   '${upcomingAppt.time} · ${upcomingAppt.clinic}',
                                   style: const TextStyle(
                                     fontSize: 12,
-                                    color: PawlyColors.warmGrey,
+                                    color: PawlyColors.secondary,
                                   ),
                                 ),
                               ],
@@ -668,7 +668,7 @@ class HomeScreen extends StatelessWidget {
                 child: Container(
                   decoration: BoxDecoration(
                     color: Colors.white,
-                    borderRadius: AppRadius.rMd,
+                    borderRadius: AppTokens.rMd,
                     border: Border.all(color: PawlyColors.border),
                   ),
                   child: Column(
@@ -679,14 +679,14 @@ class HomeScreen extends StatelessWidget {
                           leading: Container(
                             padding: const EdgeInsets.all(8),
                             decoration: BoxDecoration(
-                              color: PawlyColors.softGrey,
-                              borderRadius: AppRadius.rSm,
+                              color: PawlyColors.border,
+                              borderRadius: AppTokens.rSm,
                             ),
                             child: const Icon(Icons.monitor_weight_outlined, size: 18, color: PawlyColors.black),
                           ),
                           title: Text('Weight Check: ${recentWeight.weightKg} kg', style: PawlyTypography.titleSmall),
                           subtitle: Text('${recentWeight.date} · ${recentWeight.note}', style: PawlyTypography.caption),
-                          trailing: const Icon(Icons.chevron_right, size: 18, color: PawlyColors.midGrey),
+                          trailing: const Icon(Icons.chevron_right, size: 18, color: PawlyColors.tertiary),
                           onTap: onOpenWeight,
                         ),
 
@@ -697,7 +697,7 @@ class HomeScreen extends StatelessWidget {
                         ListTile(
                           contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 2),
                           leading: ClipRRect(
-                            borderRadius: AppRadius.rSm,
+                            borderRadius: AppTokens.rSm,
                             child: Image.network(
                               recentMemory.imageUrl,
                               width: 34,
@@ -706,14 +706,14 @@ class HomeScreen extends StatelessWidget {
                               errorBuilder: (_, __, ___) => Container(
                                 width: 34,
                                 height: 34,
-                                color: PawlyColors.softGrey,
+                                color: PawlyColors.border,
                                 child: const Icon(Icons.photo_outlined, size: 16),
                               ),
                             ),
                           ),
                           title: Text(recentMemory.title, style: PawlyTypography.titleSmall),
                           subtitle: Text('${recentMemory.date} · ${recentMemory.caption}', style: PawlyTypography.caption),
-                          trailing: const Icon(Icons.chevron_right, size: 18, color: PawlyColors.midGrey),
+                          trailing: const Icon(Icons.chevron_right, size: 18, color: PawlyColors.tertiary),
                           onTap: () => onOpenPetSpace(activePet.id),
                         ),
                     ],
@@ -749,7 +749,7 @@ class _ActionChip extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         decoration: BoxDecoration(
           color: isPrimary ? PawlyColors.black : Colors.white,
-          borderRadius: AppRadius.rSm,
+          borderRadius: AppTokens.rSm,
           border: Border.all(
             color: isPrimary ? PawlyColors.black : PawlyColors.border,
             width: 1.0,

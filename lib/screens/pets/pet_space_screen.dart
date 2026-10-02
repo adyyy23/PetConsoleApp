@@ -80,7 +80,7 @@ class _PetSpaceScreenState extends State<PetSpaceScreen> {
                 padding: const EdgeInsets.all(7),
                 decoration: BoxDecoration(
                   color: Colors.black.withOpacity(0.55),
-                  borderRadius: AppRadius.rSm,
+                  borderRadius: AppTokens.rSm,
                   border: Border.all(color: Colors.white24, width: 0.8),
                 ),
                 child: const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white, size: 16),
@@ -93,7 +93,7 @@ class _PetSpaceScreenState extends State<PetSpaceScreen> {
                   padding: const EdgeInsets.all(7),
                   decoration: BoxDecoration(
                     color: Colors.black.withOpacity(0.55),
-                    borderRadius: AppRadius.rSm,
+                    borderRadius: AppTokens.rSm,
                     border: Border.all(color: Colors.white24, width: 0.8),
                   ),
                   child: const Icon(Icons.shield_outlined, color: Colors.white, size: 18),
@@ -190,7 +190,7 @@ class _PetSpaceScreenState extends State<PetSpaceScreen> {
                       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                       decoration: BoxDecoration(
                         color: isSelected ? PawlyColors.black : Colors.white,
-                        borderRadius: AppRadius.rSm,
+                        borderRadius: AppTokens.rSm,
                         border: Border.all(
                           color: isSelected ? PawlyColors.black : PawlyColors.border,
                           width: 1.0,
@@ -255,8 +255,8 @@ class _PetSpaceScreenState extends State<PetSpaceScreen> {
                                       return Container(
                                         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                                         decoration: BoxDecoration(
-                                          color: PawlyColors.softGrey,
-                                          borderRadius: AppRadius.rSm,
+                                          color: PawlyColors.border,
+                                          borderRadius: AppTokens.rSm,
                                           border: Border.all(color: PawlyColors.border, width: 0.8),
                                         ),
                                         child: Text(
@@ -295,7 +295,7 @@ class _PetSpaceScreenState extends State<PetSpaceScreen> {
                                             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                                             decoration: BoxDecoration(
                                               color: PawlyColors.surfaceWarm,
-                                              borderRadius: AppRadius.rSm,
+                                              borderRadius: AppTokens.rSm,
                                               border: Border.all(color: PawlyColors.border, width: 0.8),
                                             ),
                                             child: Row(
@@ -324,18 +324,18 @@ class _PetSpaceScreenState extends State<PetSpaceScreen> {
                                       .map((item) => Container(
                                             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                                             decoration: BoxDecoration(
-                                              color: PawlyColors.alertLight,
-                                              borderRadius: AppRadius.rSm,
-                                              border: Border.all(color: PawlyColors.alert.withOpacity(0.3), width: 0.8),
+                                              color: PawlyColors.border,
+                                              borderRadius: AppTokens.rSm,
+                                              border: Border.all(color: PawlyColors.error.withOpacity(0.3), width: 0.8),
                                             ),
                                             child: Row(
                                               mainAxisSize: MainAxisSize.min,
                                               children: [
-                                                const Icon(Icons.thumb_down_alt_outlined, size: 13, color: PawlyColors.alert),
+                                                const Icon(Icons.thumb_down_alt_outlined, size: 13, color: PawlyColors.error),
                                                 const SizedBox(width: 6),
                                                 Text(
                                                   item.trim(),
-                                                  style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: PawlyColors.alert),
+                                                  style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: PawlyColors.error),
                                                 ),
                                               ],
                                             ),
@@ -360,7 +360,7 @@ class _PetSpaceScreenState extends State<PetSpaceScreen> {
                                     padding: const EdgeInsets.all(7),
                                     decoration: BoxDecoration(
                                       color: PawlyColors.black,
-                                      borderRadius: AppRadius.rSm,
+                                      borderRadius: AppTokens.rSm,
                                     ),
                                     child: const Icon(Icons.lightbulb_outline_rounded, color: Colors.white, size: 16),
                                   ),
@@ -449,7 +449,7 @@ class _PetSpaceScreenState extends State<PetSpaceScreen> {
                               Text('${pet.name}’s Journey', style: PawlyTypography.titleMedium),
                               Text(
                                 '${milestones.length} milestones',
-                                style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: PawlyColors.textMuted),
+                                style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: PawlyColors.tertiary),
                               ),
                             ],
                           ),
@@ -464,8 +464,8 @@ class _PetSpaceScreenState extends State<PetSpaceScreen> {
                                       Container(
                                         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                                         decoration: BoxDecoration(
-                                          color: PawlyColors.softGrey,
-                                          borderRadius: AppRadius.rSm,
+                                          color: PawlyColors.border,
+                                          borderRadius: AppTokens.rSm,
                                           border: Border.all(color: PawlyColors.border, width: 0.8),
                                         ),
                                         child: Text(
@@ -489,7 +489,7 @@ class _PetSpaceScreenState extends State<PetSpaceScreen> {
                                             const SizedBox(height: 2),
                                             Text(
                                               m.subtitle,
-                                              style: PawlyTypography.bodySmall,
+                                              style: PawlyTypography.bodyMedium,
                                             ),
                                             if (m.date.isNotEmpty) ...[
                                               const SizedBox(height: 4),
@@ -531,7 +531,7 @@ class _PetSpaceScreenState extends State<PetSpaceScreen> {
                           const SizedBox(height: 8),
                           if (routines.isEmpty)
                             EmptyStateView(
-                              icon: Icons.check_circle_outline,
+                              
                               title: 'No routines scheduled',
                               subtitle: 'Set up daily meals, walks, and medications.',
                               buttonLabel: 'Add Routine',
@@ -578,7 +578,7 @@ class _PetSpaceScreenState extends State<PetSpaceScreen> {
                                       Row(
                                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                         children: [
-                                          PawlyBadge(label: h.type),
+                                          StatusBadge(label: h.type),
                                           Text(h.date, style: PawlyTypography.caption),
                                         ],
                                       ),
@@ -623,11 +623,11 @@ class _PetSpaceScreenState extends State<PetSpaceScreen> {
                                           children: [
                                             Text(v.vaccineName, style: PawlyTypography.titleSmall),
                                             const SizedBox(height: 2),
-                                            Text('Next Due: ${v.nextDueDate} • ${v.clinic}', style: PawlyTypography.bodySmall),
+                                            Text('Next Due: ${v.nextDueDate} • ${v.clinic}', style: PawlyTypography.bodyMedium),
                                           ],
                                         ),
                                       ),
-                                      PawlyBadge(
+                                      StatusBadge(
                                         label: v.status == VaccineStatus.current ? 'Current' : 'Due Soon',
                                         variant: v.status == VaccineStatus.current ? PawlyBadgeVariant.slate : PawlyBadgeVariant.alert,
                                       ),
@@ -662,7 +662,7 @@ class _PetSpaceScreenState extends State<PetSpaceScreen> {
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
                                       ClipRRect(
-                                        borderRadius: const BorderRadius.vertical(top: Radius.circular(AppRadius.md)),
+                                        borderRadius: const BorderRadius.vertical(top: Radius.circular(AppTokens.md)),
                                         child: SizedBox(
                                           height: 180,
                                           width: double.infinity,
@@ -678,7 +678,7 @@ class _PetSpaceScreenState extends State<PetSpaceScreen> {
                                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                               children: [
                                                 Text(m.title, style: PawlyTypography.titleSmall),
-                                                PawlyBadge(label: m.milestoneType),
+                                                StatusBadge(label: m.milestoneType),
                                               ],
                                             ),
                                             const SizedBox(height: 4),
@@ -720,8 +720,8 @@ class _PetSpaceScreenState extends State<PetSpaceScreen> {
                                       Container(
                                         padding: const EdgeInsets.all(8),
                                         decoration: BoxDecoration(
-                                          color: PawlyColors.softGrey,
-                                          borderRadius: AppRadius.rSm,
+                                          color: PawlyColors.border,
+                                          borderRadius: AppTokens.rSm,
                                         ),
                                         child: const Icon(Icons.picture_as_pdf_outlined, color: PawlyColors.black, size: 20),
                                       ),
@@ -731,7 +731,7 @@ class _PetSpaceScreenState extends State<PetSpaceScreen> {
                                           crossAxisAlignment: CrossAxisAlignment.start,
                                           children: [
                                             Text(d.title, style: PawlyTypography.titleSmall),
-                                            Text('${d.category} • ${d.fileType}', style: PawlyTypography.bodySmall),
+                                            Text('${d.category} • ${d.fileType}', style: PawlyTypography.bodyMedium),
                                           ],
                                         ),
                                       ),
@@ -775,7 +775,7 @@ class _InfoRow extends StatelessWidget {
             style: TextStyle(
               fontSize: 13,
               fontWeight: FontWeight.w600,
-              color: isAlert ? PawlyColors.alert : PawlyColors.black,
+              color: isAlert ? PawlyColors.error : PawlyColors.black,
             ),
           ),
         ],

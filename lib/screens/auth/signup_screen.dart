@@ -57,9 +57,9 @@ class _SignupScreenState extends State<SignupScreen> {
                   filled: true,
                   fillColor: Colors.white,
                   contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-                  border: OutlineInputBorder(borderRadius: AppRadius.rMd, borderSide: const BorderSide(color: PawlyColors.border)),
-                  enabledBorder: OutlineInputBorder(borderRadius: AppRadius.rMd, borderSide: const BorderSide(color: PawlyColors.border)),
-                  focusedBorder: OutlineInputBorder(borderRadius: AppRadius.rMd, borderSide: const BorderSide(color: PawlyColors.black, width: 1.5)),
+                  border: OutlineInputBorder(borderRadius: AppTokens.rMd, borderSide: const BorderSide(color: PawlyColors.border)),
+                  enabledBorder: OutlineInputBorder(borderRadius: AppTokens.rMd, borderSide: const BorderSide(color: PawlyColors.border)),
+                  focusedBorder: OutlineInputBorder(borderRadius: AppTokens.rMd, borderSide: const BorderSide(color: PawlyColors.black, width: 1.5)),
                 ),
               ),
 
@@ -76,9 +76,9 @@ class _SignupScreenState extends State<SignupScreen> {
                   filled: true,
                   fillColor: Colors.white,
                   contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-                  border: OutlineInputBorder(borderRadius: AppRadius.rMd, borderSide: const BorderSide(color: PawlyColors.border)),
-                  enabledBorder: OutlineInputBorder(borderRadius: AppRadius.rMd, borderSide: const BorderSide(color: PawlyColors.border)),
-                  focusedBorder: OutlineInputBorder(borderRadius: AppRadius.rMd, borderSide: const BorderSide(color: PawlyColors.black, width: 1.5)),
+                  border: OutlineInputBorder(borderRadius: AppTokens.rMd, borderSide: const BorderSide(color: PawlyColors.border)),
+                  enabledBorder: OutlineInputBorder(borderRadius: AppTokens.rMd, borderSide: const BorderSide(color: PawlyColors.border)),
+                  focusedBorder: OutlineInputBorder(borderRadius: AppTokens.rMd, borderSide: const BorderSide(color: PawlyColors.black, width: 1.5)),
                 ),
               ),
 
@@ -95,19 +95,18 @@ class _SignupScreenState extends State<SignupScreen> {
                   filled: true,
                   fillColor: Colors.white,
                   contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-                  border: OutlineInputBorder(borderRadius: AppRadius.rMd, borderSide: const BorderSide(color: PawlyColors.border)),
-                  enabledBorder: OutlineInputBorder(borderRadius: AppRadius.rMd, borderSide: const BorderSide(color: PawlyColors.border)),
-                  focusedBorder: OutlineInputBorder(borderRadius: AppRadius.rMd, borderSide: const BorderSide(color: PawlyColors.black, width: 1.5)),
+                  border: OutlineInputBorder(borderRadius: AppTokens.rMd, borderSide: const BorderSide(color: PawlyColors.border)),
+                  enabledBorder: OutlineInputBorder(borderRadius: AppTokens.rMd, borderSide: const BorderSide(color: PawlyColors.border)),
+                  focusedBorder: OutlineInputBorder(borderRadius: AppTokens.rMd, borderSide: const BorderSide(color: PawlyColors.black, width: 1.5)),
                 ),
               ),
 
               const SizedBox(height: 28),
 
-              PawlyButton(
-                label: 'Create Account',
-                isFullWidth: true,
+              PawlyButton(text: 'Create Account',
+                
                 onPressed: widget.onSignupSuccess,
-                variant: PawlyButtonVariant.primary,
+                
               ),
 
               const SizedBox(height: 24),

@@ -36,7 +36,7 @@ class MemoriesScreen extends StatelessWidget {
           appBar: PawlyAppBar(
             title: 'Memories & Milestones',
             trailing: IconButton(
-              icon: const Icon(Icons.add_photo_alternate_rounded, color: PawlyColors.black, size: 20),
+              icon:  const Icon(Icons.add_photo_alternate_rounded, color: PawlyColors.black, size: 20),
               onPressed: () => _showAddMemoryModal(context),
             ),
           ),
@@ -59,7 +59,7 @@ class MemoriesScreen extends StatelessWidget {
                 SliverFillRemaining(
                   hasScrollBody: false,
                   child: EmptyStateView(
-                    icon: Icons.photo_library_outlined,
+                    
                     title: 'No Memories Captured',
                     subtitle: 'Save adoption milestones, puppyhood memories, and adventures with ${pet?.name ?? "your pet"}.',
                     actionLabel: 'Capture First Memory',
@@ -100,7 +100,7 @@ class _MemoryCard extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: PawlyColors.surface,
-        borderRadius: AppRadius.rMd,
+        borderRadius: AppTokens.rMd,
         border: Border.all(color: PawlyColors.border),
       ),
       clipBehavior: Clip.antiAlias,
@@ -118,7 +118,7 @@ class _MemoryCard extends StatelessWidget {
                   errorBuilder: (context, error, stackTrace) => Container(
                     color: PawlyColors.border,
                     child: const Center(
-                      child: Icon(Icons.broken_image_rounded, color: PawlyColors.textMuted, size: 40),
+                      child: Icon(Icons.broken_image_rounded, color: PawlyColors.tertiary, size: 40),
                     ),
                   ),
                 ),
@@ -134,7 +134,7 @@ class _MemoryCard extends StatelessWidget {
                   ),
                   child: Text(
                     memory.milestoneType,
-                    style: PawlyTypography.labelSmall.copyWith(
+                    style: PawlyTypography.eyebrow.copyWith(
                       color: Colors.white,
                       fontWeight: FontWeight.w700,
                     ),
@@ -164,8 +164,8 @@ class _MemoryCard extends StatelessWidget {
                     ),
                     Text(
                       memory.date,
-                      style: PawlyTypography.labelSmall.copyWith(
-                        color: PawlyColors.textSecondary,
+                      style: PawlyTypography.eyebrow.copyWith(
+                        color: PawlyColors.secondary,
                       ),
                     ),
                   ],
@@ -175,7 +175,7 @@ class _MemoryCard extends StatelessWidget {
                   Text(
                     memory.caption,
                     style: PawlyTypography.bodyMedium.copyWith(
-                      color: PawlyColors.textSecondary,
+                      color: PawlyColors.secondary,
                       height: 1.4,
                     ),
                   ),
@@ -281,8 +281,8 @@ class _AddMemorySheetState extends State<_AddMemorySheet> {
             // Select image preset
             Text(
               'SELECT PHOTO',
-              style: PawlyTypography.labelSmall.copyWith(
-                color: PawlyColors.textSecondary,
+              style: PawlyTypography.eyebrow.copyWith(
+                color: PawlyColors.secondary,
                 fontWeight: FontWeight.w700,
               ),
             ),
@@ -303,7 +303,7 @@ class _AddMemorySheetState extends State<_AddMemorySheet> {
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(
-                          color: isSelected ? PawlyColors.forest : Colors.transparent,
+                          color: isSelected ? PawlyColors.black : Colors.transparent,
                           width: 2.5,
                         ),
                         image: DecorationImage(image: NetworkImage(url), fit: BoxFit.cover),
@@ -332,10 +332,10 @@ class _AddMemorySheetState extends State<_AddMemorySheet> {
                 return ChoiceChip(
                   label: Text(m),
                   selected: isSelected,
-                  selectedColor: PawlyColors.forest.withOpacity(0.15),
+                  selectedColor: PawlyColors.black.withOpacity(0.15),
                   backgroundColor: PawlyColors.background,
-                  labelStyle: PawlyTypography.labelSmall.copyWith(
-                    color: isSelected ? PawlyColors.forest : PawlyColors.textPrimary,
+                  labelStyle: PawlyTypography.eyebrow.copyWith(
+                    color: isSelected ? PawlyColors.black : PawlyColors.textPrimary,
                     fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
                   ),
                   onSelected: (val) {
@@ -358,7 +358,7 @@ class _AddMemorySheetState extends State<_AddMemorySheet> {
 
             PawlyButton(
               text: 'Save to Timeline',
-              icon: Icons.check_rounded,
+              
               onPressed: _save,
             ),
           ],

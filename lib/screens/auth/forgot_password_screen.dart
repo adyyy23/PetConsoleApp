@@ -71,10 +71,9 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                   ),
                 ),
                 const SizedBox(height: 24),
-                PawlyButton(
-                  label: 'Back to Sign In',
-                  isFullWidth: true,
-                  variant: PawlyButtonVariant.primary,
+                PawlyButton(text: 'Back to Sign In',
+                  
+                  
                   onPressed: widget.onBackToLogin,
                 ),
               ] else ...[
@@ -90,16 +89,15 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                     filled: true,
                     fillColor: Colors.white,
                     contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-                    border: OutlineInputBorder(borderRadius: AppRadius.rMd, borderSide: const BorderSide(color: PawlyColors.border)),
-                    enabledBorder: OutlineInputBorder(borderRadius: AppRadius.rMd, borderSide: const BorderSide(color: PawlyColors.border)),
-                    focusedBorder: OutlineInputBorder(borderRadius: AppRadius.rMd, borderSide: const BorderSide(color: PawlyColors.black, width: 1.5)),
+                    border: OutlineInputBorder(borderRadius: AppTokens.rMd, borderSide: const BorderSide(color: PawlyColors.border)),
+                    enabledBorder: OutlineInputBorder(borderRadius: AppTokens.rMd, borderSide: const BorderSide(color: PawlyColors.border)),
+                    focusedBorder: OutlineInputBorder(borderRadius: AppTokens.rMd, borderSide: const BorderSide(color: PawlyColors.black, width: 1.5)),
                   ),
                 ),
                 const SizedBox(height: 24),
-                PawlyButton(
-                  label: 'Send Recovery Email',
-                  isFullWidth: true,
-                  variant: PawlyButtonVariant.primary,
+                PawlyButton(text: 'Send Recovery Email',
+                  
+                  
                   onPressed: () {
                     if (_emailController.text.trim().isNotEmpty) {
                       setState(() => _sent = true);

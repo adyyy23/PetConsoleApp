@@ -89,7 +89,7 @@ class _UniversalSearchScreenState extends State<UniversalSearchScreen> {
               child: Container(
                 decoration: BoxDecoration(
                   color: Colors.white,
-                  borderRadius: AppRadius.rMd,
+                  borderRadius: AppTokens.rMd,
                   border: Border.all(color: PawlyColors.border, width: 1.0),
                 ),
                 child: TextField(
@@ -102,7 +102,7 @@ class _UniversalSearchScreenState extends State<UniversalSearchScreen> {
                     prefixIcon: const Icon(Icons.search_rounded, color: PawlyColors.black, size: 20),
                     suffixIcon: _searchController.text.isNotEmpty
                         ? IconButton(
-                            icon: const Icon(Icons.clear_rounded, size: 18, color: PawlyColors.textMuted),
+                            icon:  const Icon(Icons.clear_rounded, size: 18, color: PawlyColors.tertiary),
                             onPressed: () => _searchController.clear(),
                           )
                         : null,
@@ -130,7 +130,7 @@ class _UniversalSearchScreenState extends State<UniversalSearchScreen> {
                       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                       decoration: BoxDecoration(
                         color: isSelected ? PawlyColors.black : Colors.white,
-                        borderRadius: AppRadius.rSm,
+                        borderRadius: AppTokens.rSm,
                         border: Border.all(
                           color: isSelected ? PawlyColors.black : PawlyColors.border,
                           width: 1.0,
@@ -165,8 +165,8 @@ class _UniversalSearchScreenState extends State<UniversalSearchScreen> {
                             Container(
                               padding: const EdgeInsets.all(14),
                               decoration: BoxDecoration(
-                                color: PawlyColors.softGrey,
-                                borderRadius: AppRadius.rMd,
+                                color: PawlyColors.border,
+                                borderRadius: AppTokens.rMd,
                               ),
                               child: const Icon(Icons.search_rounded, size: 32, color: PawlyColors.black),
                             ),
@@ -192,7 +192,7 @@ class _UniversalSearchScreenState extends State<UniversalSearchScreen> {
                             child: Column(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                const Icon(Icons.search_off_rounded, size: 36, color: PawlyColors.textMuted),
+                                const Icon(Icons.search_off_rounded, size: 36, color: PawlyColors.tertiary),
                                 const SizedBox(height: 12),
                                 Text(
                                   'No results for "${_searchController.text}"',
@@ -201,7 +201,7 @@ class _UniversalSearchScreenState extends State<UniversalSearchScreen> {
                                 const SizedBox(height: 4),
                                 const Text(
                                   'Try checking your spelling or choosing another category.',
-                                  style: PawlyTypography.bodySmall,
+                                  style: PawlyTypography.bodyMedium,
                                 ),
                               ],
                             ),
@@ -223,8 +223,8 @@ class _UniversalSearchScreenState extends State<UniversalSearchScreen> {
                                     width: 36,
                                     height: 36,
                                     decoration: BoxDecoration(
-                                      color: PawlyColors.softGrey,
-                                      borderRadius: AppRadius.rSm,
+                                      color: PawlyColors.border,
+                                      borderRadius: AppTokens.rSm,
                                     ),
                                     child: Icon(icon, color: PawlyColors.black, size: 18),
                                   ),
@@ -244,7 +244,7 @@ class _UniversalSearchScreenState extends State<UniversalSearchScreen> {
                                                 style: PawlyTypography.titleSmall,
                                               ),
                                             ),
-                                            PawlyBadge(label: item.category),
+                                            StatusBadge(label: item.category),
                                           ],
                                         ),
                                         const SizedBox(height: 2),
@@ -252,7 +252,7 @@ class _UniversalSearchScreenState extends State<UniversalSearchScreen> {
                                           item.subtitle,
                                           maxLines: 1,
                                           overflow: TextOverflow.ellipsis,
-                                          style: PawlyTypography.bodySmall,
+                                          style: PawlyTypography.bodyMedium,
                                         ),
                                         if (item.date.isNotEmpty) ...[
                                           const SizedBox(height: 2),

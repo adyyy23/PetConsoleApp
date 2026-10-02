@@ -87,10 +87,9 @@ class MedicationScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 24),
-            PawlyButton(
-              label: 'Save Medication',
-              isFullWidth: true,
-              variant: PawlyButtonVariant.primary,
+            PawlyButton(text: 'Save Medication',
+              
+              
               onPressed: () {
                 final name = nameController.text.trim();
                 if (name.isNotEmpty) {
@@ -121,16 +120,16 @@ class MedicationScreen extends StatelessWidget {
     final medications = repository.activePetMedications;
 
     return Scaffold(
-      backgroundColor: PawlyColors.creamBg,
+      backgroundColor: PawlyColors.background,
       appBar: AppBar(
         title: Text('${pet.name}’s Medications'),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_rounded),
+          icon:  const Icon(Icons.arrow_back_rounded),
           onPressed: () => Navigator.of(context).pop(),
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.add_rounded),
+            icon:  const Icon(Icons.add_rounded),
             onPressed: () => _openAddMedicationDialog(context),
           ),
         ],
@@ -141,12 +140,12 @@ class MedicationScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text('ACTIVE MEDICATIONS', style: PawlyTypography.labelSmall),
+              const Text('ACTIVE MEDICATIONS', style: PawlyTypography.eyebrow),
               const SizedBox(height: 12),
 
               if (medications.isEmpty)
                 EmptyStateView(
-                  icon: Icons.medication_outlined,
+                  
                   title: 'No active prescriptions',
                   subtitle: 'Track allergy treatments, antibiotics, or chronic condition pills.',
                   buttonLabel: 'Add Prescription',
@@ -168,13 +167,13 @@ class MedicationScreen extends StatelessWidget {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text(m.name, style: PawlyTypography.titleMedium),
-                              const PawlyBadge(label: 'Active', variant: PawlyBadgeVariant.sage),
+                              const StatusBadge(label: 'Active', ),
                             ],
                           ),
                           const SizedBox(height: 6),
                           Text(
                             'Dosage: ${m.dosage} • ${m.frequency}',
-                            style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: PawlyColors.forest),
+                            style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: PawlyColors.black),
                           ),
                           if (m.instructions.isNotEmpty) ...[
                             const SizedBox(height: 6),
@@ -184,8 +183,8 @@ class MedicationScreen extends StatelessWidget {
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Text('Started: ${m.startDate}', style: const TextStyle(fontSize: 11, color: PawlyColors.mutedGrey)),
-                              Text('Ends: ${m.endDate}', style: const TextStyle(fontSize: 11, color: PawlyColors.mutedGrey)),
+                              Text('Started: ${m.startDate}', style: const TextStyle(fontSize: 11, color: PawlyColors.tertiary)),
+                              Text('Ends: ${m.endDate}', style: const TextStyle(fontSize: 11, color: PawlyColors.tertiary)),
                             ],
                           ),
                         ],
@@ -194,11 +193,10 @@ class MedicationScreen extends StatelessWidget {
 
               const SizedBox(height: 20),
 
-              PawlyButton(
-                label: 'Add Medication Prescription',
-                icon: Icons.add,
-                isFullWidth: true,
-                variant: PawlyButtonVariant.primary,
+              PawlyButton(text: 'Add Medication Prescription',
+                
+                
+                
                 onPressed: () => _openAddMedicationDialog(context),
               ),
               const SizedBox(height: 24),

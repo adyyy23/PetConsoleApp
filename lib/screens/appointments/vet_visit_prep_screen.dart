@@ -57,7 +57,7 @@ class _VetVisitPrepScreenState extends State<VetVisitPrepScreen> {
             backgroundColor: PawlyColors.surface,
             elevation: 0,
             leading: IconButton(
-              icon: const Icon(Icons.arrow_back_ios_new_rounded, color: PawlyColors.textPrimary, size: 20),
+              icon:  const Icon(Icons.arrow_back_ios_new_rounded, color: PawlyColors.textPrimary, size: 20),
               onPressed: () => Navigator.pop(context),
             ),
             title: Text(
@@ -86,14 +86,14 @@ class _VetVisitPrepScreenState extends State<VetVisitPrepScreen> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          PawlyBadge(
+                          StatusBadge(
                             label: '${widget.appointment.date} • ${widget.appointment.time}',
                             backgroundColor: PawlyColors.warmHoney.withOpacity(0.25),
                             textColor: PawlyColors.warmHoney,
                           ),
                           Text(
                             '$completedCount of ${items.length} Ready',
-                            style: PawlyTypography.labelSmall.copyWith(color: Colors.white70),
+                            style: PawlyTypography.eyebrow.copyWith(color: Colors.white70),
                           ),
                         ],
                       ),
@@ -107,7 +107,7 @@ class _VetVisitPrepScreenState extends State<VetVisitPrepScreen> {
                       ),
                       Text(
                         '${widget.appointment.clinic} • ${widget.appointment.vetName}',
-                        style: PawlyTypography.bodySmall.copyWith(color: Colors.white70),
+                        style: PawlyTypography.bodyMedium.copyWith(color: Colors.white70),
                       ),
                       const SizedBox(height: 16),
                       // Progress bar
@@ -117,7 +117,7 @@ class _VetVisitPrepScreenState extends State<VetVisitPrepScreen> {
                           value: progress,
                           minHeight: 6,
                           backgroundColor: Colors.white.withOpacity(0.15),
-                          valueColor: const AlwaysStoppedAnimation<Color>(PawlyColors.forestLight),
+                          valueColor: const AlwaysStoppedAnimation<Color>(PawlyColors.surfaceWarm),
                         ),
                       ),
                     ],
@@ -129,7 +129,7 @@ class _VetVisitPrepScreenState extends State<VetVisitPrepScreen> {
                 Text(
                   'PRE-CONSULTATION CHECKLIST',
                   style: PawlyTypography.labelMedium.copyWith(
-                    color: PawlyColors.textSecondary,
+                    color: PawlyColors.secondary,
                     fontWeight: FontWeight.w700,
                     letterSpacing: 1.1,
                   ),
@@ -144,19 +144,19 @@ class _VetVisitPrepScreenState extends State<VetVisitPrepScreen> {
                       color: PawlyColors.surface,
                       borderRadius: BorderRadius.circular(16),
                       border: Border.all(
-                        color: item.isChecked ? PawlyColors.forest.withOpacity(0.2) : PawlyColors.border,
+                        color: item.isChecked ? PawlyColors.black.withOpacity(0.2) : PawlyColors.border,
                       ),
                     ),
                     child: CheckboxListTile(
                       value: item.isChecked,
                       onChanged: (_) => widget.repository.toggleVetPrepItem(item.id),
-                      activeColor: PawlyColors.forest,
+                      activeColor: PawlyColors.black,
                       contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
                       title: Text(
                         item.text,
                         style: PawlyTypography.bodyMedium.copyWith(
                           decoration: item.isChecked ? TextDecoration.lineThrough : null,
-                          color: item.isChecked ? PawlyColors.textMuted : PawlyColors.textPrimary,
+                          color: item.isChecked ? PawlyColors.tertiary : PawlyColors.textPrimary,
                           fontWeight: item.isChecked ? FontWeight.normal : FontWeight.w500,
                         ),
                       ),
@@ -183,7 +183,7 @@ class _VetVisitPrepScreenState extends State<VetVisitPrepScreen> {
                     const SizedBox(width: 10),
                     IconButton(
                       style: IconButton.styleFrom(
-                        backgroundColor: PawlyColors.forest,
+                        backgroundColor: PawlyColors.black,
                         foregroundColor: Colors.white,
                         padding: const EdgeInsets.all(14),
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
@@ -222,7 +222,7 @@ class _VetVisitPrepScreenState extends State<VetVisitPrepScreen> {
                       const SizedBox(height: 8),
                       Text(
                         'Take short video clips of any unusual behavior, cough, or gait at home. Pets often act adrenaline-energized at the clinic and mask subtle symptoms.',
-                        style: PawlyTypography.bodySmall.copyWith(
+                        style: PawlyTypography.bodyMedium.copyWith(
                           color: PawlyColors.deepEspresso.withOpacity(0.8),
                           height: 1.45,
                         ),

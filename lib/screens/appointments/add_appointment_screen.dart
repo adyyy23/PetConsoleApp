@@ -99,7 +99,7 @@ class _AddAppointmentScreenState extends State<AddAppointmentScreen> {
         backgroundColor: PawlyColors.surface,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new_rounded, color: PawlyColors.textPrimary, size: 20),
+          icon:  const Icon(Icons.arrow_back_ios_new_rounded, color: PawlyColors.textPrimary, size: 20),
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
@@ -136,7 +136,7 @@ class _AddAppointmentScreenState extends State<AddAppointmentScreen> {
                       ),
                       Text(
                         '${pet?.breed ?? ""} • ${pet?.species ?? ""}',
-                        style: PawlyTypography.bodySmall.copyWith(color: PawlyColors.textSecondary),
+                        style: PawlyTypography.bodyMedium.copyWith(color: PawlyColors.secondary),
                       ),
                     ],
                   ),
@@ -149,7 +149,7 @@ class _AddAppointmentScreenState extends State<AddAppointmentScreen> {
             Text(
               'REASON FOR VISIT',
               style: PawlyTypography.labelMedium.copyWith(
-                color: PawlyColors.textSecondary,
+                color: PawlyColors.secondary,
                 fontWeight: FontWeight.w700,
                 letterSpacing: 1.1,
               ),
@@ -163,10 +163,10 @@ class _AddAppointmentScreenState extends State<AddAppointmentScreen> {
                 return ChoiceChip(
                   label: Text(p),
                   selected: isSelected,
-                  selectedColor: PawlyColors.forest.withOpacity(0.15),
+                  selectedColor: PawlyColors.black.withOpacity(0.15),
                   backgroundColor: PawlyColors.surface,
-                  labelStyle: PawlyTypography.labelSmall.copyWith(
-                    color: isSelected ? PawlyColors.forest : PawlyColors.textPrimary,
+                  labelStyle: PawlyTypography.eyebrow.copyWith(
+                    color: isSelected ? PawlyColors.black : PawlyColors.textPrimary,
                     fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
                   ),
                   onSelected: (val) {
@@ -192,7 +192,7 @@ class _AddAppointmentScreenState extends State<AddAppointmentScreen> {
             Text(
               'DATE & TIME',
               style: PawlyTypography.labelMedium.copyWith(
-                color: PawlyColors.textSecondary,
+                color: PawlyColors.secondary,
                 fontWeight: FontWeight.w700,
                 letterSpacing: 1.1,
               ),
@@ -223,7 +223,7 @@ class _AddAppointmentScreenState extends State<AddAppointmentScreen> {
                       ),
                       child: Row(
                         children: [
-                          const Icon(Icons.calendar_month_rounded, color: PawlyColors.forest, size: 20),
+                          const Icon(Icons.calendar_month_rounded, color: PawlyColors.black, size: 20),
                           const SizedBox(width: 10),
                           Text(
                             '${_selectedDate.year}-${_selectedDate.month.toString().padLeft(2, '0')}-${_selectedDate.day.toString().padLeft(2, '0')}',
@@ -256,7 +256,7 @@ class _AddAppointmentScreenState extends State<AddAppointmentScreen> {
                       ),
                       child: Row(
                         children: [
-                          const Icon(Icons.access_time_rounded, color: PawlyColors.forest, size: 20),
+                          const Icon(Icons.access_time_rounded, color: PawlyColors.black, size: 20),
                           const SizedBox(width: 10),
                           Text(
                             _selectedTime.format(context),
@@ -275,7 +275,7 @@ class _AddAppointmentScreenState extends State<AddAppointmentScreen> {
             Text(
               'CLINIC & VETERINARIAN',
               style: PawlyTypography.labelMedium.copyWith(
-                color: PawlyColors.textSecondary,
+                color: PawlyColors.secondary,
                 fontWeight: FontWeight.w700,
                 letterSpacing: 1.1,
               ),
@@ -310,7 +310,7 @@ class _AddAppointmentScreenState extends State<AddAppointmentScreen> {
 
             PawlyButton(
               text: 'Save Appointment',
-              icon: Icons.check_circle_rounded,
+              
               onPressed: _submit,
             ),
             const SizedBox(height: 40),

@@ -1,46 +1,42 @@
 import 'package:flutter/material.dart';
 
-/// Centralized border radius design tokens (strictly 4px – 12px for regular UI).
-class AppRadius {
-  AppRadius._();
-
-  /// 4px: micro indicators, tiny badges
-  static const double xs = 4.0;
-
-  /// 6px: small buttons, input fields, control chips
-  static const double sm = 6.0;
-
-  /// 8px: standard cards, list containers, tiles
-  static const double md = 8.0;
-
-  /// 10px: large photo cards, featured hero containers
-  static const double lg = 10.0;
-
-  /// 12px: bottom sheets, modal dialogs (maximum allowable)
-  static const double xl = 12.0;
-
-  /// 999px: pill shape (reserved strictly for small filter chips and status tags)
+class AppTokens {
+  static const double r6 = 6.0;
+  static const double r10 = 10.0;
+  static const double r14 = 14.0;
+  static const double r18 = 18.0; // DEFAULT card
+  static const double r24 = 24.0; // large photo
   static const double pill = 999.0;
 
-  static BorderRadius get rXs => BorderRadius.circular(xs);
-  static BorderRadius get rSm => BorderRadius.circular(sm);
-  static BorderRadius get rMd => BorderRadius.circular(md);
-  static BorderRadius get rLg => BorderRadius.circular(lg);
-  static BorderRadius get rXl => BorderRadius.circular(xl);
-  static BorderRadius get rPill => BorderRadius.circular(pill);
+  // Short const alias numbers (usable in const expressions)
+  static const double xs = 6.0;
+  static const double sm = 10.0;
+  static const double md = 14.0;
+  static const double lg = 18.0;
+  static const double xl = 24.0;
+
+  // Named BorderRadius shortcuts
+  static BorderRadius rXs = BorderRadius.circular(6);
+  static BorderRadius rSm = BorderRadius.circular(10);
+  static BorderRadius rMd = BorderRadius.circular(14);
+  static BorderRadius rLg = BorderRadius.circular(18);
+  static BorderRadius rXl = BorderRadius.circular(24);
+  static BorderRadius rPill = BorderRadius.circular(999);
 }
 
-/// Standardized spacing grid tokens.
-class AppSpacing {
-  AppSpacing._();
+/// Backward-compatible alias — older screens reference AppRadius.*
+class AppRadius {
+  static const double xs = 6.0;
+  static const double sm = 10.0;
+  static const double md = 14.0;
+  static const double lg = 18.0;
+  static const double xl = 24.0;
+  static const double pill = 999.0;
 
-  static const double s4 = 4.0;
-  static const double s8 = 8.0;
-  static const double s12 = 12.0;
-  static const double s16 = 16.0;
-  static const double s20 = 20.0;
-  static const double s24 = 24.0;
-  static const double s32 = 32.0;
-  static const double s40 = 40.0;
-  static const double s48 = 48.0;
+  static BorderRadius rXs = BorderRadius.circular(6);
+  static BorderRadius rSm = BorderRadius.circular(10);
+  static BorderRadius rMd = BorderRadius.circular(14);
+  static BorderRadius rLg = BorderRadius.circular(18);
+  static BorderRadius rXl = BorderRadius.circular(24);
+  static BorderRadius rPill = BorderRadius.circular(999);
 }

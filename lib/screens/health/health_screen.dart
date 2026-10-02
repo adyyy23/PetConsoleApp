@@ -37,7 +37,7 @@ class HealthScreen extends StatelessWidget {
         builder: (ctx, setModalState) => Container(
           decoration: const BoxDecoration(
             color: PawlyColors.surface,
-            borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadius.xl)),
+            borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
           ),
           padding: EdgeInsets.fromLTRB(20, 16, 20, MediaQuery.of(ctx).viewInsets.bottom + 24),
           child: Column(
@@ -72,7 +72,7 @@ class HealthScreen extends StatelessWidget {
                       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                       decoration: BoxDecoration(
                         color: isSelected ? PawlyColors.black : Colors.white,
-                        borderRadius: AppRadius.rSm,
+                        borderRadius: AppTokens.rSm,
                         border: Border.all(
                           color: isSelected ? PawlyColors.black : PawlyColors.border,
                           width: 1.0,
@@ -103,7 +103,7 @@ class HealthScreen extends StatelessWidget {
                       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                       decoration: BoxDecoration(
                         color: isSelected ? PawlyColors.black : Colors.white,
-                        borderRadius: AppRadius.rSm,
+                        borderRadius: AppTokens.rSm,
                         border: Border.all(
                           color: isSelected ? PawlyColors.black : PawlyColors.border,
                           width: 1.0,
@@ -131,15 +131,15 @@ class HealthScreen extends StatelessWidget {
                   filled: true,
                   fillColor: PawlyColors.surfaceWarm,
                   border: OutlineInputBorder(
-                    borderRadius: AppRadius.rMd,
+                    borderRadius: AppTokens.rMd,
                     borderSide: const BorderSide(color: PawlyColors.border),
                   ),
                   enabledBorder: OutlineInputBorder(
-                    borderRadius: AppRadius.rMd,
+                    borderRadius: AppTokens.rMd,
                     borderSide: const BorderSide(color: PawlyColors.border),
                   ),
                   focusedBorder: OutlineInputBorder(
-                    borderRadius: AppRadius.rMd,
+                    borderRadius: AppTokens.rMd,
                     borderSide: const BorderSide(color: PawlyColors.black, width: 1.5),
                   ),
                 ),
@@ -191,18 +191,20 @@ class HealthScreen extends StatelessWidget {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text('MEDICAL & WELLNESS • ${activePet.name.toUpperCase()}', style: PawlyTypography.eyebrow),
-                        const SizedBox(height: 2),
-                        Text('${activePet.name}’s Health Story', style: PawlyTypography.displayMedium),
-                      ],
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('MEDICAL & WELLNESS • ${activePet.name.toUpperCase()}', style: PawlyTypography.eyebrow, overflow: TextOverflow.ellipsis),
+                          const SizedBox(height: 2),
+                          Text('${activePet.name}’s Health Story', style: PawlyTypography.displayMedium, overflow: TextOverflow.ellipsis),
+                        ],
+                      ),
                     ),
+                    const SizedBox(width: 8),
                     PawlyButton(
                       text: '+ Log Event',
                       isSmall: true,
-                      variant: PawlyButtonVariant.primary,
                       onPressed: onOpenAddHealthEvent,
                     ),
                   ],
@@ -252,10 +254,12 @@ class HealthScreen extends StatelessWidget {
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(20, 4, 20, 8),
                 child: SectionHeader(
+                  eyebrow: 'WELLNESS JOURNAL',
                   title: 'Daily Observations & Symptoms',
-                  subtitle: 'Owner wellness notes & logs',
-                  actionText: '+ Log Note',
-                  onAction: () => _showAddObservationSheet(context),
+                  action: TextButton(
+                    onPressed: () => _showAddObservationSheet(context),
+                    child: const Text('+ Log Note', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: PawlyColors.black)),
+                  ),
                 ),
               ),
             ),
@@ -292,8 +296,8 @@ class HealthScreen extends StatelessWidget {
                                 Container(
                                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                                   decoration: BoxDecoration(
-                                    color: PawlyColors.softGrey,
-                                    borderRadius: AppRadius.rSm,
+                                    color: PawlyColors.border,
+                                    borderRadius: AppTokens.rSm,
                                     border: Border.all(color: PawlyColors.border, width: 0.8),
                                   ),
                                   child: Text(
@@ -336,7 +340,7 @@ class HealthScreen extends StatelessWidget {
             if (events.isEmpty)
               SliverFillRemaining(
                 child: EmptyStateView(
-                  icon: Icons.favorite_border,
+                  
                   title: 'No health records yet',
                   subtitle: 'Keep a clean medical history of checkups, vaccines, and dosages.',
                   buttonLabel: 'Record First Event',
@@ -360,7 +364,7 @@ class HealthScreen extends StatelessWidget {
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
-                                  PawlyBadge(label: item.type),
+                                  StatusBadge(label: item.type),
                                   Text(
                                     item.date,
                                     style: PawlyTypography.caption,
@@ -409,10 +413,10 @@ class _SymptomPill extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
       decoration: BoxDecoration(
-        color: isAlert ? PawlyColors.alertLight : PawlyColors.softGrey,
-        borderRadius: AppRadius.rXs,
+        color: isAlert ? PawlyColors.border : PawlyColors.border,
+        borderRadius: AppTokens.rXs,
         border: Border.all(
-          color: isAlert ? PawlyColors.alert.withOpacity(0.3) : PawlyColors.border,
+          color: isAlert ? PawlyColors.error.withOpacity(0.3) : PawlyColors.border,
           width: 0.8,
         ),
       ),
@@ -421,7 +425,7 @@ class _SymptomPill extends StatelessWidget {
         style: TextStyle(
           fontSize: 11,
           fontWeight: FontWeight.w600,
-          color: isAlert ? PawlyColors.alert : PawlyColors.black,
+          color: isAlert ? PawlyColors.error : PawlyColors.black,
         ),
       ),
     );
@@ -453,15 +457,15 @@ class _QuickHealthShortcut extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(6),
               decoration: BoxDecoration(
-                color: PawlyColors.softGrey,
-                borderRadius: AppRadius.rSm,
+                color: PawlyColors.border,
+                borderRadius: AppTokens.rSm,
               ),
               child: Icon(icon, size: 16, color: PawlyColors.black),
             ),
             const SizedBox(height: 8),
             Text(
               label.toUpperCase(),
-              style: PawlyTypography.labelSmall.copyWith(fontSize: 9),
+              style: PawlyTypography.eyebrow.copyWith(fontSize: 9),
             ),
             const SizedBox(height: 2),
             Text(

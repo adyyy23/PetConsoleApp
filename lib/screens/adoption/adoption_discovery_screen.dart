@@ -48,7 +48,7 @@ class _AdoptionDiscoveryScreenState extends State<AdoptionDiscoveryScreen> {
             expandedHeight: 120,
             leading: Navigator.canPop(context)
                 ? IconButton(
-                    icon: const Icon(Icons.arrow_back_ios_new_rounded, color: PawlyColors.textPrimary, size: 20),
+                    icon:  const Icon(Icons.arrow_back_ios_new_rounded, color: PawlyColors.textPrimary, size: 20),
                     onPressed: () => Navigator.pop(context),
                   )
                 : null,
@@ -76,9 +76,9 @@ class _AdoptionDiscoveryScreenState extends State<AdoptionDiscoveryScreen> {
                     child: ChoiceChip(
                       label: Text(category == 'All' ? 'All Pets' : '${category}s'),
                       selected: isSelected,
-                      selectedColor: PawlyColors.forest,
+                      selectedColor: PawlyColors.black,
                       backgroundColor: PawlyColors.surface,
-                      labelStyle: PawlyTypography.labelSmall.copyWith(
+                      labelStyle: PawlyTypography.eyebrow.copyWith(
                         color: isSelected ? Colors.white : PawlyColors.textPrimary,
                         fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
                       ),
@@ -154,16 +154,16 @@ class _AdoptionCard extends StatelessWidget {
                   fit: BoxFit.cover,
                   errorBuilder: (_, __, ___) => Container(
                     color: PawlyColors.border,
-                    child: const Icon(Icons.pets_rounded, size: 50, color: PawlyColors.textMuted),
+                    child: const Icon(Icons.pets_rounded, size: 50, color: PawlyColors.tertiary),
                   ),
                 ),
               ),
               Positioned(
                 top: 14,
                 right: 14,
-                child: PawlyBadge(
+                child: StatusBadge(
                   label: pet.fosterStatus,
-                  backgroundColor: PawlyColors.forest,
+                  backgroundColor: PawlyColors.black,
                   textColor: Colors.white,
                 ),
               ),
@@ -183,15 +183,15 @@ class _AdoptionCard extends StatelessWidget {
                     ),
                     Text(
                       '${pet.ageYears.toStringAsFixed(1)} yrs old',
-                      style: PawlyTypography.bodyMedium.copyWith(color: PawlyColors.textSecondary),
+                      style: PawlyTypography.bodyMedium.copyWith(color: PawlyColors.secondary),
                     ),
                   ],
                 ),
                 const SizedBox(height: 4),
                 Text(
                   '${pet.breed} • ${pet.species}',
-                  style: PawlyTypography.bodySmall.copyWith(
-                    color: PawlyColors.textSecondary,
+                  style: PawlyTypography.bodyMedium.copyWith(
+                    color: PawlyColors.secondary,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
@@ -199,7 +199,7 @@ class _AdoptionCard extends StatelessWidget {
                 Text(
                   pet.bio,
                   style: PawlyTypography.bodyMedium.copyWith(
-                    color: PawlyColors.textSecondary,
+                    color: PawlyColors.secondary,
                     height: 1.4,
                   ),
                 ),
@@ -209,7 +209,7 @@ class _AdoptionCard extends StatelessWidget {
                     Expanded(
                       child: PawlyButton(
                         text: 'Meet ${pet.name}',
-                        icon: Icons.favorite_rounded,
+                        
                         onPressed: onInquire,
                       ),
                     ),
@@ -285,7 +285,7 @@ class _InquiryBottomSheetState extends State<_InquiryBottomSheet> {
             const SizedBox(height: 6),
             Text(
               'Connect directly with the foster shelter coordinator.',
-              style: PawlyTypography.bodySmall.copyWith(color: PawlyColors.textSecondary),
+              style: PawlyTypography.bodyMedium.copyWith(color: PawlyColors.secondary),
             ),
             const SizedBox(height: 18),
 
@@ -311,14 +311,14 @@ class _InquiryBottomSheetState extends State<_InquiryBottomSheet> {
 
             PawlyButton(
               text: 'Submit Adoption Inquiry',
-              icon: Icons.send_rounded,
+              
               onPressed: () {
                 Navigator.pop(context);
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Text('Inquiry sent for ${widget.pet.name}! The coordinator will reach out shortly.'),
                     behavior: SnackBarBehavior.floating,
-                    backgroundColor: PawlyColors.forest,
+                    backgroundColor: PawlyColors.black,
                   ),
                 );
               },

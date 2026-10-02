@@ -44,7 +44,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 height: 44,
                 decoration: BoxDecoration(
                   color: PawlyColors.black,
-                  borderRadius: AppRadius.rMd,
+                  borderRadius: AppTokens.rMd,
                 ),
                 child: const Icon(Icons.pets, color: Colors.white, size: 22),
               ),
@@ -85,11 +85,10 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                     ),
                     const SizedBox(width: 12),
-                    PawlyButton(
-                      label: 'Demo Enter',
+                    PawlyButton(text: 'Demo Enter',
                       onPressed: widget.onLoginSuccess,
                       isSmall: true,
-                      variant: PawlyButtonVariant.primary,
+                      
                     ),
                   ],
                 ),
@@ -111,15 +110,15 @@ class _LoginScreenState extends State<LoginScreen> {
                   fillColor: Colors.white,
                   contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
                   border: OutlineInputBorder(
-                    borderRadius: AppRadius.rMd,
+                    borderRadius: AppTokens.rMd,
                     borderSide: const BorderSide(color: PawlyColors.border),
                   ),
                   enabledBorder: OutlineInputBorder(
-                    borderRadius: AppRadius.rMd,
+                    borderRadius: AppTokens.rMd,
                     borderSide: const BorderSide(color: PawlyColors.border),
                   ),
                   focusedBorder: OutlineInputBorder(
-                    borderRadius: AppRadius.rMd,
+                    borderRadius: AppTokens.rMd,
                     borderSide: const BorderSide(color: PawlyColors.black, width: 1.5),
                   ),
                 ),
@@ -163,21 +162,21 @@ class _LoginScreenState extends State<LoginScreen> {
                   suffixIcon: IconButton(
                     icon: Icon(
                       _obscurePassword ? Icons.visibility_off : Icons.visibility,
-                      color: PawlyColors.textMuted,
+                      color: PawlyColors.tertiary,
                       size: 18,
                     ),
                     onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
                   ),
                   border: OutlineInputBorder(
-                    borderRadius: AppRadius.rMd,
+                    borderRadius: AppTokens.rMd,
                     borderSide: const BorderSide(color: PawlyColors.border),
                   ),
                   enabledBorder: OutlineInputBorder(
-                    borderRadius: AppRadius.rMd,
+                    borderRadius: AppTokens.rMd,
                     borderSide: const BorderSide(color: PawlyColors.border),
                   ),
                   focusedBorder: OutlineInputBorder(
-                    borderRadius: AppRadius.rMd,
+                    borderRadius: AppTokens.rMd,
                     borderSide: const BorderSide(color: PawlyColors.black, width: 1.5),
                   ),
                 ),
@@ -185,11 +184,10 @@ class _LoginScreenState extends State<LoginScreen> {
 
               const SizedBox(height: 24),
 
-              PawlyButton(
-                label: 'Sign in to Pawly',
-                isFullWidth: true,
+              PawlyButton(text: 'Sign in to Pawly',
+                
                 onPressed: widget.onLoginSuccess,
-                variant: PawlyButtonVariant.primary,
+                
               ),
 
               const SizedBox(height: 24),

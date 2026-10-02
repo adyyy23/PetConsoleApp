@@ -19,7 +19,7 @@ class PawlyTheme {
         onSecondary: Colors.white,
         surface: PawlyColors.surface,
         onSurface: PawlyColors.black,
-        error: PawlyColors.alert,
+        error: PawlyColors.error,
       ),
       appBarTheme: const AppBarTheme(
         backgroundColor: Colors.transparent,
@@ -33,14 +33,14 @@ class PawlyTheme {
       bottomSheetTheme: const BottomSheetThemeData(
         backgroundColor: PawlyColors.surface,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadius.xl)),
+          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
         ),
       ),
       cardTheme: CardTheme(
         color: PawlyColors.surface,
         elevation: 0,
         shape: RoundedRectangleBorder(
-          borderRadius: AppRadius.rMd,
+          borderRadius: AppTokens.rMd,
           side: const BorderSide(color: PawlyColors.border, width: 1),
         ),
         margin: EdgeInsets.zero,
@@ -50,19 +50,19 @@ class PawlyTheme {
         fillColor: PawlyColors.surface,
         contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
         border: OutlineInputBorder(
-          borderRadius: AppRadius.rSm,
+          borderRadius: AppTokens.rSm,
           borderSide: const BorderSide(color: PawlyColors.border, width: 1.0),
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: AppRadius.rSm,
+          borderRadius: AppTokens.rSm,
           borderSide: const BorderSide(color: PawlyColors.border, width: 1.0),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: AppRadius.rSm,
+          borderRadius: AppTokens.rSm,
           borderSide: const BorderSide(color: PawlyColors.black, width: 1.2),
         ),
-        hintStyle: const TextStyle(fontSize: 14, color: PawlyColors.textMuted),
-        labelStyle: const TextStyle(fontSize: 13, color: PawlyColors.textSecondary),
+        hintStyle: const TextStyle(fontSize: 14, color: PawlyColors.tertiary),
+        labelStyle: const TextStyle(fontSize: 13, color: PawlyColors.secondary),
       ),
       dividerTheme: const DividerThemeData(
         color: PawlyColors.border,

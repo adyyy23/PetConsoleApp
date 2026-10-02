@@ -59,18 +59,20 @@ class _CareScreenState extends State<CareScreen> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text('EVERYDAY ROUTINES • ${activePet.name.toUpperCase()}', style: PawlyTypography.eyebrow),
-                        const SizedBox(height: 2),
-                        const Text('Care Agenda', style: PawlyTypography.displayMedium),
-                      ],
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('EVERYDAY ROUTINES • ${activePet.name.toUpperCase()}', style: PawlyTypography.eyebrow, overflow: TextOverflow.ellipsis),
+                          const SizedBox(height: 2),
+                          const Text('Care Agenda', style: PawlyTypography.displayMedium, overflow: TextOverflow.ellipsis),
+                        ],
+                      ),
                     ),
+                    const SizedBox(width: 8),
                     PawlyButton(
                       text: '+ Add Care',
                       isSmall: true,
-                      variant: PawlyButtonVariant.primary,
                       onPressed: widget.onOpenAddCare,
                     ),
                   ],
@@ -96,7 +98,7 @@ class _CareScreenState extends State<CareScreen> {
                           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                           decoration: BoxDecoration(
                             color: isSelected ? PawlyColors.black : Colors.transparent,
-                            borderRadius: AppRadius.rSm,
+                            borderRadius: AppTokens.rSm,
                           ),
                           child: Column(
                             mainAxisSize: MainAxisSize.min,
@@ -106,7 +108,7 @@ class _CareScreenState extends State<CareScreen> {
                                 style: TextStyle(
                                   fontSize: 10,
                                   fontWeight: FontWeight.w700,
-                                  color: isSelected ? Colors.white70 : PawlyColors.textMuted,
+                                  color: isSelected ? Colors.white70 : PawlyColors.tertiary,
                                 ),
                               ),
                               const SizedBox(height: 2),
@@ -141,7 +143,7 @@ class _CareScreenState extends State<CareScreen> {
                         padding: const EdgeInsets.all(7),
                         decoration: BoxDecoration(
                           color: PawlyColors.black,
-                          borderRadius: AppRadius.rSm,
+                          borderRadius: AppTokens.rSm,
                         ),
                         child: const Icon(Icons.star_rounded, color: Colors.white, size: 16),
                       ),
@@ -161,7 +163,7 @@ class _CareScreenState extends State<CareScreen> {
                             const SizedBox(height: 2),
                             Text(
                               '${activePet.name} is on track with scheduled wellness care.',
-                              style: PawlyTypography.bodySmall,
+                              style: PawlyTypography.bodyMedium,
                             ),
                           ],
                         ),
@@ -207,7 +209,7 @@ class _CareScreenState extends State<CareScreen> {
             if (filtered.isEmpty)
               SliverFillRemaining(
                 child: EmptyStateView(
-                  icon: Icons.check_circle_outline,
+                  
                   title: 'No routines found',
                   subtitle: 'Add everyday care routines for feeding, medication, or walks.',
                   buttonLabel: 'Create Care Routine',
@@ -290,7 +292,7 @@ class _FilterChip extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
         decoration: BoxDecoration(
           color: isSelected ? PawlyColors.black : Colors.white,
-          borderRadius: AppRadius.rSm,
+          borderRadius: AppTokens.rSm,
           border: Border.all(
             color: isSelected ? PawlyColors.black : PawlyColors.border,
             width: 1.0,

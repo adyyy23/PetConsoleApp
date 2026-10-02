@@ -19,10 +19,7 @@ class PawlyBottomNavBar extends StatelessWidget {
       decoration: const BoxDecoration(
         color: Colors.white,
         border: Border(
-          top: BorderSide(
-            color: PawlyColors.border,
-            width: 1.0,
-          ),
+          top: BorderSide(color: PawlyColors.border, width: 1.0),
         ),
       ),
       child: SafeArea(
@@ -33,7 +30,8 @@ class PawlyBottomNavBar extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
               _NavItem(
-                icon: Icons.home_filled,
+                icon: Icons.home_outlined,
+                selectedIcon: Icons.home_rounded,
                 label: 'Home',
                 isSelected: currentDestination == PawlyNavDestination.home,
                 onTap: () => onDestinationSelected(PawlyNavDestination.home),
@@ -53,14 +51,15 @@ class PawlyBottomNavBar extends StatelessWidget {
                 onTap: () => onDestinationSelected(PawlyNavDestination.care),
               ),
               _NavItem(
-                icon: Icons.favorite_border_rounded,
+                icon: Icons.favorite_outline_rounded,
                 selectedIcon: Icons.favorite_rounded,
                 label: 'Health',
                 isSelected: currentDestination == PawlyNavDestination.health,
                 onTap: () => onDestinationSelected(PawlyNavDestination.health),
               ),
               _NavItem(
-                icon: Icons.more_horiz_rounded,
+                icon: Icons.menu_rounded,
+                selectedIcon: Icons.menu_rounded,
                 label: 'More',
                 isSelected: currentDestination == PawlyNavDestination.more,
                 onTap: () => onDestinationSelected(PawlyNavDestination.more),
@@ -90,7 +89,7 @@ class _NavItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = isSelected ? PawlyColors.black : PawlyColors.warmGrey;
+    final color = isSelected ? PawlyColors.black : PawlyColors.secondary;
 
     return GestureDetector(
       onTap: onTap,

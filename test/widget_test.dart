@@ -114,18 +114,18 @@ void main() {
   });
 
   testWidgets('Pawly Theme Tokens & Palette verification', (WidgetTester tester) async {
-    // Verify standard radius tokens
-    expect(AppRadius.xs, 4.0);
-    expect(AppRadius.sm, 6.0);
-    expect(AppRadius.md, 8.0);
-    expect(AppRadius.lg, 10.0);
-    expect(AppRadius.xl, 12.0);
+    // Verify standard radius tokens (new design system: 6, 10, 14, 18, 24)
+    expect(AppTokens.xs, 6.0);
+    expect(AppTokens.sm, 10.0);
+    expect(AppTokens.md, 14.0);
+    expect(AppTokens.lg, 18.0);
+    expect(AppTokens.xl, 24.0);
 
     // Verify colors are purely black, white, charcoal, neutrals, not green
     expect(PawlyColors.black, const Color(0xFF111111));
-    expect(PawlyColors.background, const Color(0xFFFAF9F6));
+    expect(PawlyColors.background, const Color(0xFFF7F4EF));
     expect(PawlyColors.surface, const Color(0xFFFFFFFF));
-    expect(PawlyColors.charcoal, const Color(0xFF222222));
+    expect(PawlyColors.charcoal, const Color(0xFF2C2A27));
   });
 
   testWidgets('Pawly responsive viewports (320px narrow and 430px wide) without RenderFlex overflow', (WidgetTester tester) async {

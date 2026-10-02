@@ -65,7 +65,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         padding: const EdgeInsets.all(5),
                         decoration: BoxDecoration(
                           color: PawlyColors.black,
-                          borderRadius: AppRadius.rSm,
+                          borderRadius: AppTokens.rSm,
                         ),
                         child: const Icon(Icons.pets, size: 16, color: Colors.white),
                       ),
@@ -87,7 +87,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       child: const Text(
                         'Skip',
                         style: TextStyle(
-                          color: PawlyColors.warmGrey,
+                          color: PawlyColors.secondary,
                           fontWeight: FontWeight.w600,
                           fontSize: 14,
                         ),
@@ -116,7 +116,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         AspectRatio(
                           aspectRatio: 16 / 11,
                           child: ClipRRect(
-                            borderRadius: AppRadius.rLg,
+                            borderRadius: AppTokens.rLg,
                             child: Stack(
                               fit: StackFit.expand,
                               children: [
@@ -124,7 +124,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                                   item.imageUrl,
                                   fit: BoxFit.cover,
                                   errorBuilder: (_, __, ___) => Container(
-                                    color: PawlyColors.softGrey,
+                                    color: PawlyColors.border,
                                     child: const Icon(Icons.pets, size: 54, color: PawlyColors.black),
                                   ),
                                 ),
@@ -135,7 +135,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                                     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                                     decoration: BoxDecoration(
                                       color: Colors.black.withOpacity(0.75),
-                                      borderRadius: AppRadius.rSm,
+                                      borderRadius: AppTokens.rSm,
                                       border: Border.all(color: Colors.white24, width: 0.8),
                                     ),
                                     child: Text(
@@ -189,11 +189,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     ),
                   ),
 
-                  // Continue / Get Started Button (6-8px radius)
                   PawlyButton(
-                    label: isLast ? 'Get Started' : 'Continue',
-                    icon: Icons.arrow_forward_rounded,
-                    variant: PawlyButtonVariant.primary,
+                    text: isLast ? 'Get Started' : 'Continue',
+                    isSmall: true,
                     onPressed: () {
                       if (isLast) {
                         widget.onFinish();

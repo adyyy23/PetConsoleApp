@@ -34,19 +34,20 @@ class MyPetsScreen extends StatelessWidget {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text('FAMILY COMPANIONS', style: PawlyTypography.eyebrow),
-                        SizedBox(height: 2),
-                        Text('My Pets', style: PawlyTypography.displayMedium),
-                      ],
+                    const Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('FAMILY COMPANIONS', style: PawlyTypography.eyebrow, overflow: TextOverflow.ellipsis),
+                          SizedBox(height: 2),
+                          Text('My Pets', style: PawlyTypography.displayMedium, overflow: TextOverflow.ellipsis),
+                        ],
+                      ),
                     ),
+                    const SizedBox(width: 8),
                     PawlyButton(
-                      label: 'Add Pet',
-                      icon: Icons.add,
+                      text: 'Add Pet',
                       isSmall: true,
-                      variant: PawlyButtonVariant.primary,
                       onPressed: onOpenAddPet,
                     ),
                   ],
@@ -57,7 +58,7 @@ class MyPetsScreen extends StatelessWidget {
             if (pets.isEmpty)
               SliverFillRemaining(
                 child: EmptyStateView(
-                  icon: Icons.pets_outlined,
+                  
                   title: 'No pets added yet',
                   subtitle: 'Add your first companion to begin tracking care and health.',
                   buttonLabel: 'Add First Pet',
@@ -117,7 +118,7 @@ class _PetCollectionCard extends StatelessWidget {
           children: [
             // Expressive Pet Photography Banner (8px top radius)
             ClipRRect(
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(AppRadius.md)),
+              borderRadius: const BorderRadius.vertical(top: Radius.circular(AppTokens.md)),
               child: SizedBox(
                 height: 190,
                 width: double.infinity,
@@ -128,7 +129,7 @@ class _PetCollectionCard extends StatelessWidget {
                       pet.imageUrl,
                       fit: BoxFit.cover,
                       errorBuilder: (_, __, ___) => Container(
-                        color: PawlyColors.softGrey,
+                        color: PawlyColors.border,
                         child: const Icon(Icons.pets, size: 44, color: PawlyColors.charcoal),
                       ),
                     ),
@@ -153,7 +154,7 @@ class _PetCollectionCard extends StatelessWidget {
                         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                         decoration: BoxDecoration(
                           color: Colors.black.withOpacity(0.65),
-                          borderRadius: AppRadius.rSm,
+                          borderRadius: AppTokens.rSm,
                           border: Border.all(color: Colors.white24, width: 0.8),
                         ),
                         child: Text(
@@ -175,7 +176,7 @@ class _PetCollectionCard extends StatelessWidget {
                           padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 3),
                           decoration: BoxDecoration(
                             color: Colors.black.withOpacity(0.65),
-                            borderRadius: AppRadius.rSm,
+                            borderRadius: AppTokens.rSm,
                             border: Border.all(color: Colors.white12, width: 0.8),
                           ),
                           child: Text(
@@ -218,8 +219,8 @@ class _PetCollectionCard extends StatelessWidget {
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
                         decoration: BoxDecoration(
-                          color: PawlyColors.softGrey,
-                          borderRadius: AppRadius.rSm,
+                          color: PawlyColors.border,
+                          borderRadius: AppTokens.rSm,
                           border: Border.all(color: PawlyColors.border, width: 0.8),
                         ),
                         child: Text(
@@ -241,7 +242,7 @@ class _PetCollectionCard extends StatelessWidget {
                     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 9),
                     decoration: BoxDecoration(
                       color: PawlyColors.surfaceWarm,
-                      borderRadius: AppRadius.rSm,
+                      borderRadius: AppTokens.rSm,
                       border: Border.all(color: PawlyColors.border, width: 0.8),
                     ),
                     child: Row(
@@ -260,7 +261,7 @@ class _PetCollectionCard extends StatelessWidget {
                             ),
                           ),
                         ),
-                        const Icon(Icons.arrow_forward_ios_rounded, size: 10, color: PawlyColors.textMuted),
+                        const Icon(Icons.arrow_forward_ios_rounded, size: 10, color: PawlyColors.tertiary),
                       ],
                     ),
                   ),

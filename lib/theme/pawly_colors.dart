@@ -3,86 +3,53 @@ import 'package:flutter/material.dart';
 class PawlyColors {
   PawlyColors._();
 
-  // Foundation & Neutrals (Editorial Black & White with Warm Neutrals)
-  static const Color black = Color(0xFF111111);
-  static const Color pureBlack = Color(0xFF000000);
-  static const Color charcoal = Color(0xFF222222);
-  static const Color darkGrey = Color(0xFF383838);
-  static const Color midGrey = Color(0xFF6E6E6E);
-  static const Color warmGrey = Color(0xFF76726D);
-  static const Color lightGrey = Color(0xFFE8E5DF);
-  static const Color softGrey = Color(0xFFF3F1EC);
-  static const Color offWhite = Color(0xFFFAF9F6);
-  static const Color warmWhite = Color(0xFFF6F5F1);
-  static const Color white = Color(0xFFFFFFFF);
+  // ── Core palette ────────────────────────────────────────────────────────────
+  static const Color black      = Color(0xFF111111);
+  static const Color charcoal   = Color(0xFF2C2A27);
+  static const Color secondary  = Color(0xFF6F6A63);
+  static const Color tertiary   = Color(0xFF9C9690);
+  static const Color background = Color(0xFFF7F4EF);
+  static const Color surface    = Color(0xFFFFFFFF);
+  static const Color surfaceWarm= Color(0xFFF0EDE8);
+  static const Color border     = Color(0xFFEAE6DF);
+  static const Color borderDark = Color(0xFFD5D0C8);
 
-  // Backgrounds & Surfaces
-  static const Color background = offWhite;
-  static const Color creamBg = offWhite;
-  static const Color surface = white;
-  static const Color surfaceWarm = softGrey;
-  static const Color surfaceMuted = lightGrey;
+  // Overlays (for surfaces over photography — NEVER for text)
+  static const Color overlayDark  = Color(0xB3111111); // 70% black
+  static const Color overlayLight = Color(0xDEFFFFFF); // 87% white
 
-  // Typography
-  static const Color textPrimary = black;
-  static const Color textSecondary = midGrey;
-  static const Color textMuted = Color(0xFF98948E);
-  static const Color espresso = black;
-  static const Color deepEspresso = black;
-  static const Color mutedGrey = textMuted;
-
-  // Borders & Dividers (Very subtle neutral borders)
-  static const Color border = Color(0xFFE6E3DC);
-  static const Color borderLight = Color(0xFFEFECE5);
-  static const Color borderDark = Color(0xFF2E2E2E);
-
-  // Primary Action Accent (Strictly Editorial Black / Charcoal - NO GREEN)
+  // Semantic
   static const Color primary = black;
-  static const Color primarySubtle = softGrey;
-  static const Color secondary = charcoal;
+  static const Color error   = Color(0xFFD32F2F);
+  static const Color success = Color(0xFF388E3C);
 
-  // Subtle Status Tones (Restrained, low-saturation)
-  static const Color alert = Color(0xFFB33927);
-  static const Color alertLight = Color(0xFFFAF0EE);
-  static const Color tagBg = softGrey;
-  static const Color tagText = charcoal;
+  // Alert / safety (used by emergency screens)
+  static const Color alert      = Color(0xFFD32F2F);
+  static const Color alertLight = Color(0xFFFDE8E8);
 
-  // Backwards compatibility aliases mapped strictly to neutral palette (Zero green)
-  static const Color forest = black;
-  static const Color forestLight = softGrey;
-  static const Color forestBorder = border;
-  static const Color softSage = lightGrey;
-  static const Color sageLight = softGrey;
-  static const Color sageBg = offWhite;
+  // ── Backward-compat aliases ─────────────────────────────────────────────────
+  // Old screens referenced these names; map them to the new palette.
+  static const Color pureBlack     = black;
+  static const Color darkGrey      = charcoal;
+  static const Color midGrey       = secondary;
+  static const Color warmGrey      = secondary;
+  static const Color lightGrey     = border;
+  static const Color softGrey      = surfaceWarm;
+  static const Color offWhite      = background;
+  static const Color warmWhite     = surfaceWarm;
+  static const Color white         = surface;
+  static const Color creamBg       = background;
+  static const Color surfaceMuted  = border;
+  static const Color borderLight   = border;
+  static const Color textPrimary   = black;
+  static const Color textSecondary = secondary;
+  static const Color textMuted     = tertiary;
+  static const Color espresso      = black;
+  static const Color deepEspresso  = black;
+  static const Color mutedGrey     = tertiary;
 
-  static const Color clay = charcoal;
-  static const Color warmClay = charcoal;
-  static const Color terracotta = charcoal;
-  static const Color clayLight = softGrey;
-  static const Color terracottaLight = softGrey;
-  static const Color clayBorder = border;
-  static const Color terracottaBorder = border;
-
-  static const Color butterYellow = softGrey;
-  static const Color butterBg = offWhite;
-  static const Color honey = charcoal;
-  static const Color warmHoney = charcoal;
-  static const Color honeyLight = softGrey;
-  static const Color honeyBorder = border;
-
-  static const Color powderBlue = lightGrey;
-  static const Color powderBlueBg = offWhite;
-  static const Color slate = charcoal;
-  static const Color slateLight = softGrey;
-
-  static const Color rose = alert;
-  static const Color alertRose = alert;
-  static const Color roseLight = alertLight;
-
-  // Scrim & Controlled Overlays
-  static const Color frostedWhite = Color(0xF2FFFFFF);
-  static const Color frostedWarmWhite = Color(0xF2FAF9F6);
-  static const Color frostedEspresso = Color(0xD9000000);
-  static const Color frostedBorder = Color(0x33FFFFFF);
-  static const Color frostedBorderDark = Color(0x22000000);
+  // alertRose → map to error/alert for lost-pet screens
+  static const Color alertRose     = alert;
+  // warmHoney → a warm neutral accent (emergency)
+  static const Color warmHoney     = Color(0xFFB07D3E);
 }

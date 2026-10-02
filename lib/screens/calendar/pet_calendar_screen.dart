@@ -84,7 +84,7 @@ class _PetCalendarScreenState extends State<PetCalendarScreen> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     IconButton(
-                      icon: const Icon(Icons.chevron_left_rounded, color: PawlyColors.black),
+                      icon:  const Icon(Icons.chevron_left_rounded, color: PawlyColors.black),
                       onPressed: _prevMonth,
                       visualDensity: VisualDensity.compact,
                     ),
@@ -93,7 +93,7 @@ class _PetCalendarScreenState extends State<PetCalendarScreen> {
                       style: PawlyTypography.titleMedium,
                     ),
                     IconButton(
-                      icon: const Icon(Icons.chevron_right_rounded, color: PawlyColors.black),
+                      icon:  const Icon(Icons.chevron_right_rounded, color: PawlyColors.black),
                       onPressed: _nextMonth,
                       visualDensity: VisualDensity.compact,
                     ),
@@ -140,8 +140,8 @@ class _PetCalendarScreenState extends State<PetCalendarScreen> {
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                     decoration: BoxDecoration(
-                      color: PawlyColors.softGrey,
-                      borderRadius: AppRadius.rSm,
+                      color: PawlyColors.border,
+                      borderRadius: AppTokens.rSm,
                       border: Border.all(color: PawlyColors.border, width: 0.8),
                     ),
                     child: Text(
@@ -198,7 +198,7 @@ class _PetCalendarScreenState extends State<PetCalendarScreen> {
                                 const SizedBox(height: 2),
                                 Text(
                                   '${appt.time} • ${appt.clinic}',
-                                  style: PawlyTypography.bodySmall,
+                                  style: PawlyTypography.bodyMedium,
                                 ),
                                 if (appt.vetName.isNotEmpty) ...[
                                   const SizedBox(height: 2),
@@ -244,8 +244,8 @@ class _PetCalendarScreenState extends State<PetCalendarScreen> {
                             Container(
                               padding: const EdgeInsets.all(6),
                               decoration: BoxDecoration(
-                                color: PawlyColors.softGrey,
-                                borderRadius: AppRadius.rSm,
+                                color: PawlyColors.border,
+                                borderRadius: AppTokens.rSm,
                               ),
                               child: const Icon(Icons.medication_outlined, color: PawlyColors.black, size: 16),
                             ),
@@ -311,7 +311,7 @@ class _PetCalendarScreenState extends State<PetCalendarScreen> {
             height: 38,
             decoration: BoxDecoration(
               color: isSelected ? PawlyColors.black : Colors.transparent,
-              borderRadius: AppRadius.rSm,
+              borderRadius: AppTokens.rSm,
             ),
             child: Stack(
               alignment: Alignment.center,
@@ -381,7 +381,7 @@ class _WeekDayLabel extends StatelessWidget {
       child: Center(
         child: Text(
           label,
-          style: PawlyTypography.labelSmall.copyWith(fontSize: 10),
+          style: PawlyTypography.eyebrow.copyWith(fontSize: 10),
         ),
       ),
     );

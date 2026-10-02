@@ -55,7 +55,7 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
           appBar: PawlyAppBar(
             title: 'Document Wallet',
             trailing: IconButton(
-              icon: const Icon(Icons.upload_file_rounded, color: PawlyColors.black, size: 20),
+              icon:  const Icon(Icons.upload_file_rounded, color: PawlyColors.black, size: 20),
               onPressed: _showAddDocumentModal,
             ),
           ),
@@ -89,9 +89,9 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
                       return ChoiceChip(
                         label: Text(cat),
                         selected: isSelected,
-                        selectedColor: PawlyColors.forest,
+                        selectedColor: PawlyColors.black,
                         backgroundColor: PawlyColors.surface,
-                        labelStyle: PawlyTypography.labelSmall.copyWith(
+                        labelStyle: PawlyTypography.eyebrow.copyWith(
                           color: isSelected ? Colors.white : PawlyColors.textPrimary,
                           fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
                         ),
@@ -111,7 +111,7 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
                 SliverFillRemaining(
                   hasScrollBody: false,
                   child: EmptyStateView(
-                    icon: Icons.folder_open_rounded,
+                    
                     title: 'No Documents Found',
                     subtitle: 'Keep certificates, insurance policies, and blood panels organized for ${pet?.name ?? "your pet"}.',
                     actionLabel: 'Upload Document',
@@ -156,8 +156,8 @@ class _DocumentCard extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: PawlyColors.softGrey,
-              borderRadius: AppRadius.rSm,
+              color: PawlyColors.border,
+              borderRadius: AppTokens.rSm,
             ),
             child: const Icon(
               Icons.description_rounded,
@@ -179,15 +179,15 @@ class _DocumentCard extends StatelessWidget {
                 const SizedBox(height: 4),
                 Row(
                   children: [
-                    PawlyBadge(
+                    StatusBadge(
                       label: doc.category,
                       backgroundColor: PawlyColors.background,
-                      textColor: PawlyColors.textSecondary,
+                      textColor: PawlyColors.secondary,
                     ),
                     const SizedBox(width: 8),
                     Text(
                       'Added ${doc.dateAdded}',
-                      style: PawlyTypography.bodySmall.copyWith(color: PawlyColors.textMuted),
+                      style: PawlyTypography.bodyMedium.copyWith(color: PawlyColors.tertiary),
                     ),
                   ],
                 ),
@@ -195,7 +195,7 @@ class _DocumentCard extends StatelessWidget {
             ),
           ),
           IconButton(
-            icon: const Icon(Icons.download_rounded, color: PawlyColors.textSecondary, size: 20),
+            icon:  const Icon(Icons.download_rounded, color: PawlyColors.secondary, size: 20),
             onPressed: () {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
@@ -299,8 +299,8 @@ class _AddDocumentSheetState extends State<_AddDocumentSheet> {
 
           Text(
             'CATEGORY',
-            style: PawlyTypography.labelSmall.copyWith(
-              color: PawlyColors.textSecondary,
+            style: PawlyTypography.eyebrow.copyWith(
+              color: PawlyColors.secondary,
               fontWeight: FontWeight.w700,
             ),
           ),
@@ -313,10 +313,10 @@ class _AddDocumentSheetState extends State<_AddDocumentSheet> {
               return ChoiceChip(
                 label: Text(c),
                 selected: isSelected,
-                selectedColor: PawlyColors.forest.withOpacity(0.15),
+                selectedColor: PawlyColors.black.withOpacity(0.15),
                 backgroundColor: PawlyColors.background,
-                labelStyle: PawlyTypography.labelSmall.copyWith(
-                  color: isSelected ? PawlyColors.forest : PawlyColors.textPrimary,
+                labelStyle: PawlyTypography.eyebrow.copyWith(
+                  color: isSelected ? PawlyColors.black : PawlyColors.textPrimary,
                   fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
                 ),
                 onSelected: (val) {
@@ -329,7 +329,7 @@ class _AddDocumentSheetState extends State<_AddDocumentSheet> {
 
           PawlyButton(
             text: 'Save Document',
-            icon: Icons.check_rounded,
+            
             onPressed: _save,
           ),
         ],

@@ -73,10 +73,9 @@ class VaccinationPassportScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 24),
-            PawlyButton(
-              label: 'Save to Passport',
-              isFullWidth: true,
-              variant: PawlyButtonVariant.primary,
+            PawlyButton(text: 'Save to Passport',
+              
+              
               onPressed: () {
                 final name = nameController.text.trim();
                 if (name.isNotEmpty) {
@@ -108,16 +107,16 @@ class VaccinationPassportScreen extends StatelessWidget {
     final vaccines = repository.activePetVaccinations;
 
     return Scaffold(
-      backgroundColor: PawlyColors.creamBg,
+      backgroundColor: PawlyColors.background,
       appBar: AppBar(
         title: Text('${pet.name}’s Passport'),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_rounded),
+          icon:  const Icon(Icons.arrow_back_rounded),
           onPressed: () => Navigator.of(context).pop(),
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.add_rounded),
+            icon:  const Icon(Icons.add_rounded),
             onPressed: () => _openAddVaccineDialog(context),
           ),
         ],
@@ -133,11 +132,11 @@ class VaccinationPassportScreen extends StatelessWidget {
                 width: double.infinity,
                 padding: const EdgeInsets.all(22),
                 decoration: BoxDecoration(
-                  color: PawlyColors.forest,
+                  color: PawlyColors.black,
                   borderRadius: BorderRadius.circular(24),
                   boxShadow: [
                     BoxShadow(
-                      color: PawlyColors.forest.withOpacity(0.2),
+                      color: PawlyColors.black.withOpacity(0.2),
                       blurRadius: 16,
                       offset: const Offset(0, 6),
                     ),
@@ -191,12 +190,12 @@ class VaccinationPassportScreen extends StatelessWidget {
               ),
 
               const SizedBox(height: 24),
-              const Text('RECORDED VACCINATIONS', style: PawlyTypography.labelSmall),
+              const Text('RECORDED VACCINATIONS', style: PawlyTypography.eyebrow),
               const SizedBox(height: 12),
 
               if (vaccines.isEmpty)
                 EmptyStateView(
-                  icon: Icons.shield_outlined,
+                  
                   title: 'No vaccines logged',
                   subtitle: 'Add core boosters to keep an official digital record.',
                   buttonLabel: 'Add Vaccine Record',
@@ -237,7 +236,7 @@ class VaccinationPassportScreen extends StatelessWidget {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(v.vaccineName, style: PawlyTypography.titleMedium),
-                            PawlyBadge(label: statusLabel, variant: badgeVariant),
+                            StatusBadge(label: statusLabel, variant: badgeVariant),
                           ],
                         ),
                         const SizedBox(height: 8),
@@ -247,9 +246,9 @@ class VaccinationPassportScreen extends StatelessWidget {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  const Text('Given on', style: TextStyle(fontSize: 11, color: PawlyColors.mutedGrey)),
+                                  const Text('Given on', style: TextStyle(fontSize: 11, color: PawlyColors.tertiary)),
                                   const SizedBox(height: 2),
-                                  Text(v.dateAdministered, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: PawlyColors.espresso)),
+                                  Text(v.dateAdministered, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: PawlyColors.charcoal)),
                                 ],
                               ),
                             ),
@@ -257,9 +256,9 @@ class VaccinationPassportScreen extends StatelessWidget {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  const Text('Next Booster Due', style: TextStyle(fontSize: 11, color: PawlyColors.mutedGrey)),
+                                  const Text('Next Booster Due', style: TextStyle(fontSize: 11, color: PawlyColors.tertiary)),
                                   const SizedBox(height: 2),
-                                  Text(v.nextDueDate, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: PawlyColors.forest)),
+                                  Text(v.nextDueDate, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: PawlyColors.black)),
                                 ],
                               ),
                             ),
@@ -268,7 +267,7 @@ class VaccinationPassportScreen extends StatelessWidget {
                         const SizedBox(height: 10),
                         Text(
                           '${v.clinic} • ${v.veterinarian}',
-                          style: const TextStyle(fontSize: 12, color: PawlyColors.warmGrey),
+                          style: const TextStyle(fontSize: 12, color: PawlyColors.secondary),
                         ),
                       ],
                     ),
@@ -277,11 +276,10 @@ class VaccinationPassportScreen extends StatelessWidget {
 
               const SizedBox(height: 20),
 
-              PawlyButton(
-                label: 'Add Vaccine to Passport',
-                icon: Icons.add,
-                isFullWidth: true,
-                variant: PawlyButtonVariant.primary,
+              PawlyButton(text: 'Add Vaccine to Passport',
+                
+                
+                
                 onPressed: () => _openAddVaccineDialog(context),
               ),
               const SizedBox(height: 24),

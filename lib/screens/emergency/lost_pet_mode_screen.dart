@@ -33,10 +33,10 @@ class LostPetModeScreen extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: isLost ? PawlyColors.alertLight : Colors.white,
-                    borderRadius: AppRadius.rMd,
+                    color: isLost ? PawlyColors.border : Colors.white,
+                    borderRadius: AppTokens.rMd,
                     border: Border.all(
-                      color: isLost ? PawlyColors.alert : PawlyColors.border,
+                      color: isLost ? PawlyColors.error : PawlyColors.border,
                       width: isLost ? 1.5 : 1.0,
                     ),
                   ),
@@ -50,7 +50,7 @@ class LostPetModeScreen extends StatelessWidget {
                         ),
                         child: Icon(
                           Icons.radar_rounded,
-                          color: isLost ? Colors.white : PawlyColors.textSecondary,
+                          color: isLost ? Colors.white : PawlyColors.secondary,
                           size: 24,
                         ),
                       ),
@@ -70,8 +70,8 @@ class LostPetModeScreen extends StatelessWidget {
                               isLost
                                   ? 'Poster is public & ready to broadcast.'
                                   : 'Turn on if ${pet?.name ?? "your pet"} is missing.',
-                              style: PawlyTypography.bodySmall.copyWith(
-                                color: PawlyColors.textSecondary,
+                              style: PawlyTypography.bodyMedium.copyWith(
+                                color: PawlyColors.secondary,
                               ),
                             ),
                           ],
@@ -121,7 +121,7 @@ class LostPetModeScreen extends StatelessWidget {
                             ),
                             Text(
                               'PLEASE HELP BRING ${pet?.name.toUpperCase()} HOME',
-                              style: PawlyTypography.labelSmall.copyWith(
+                              style: PawlyTypography.eyebrow.copyWith(
                                 color: Colors.white.withOpacity(0.9),
                                 fontWeight: FontWeight.w700,
                                 letterSpacing: 1.0,
@@ -139,7 +139,7 @@ class LostPetModeScreen extends StatelessWidget {
                           fit: BoxFit.cover,
                           errorBuilder: (_, __, ___) => Container(
                             color: PawlyColors.border,
-                            child: const Icon(Icons.pets_rounded, size: 60, color: PawlyColors.textMuted),
+                            child: const Icon(Icons.pets_rounded, size: 60, color: PawlyColors.tertiary),
                           ),
                         ),
                       ),
@@ -151,7 +151,7 @@ class LostPetModeScreen extends StatelessWidget {
                           children: [
                             Text(
                               pet?.name ?? 'Pet',
-                              style: PawlyTypography.headlineMedium.copyWith(
+                              style: PawlyTypography.headlineSmall.copyWith(
                                 color: PawlyColors.deepEspresso,
                                 fontWeight: FontWeight.w800,
                               ),
@@ -160,7 +160,7 @@ class LostPetModeScreen extends StatelessWidget {
                             Text(
                               '${pet?.breed} • ${pet?.gender} • ${pet?.weightKg} kg',
                               style: PawlyTypography.bodyMedium.copyWith(
-                                color: PawlyColors.textSecondary,
+                                color: PawlyColors.secondary,
                                 fontWeight: FontWeight.w600,
                               ),
                             ),
@@ -177,10 +177,10 @@ class LostPetModeScreen extends StatelessWidget {
                                   Row(
                                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
-                                      Text('Microchip:', style: PawlyTypography.bodySmall.copyWith(color: PawlyColors.textSecondary)),
+                                      Text('Microchip:', style: PawlyTypography.bodyMedium.copyWith(color: PawlyColors.secondary)),
                                       Text(
                                         pet?.microchipId.isNotEmpty == true ? pet!.microchipId : 'Registered',
-                                        style: PawlyTypography.bodySmall.copyWith(fontWeight: FontWeight.w700),
+                                        style: PawlyTypography.bodyMedium.copyWith(fontWeight: FontWeight.w700),
                                       ),
                                     ],
                                   ),
@@ -188,10 +188,10 @@ class LostPetModeScreen extends StatelessWidget {
                                   Row(
                                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
-                                      Text('Contact:', style: PawlyTypography.bodySmall.copyWith(color: PawlyColors.textSecondary)),
+                                      Text('Contact:', style: PawlyTypography.bodyMedium.copyWith(color: PawlyColors.secondary)),
                                       Text(
                                         card.emergencyContactName,
-                                        style: PawlyTypography.bodySmall.copyWith(fontWeight: FontWeight.w700),
+                                        style: PawlyTypography.bodyMedium.copyWith(fontWeight: FontWeight.w700),
                                       ),
                                     ],
                                   ),
@@ -199,12 +199,12 @@ class LostPetModeScreen extends StatelessWidget {
                                   Row(
                                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
-                                      Text('Phone:', style: PawlyTypography.bodySmall.copyWith(color: PawlyColors.textSecondary)),
+                                      Text('Phone:', style: PawlyTypography.bodyMedium.copyWith(color: PawlyColors.secondary)),
                                       Text(
                                         card.emergencyPhone,
                                         style: PawlyTypography.titleSmall.copyWith(
                                           fontWeight: FontWeight.w800,
-                                          color: PawlyColors.forest,
+                                          color: PawlyColors.black,
                                         ),
                                       ),
                                     ],
@@ -217,8 +217,8 @@ class LostPetModeScreen extends StatelessWidget {
                             Text(
                               'If spotted or found, please call immediately. Approach gently as they may be scared.',
                               textAlign: TextAlign.center,
-                              style: PawlyTypography.bodySmall.copyWith(
-                                color: PawlyColors.textMuted,
+                              style: PawlyTypography.bodyMedium.copyWith(
+                                color: PawlyColors.tertiary,
                                 fontStyle: FontStyle.italic,
                               ),
                             ),
@@ -233,7 +233,7 @@ class LostPetModeScreen extends StatelessWidget {
                 // Broadcast actions
                 PawlyButton(
                   text: 'Broadcast Digital Poster',
-                  icon: Icons.share_rounded,
+                  
                   onPressed: () {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
@@ -247,7 +247,7 @@ class LostPetModeScreen extends StatelessWidget {
                 const SizedBox(height: 12),
                 PawlyButton(
                   text: 'Call Emergency Vet',
-                  icon: Icons.phone_in_talk_rounded,
+                  
                   isSecondary: true,
                   onPressed: () {
                     ScaffoldMessenger.of(context).showSnackBar(

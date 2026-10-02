@@ -54,11 +54,11 @@ class _AddCareScreenState extends State<AddCareScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: PawlyColors.creamBg,
+      backgroundColor: PawlyColors.background,
       appBar: AppBar(
         title: const Text('Add Care Routine'),
         leading: IconButton(
-          icon: const Icon(Icons.close_rounded),
+          icon:  const Icon(Icons.close_rounded),
           onPressed: () => Navigator.of(context).pop(),
         ),
       ),
@@ -85,7 +85,7 @@ class _AddCareScreenState extends State<AddCareScreen> {
                       selected: isSelected,
                       onSelected: (_) => setState(() => _selectedPetId = pet.id),
                       backgroundColor: PawlyColors.surface,
-                      selectedColor: PawlyColors.forest,
+                      selectedColor: PawlyColors.black,
                       labelStyle: TextStyle(
                         fontSize: 13,
                         fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
@@ -94,7 +94,7 @@ class _AddCareScreenState extends State<AddCareScreen> {
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(16),
                         side: BorderSide(
-                          color: isSelected ? PawlyColors.forest : PawlyColors.border,
+                          color: isSelected ? PawlyColors.black : PawlyColors.border,
                         ),
                       ),
                     );
@@ -117,7 +117,7 @@ class _AddCareScreenState extends State<AddCareScreen> {
                     selected: isSelected,
                     onSelected: (_) => setState(() => _selectedCategory = cat),
                     backgroundColor: PawlyColors.surface,
-                    selectedColor: PawlyColors.espresso,
+                    selectedColor: PawlyColors.charcoal,
                     labelStyle: TextStyle(
                       fontSize: 12,
                       fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
@@ -126,7 +126,7 @@ class _AddCareScreenState extends State<AddCareScreen> {
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(16),
                       side: BorderSide(
-                        color: isSelected ? PawlyColors.espresso : PawlyColors.border,
+                        color: isSelected ? PawlyColors.charcoal : PawlyColors.border,
                       ),
                     ),
                   );
@@ -232,11 +232,10 @@ class _AddCareScreenState extends State<AddCareScreen> {
 
               const SizedBox(height: 32),
 
-              PawlyButton(
-                label: 'Save Care Routine',
-                icon: Icons.check,
-                isFullWidth: true,
-                variant: PawlyButtonVariant.primary,
+              PawlyButton(text: 'Save Care Routine',
+                
+                
+                
                 onPressed: _handleSave,
               ),
               const SizedBox(height: 20),

@@ -46,11 +46,11 @@ class _AddHealthEventScreenState extends State<AddHealthEventScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: PawlyColors.creamBg,
+      backgroundColor: PawlyColors.background,
       appBar: AppBar(
         title: const Text('Log Health Event'),
         leading: IconButton(
-          icon: const Icon(Icons.close_rounded),
+          icon:  const Icon(Icons.close_rounded),
           onPressed: () => Navigator.of(context).pop(),
         ),
       ),
@@ -72,7 +72,7 @@ class _AddHealthEventScreenState extends State<AddHealthEventScreen> {
                     selected: isSelected,
                     onSelected: (_) => setState(() => _eventType = t),
                     backgroundColor: PawlyColors.surface,
-                    selectedColor: PawlyColors.clay,
+                    selectedColor: PawlyColors.surfaceWarm,
                     labelStyle: TextStyle(
                       fontSize: 12,
                       fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
@@ -81,7 +81,7 @@ class _AddHealthEventScreenState extends State<AddHealthEventScreen> {
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(16),
                       side: BorderSide(
-                        color: isSelected ? PawlyColors.clay : PawlyColors.border,
+                        color: isSelected ? PawlyColors.surfaceWarm : PawlyColors.border,
                       ),
                     ),
                   );
@@ -171,10 +171,9 @@ class _AddHealthEventScreenState extends State<AddHealthEventScreen> {
 
               const SizedBox(height: 32),
 
-              PawlyButton(
-                label: 'Save Health Event',
-                icon: Icons.check,
-                isFullWidth: true,
+              PawlyButton(text: 'Save Health Event',
+                
+                
                 variant: PawlyButtonVariant.clay,
                 onPressed: _handleSave,
               ),

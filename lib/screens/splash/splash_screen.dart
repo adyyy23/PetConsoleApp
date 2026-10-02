@@ -34,7 +34,7 @@ class _SplashScreenState extends State<SplashScreen> {
               height: 64,
               decoration: BoxDecoration(
                 color: PawlyColors.black,
-                borderRadius: AppRadius.rMd,
+                borderRadius: AppTokens.rMd,
               ),
               child: const Center(
                 child: Icon(Icons.pets, size: 30, color: Colors.white),
@@ -54,7 +54,7 @@ class _SplashScreenState extends State<SplashScreen> {
                 borderRadius: BorderRadius.circular(2),
                 child: const LinearProgressIndicator(
                   minHeight: 2,
-                  backgroundColor: PawlyColors.softGrey,
+                  backgroundColor: PawlyColors.border,
                   valueColor: AlwaysStoppedAnimation<Color>(PawlyColors.black),
                 ),
               ),
