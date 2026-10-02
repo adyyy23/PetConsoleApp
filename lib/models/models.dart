@@ -13,11 +13,12 @@ class HealthEvent {
     required this.petId,
     required this.date,
     required this.title,
-    required this.type,
+    String? type,
+    String? eventType,
     required this.notes,
     this.veterinarian = 'Attending Vet',
     this.clinic = '',
-  });
+  }) : type = type ?? eventType ?? 'Checkup';
 
   Map<String, dynamic> toJson() => {
     'id': id,
@@ -54,8 +55,9 @@ class WeightEntry {
     required this.petId,
     required this.date,
     required this.weightKg,
-    this.note = '',
-  });
+    String? note,
+    String? notes,
+  }) : note = note ?? notes ?? '';
 
   Map<String, dynamic> toJson() => {
     'id': id,
@@ -454,4 +456,167 @@ class UserProfile {
     avatarUrl: json['avatarUrl'] as String? ?? '',
     weightUnit: json['weightUnit'] as String? ?? 'kg',
   );
+}
+
+class CareCircleMember {
+  final String id;
+  final String name;
+  final String role; // Owner, Family, Pet Sitter, Co-Owner
+  final String email;
+  final String phone;
+  final String avatarUrl;
+  final List<String> permissions; // View pet, Complete routines, Add notes, View health, Emergency access
+
+  const CareCircleMember({
+    required this.id,
+    required this.name,
+    required this.role,
+    required this.email,
+    required this.phone,
+    this.avatarUrl = '',
+    this.permissions = const ['View pet', 'Complete routines', 'Add notes'],
+  });
+
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'name': name,
+    'role': role,
+    'email': email,
+    'phone': phone,
+    'avatarUrl': avatarUrl,
+    'permissions': permissions,
+  };
+
+  factory CareCircleMember.fromJson(Map<String, dynamic> json) => CareCircleMember(
+    id: json['id'] as String,
+    name: json['name'] as String,
+    role: json['role'] as String,
+    email: json['email'] as String,
+    phone: json['phone'] as String? ?? '',
+    avatarUrl: json['avatarUrl'] as String? ?? '',
+    permissions: (json['permissions'] as List?)?.map((e) => e.toString()).toList() ??
+        const ['View pet', 'Complete routines', 'Add notes'],
+  );
+}
+
+class PetMilestone {
+  final String id;
+  final String petId;
+  final String year;
+  final String title;
+  final String subtitle;
+  final String date;
+  final bool isAutomated;
+
+  const PetMilestone({
+    required this.id,
+    required this.petId,
+    required this.year,
+    required this.title,
+    required this.subtitle,
+    required this.date,
+    this.isAutomated = false,
+  });
+
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'petId': petId,
+    'year': year,
+    'title': title,
+    'subtitle': subtitle,
+    'date': date,
+    'isAutomated': isAutomated,
+  };
+
+  factory PetMilestone.fromJson(Map<String, dynamic> json) => PetMilestone(
+    id: json['id'] as String,
+    petId: json['petId'] as String,
+    year: json['year'] as String,
+    title: json['title'] as String,
+    subtitle: json['subtitle'] as String? ?? '',
+    date: json['date'] as String? ?? '',
+    isAutomated: json['isAutomated'] as bool? ?? false,
+  );
+}
+
+class WellnessSnapshot {
+  final int waterCupsDrank;
+  final int waterCupsTarget;
+  final int mealsCompleted;
+  final int mealsTarget;
+  final int walkMinutes;
+  final int medicationCompleted;
+  final int medicationTarget;
+
+  const WellnessSnapshot({
+    this.waterCupsDrank = 3,
+    this.waterCupsTarget = 4,
+    this.mealsCompleted = 2,
+    this.mealsTarget = 3,
+    this.walkMinutes = 35,
+    this.medicationCompleted = 1,
+    this.medicationTarget = 2,
+  });
+}
+
+class SymptomNote {
+  final String id;
+  final String petId;
+  final String date;
+  final String appetite; // Good, Fair, Reduced, None
+  final String energy; // Normal, Lethargic, High
+  final String stool; // Normal, Soft, Hard
+  final String skin; // Clear, Mild paw redness, Itchy
+  final String notes;
+
+  const SymptomNote({
+    required this.id,
+    required this.petId,
+    required this.date,
+    required this.appetite,
+    required this.energy,
+    required this.stool,
+    required this.skin,
+    required this.notes,
+  });
+
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'petId': petId,
+    'date': date,
+    'appetite': appetite,
+    'energy': energy,
+    'stool': stool,
+    'skin': skin,
+    'notes': notes,
+  };
+
+  factory SymptomNote.fromJson(Map<String, dynamic> json) => SymptomNote(
+    id: json['id'] as String,
+    petId: json['petId'] as String,
+    date: json['date'] as String,
+    appetite: json['appetite'] as String? ?? 'Good',
+    energy: json['energy'] as String? ?? 'Normal',
+    stool: json['stool'] as String? ?? 'Normal',
+    skin: json['skin'] as String? ?? 'Clear',
+    notes: json['notes'] as String? ?? '',
+  );
+}
+
+class SearchResultItem {
+  final String title;
+  final String subtitle;
+  final String category; // 'Care', 'Health', 'Medication', 'Appointment', 'Memory', 'Document', 'Pet'
+  final String date;
+  final String petName;
+  final dynamic originalObject;
+
+  const SearchResultItem({
+    required this.title,
+    required this.subtitle,
+    required this.category,
+    this.date = '',
+    this.petName = '',
+    this.originalObject,
+  });
 }

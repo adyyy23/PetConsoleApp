@@ -35,10 +35,11 @@ void main() {
     await tester.tap(find.text('Demo Enter'));
     await tester.pumpAndSettle();
 
-    // 3. Verify Home Screen is active with pet Mochi and Today's routine
+    // 3. Verify Home Screen is active with pet Mochi, wellness, and Care routine
     expect(find.text('Mochi'), findsWidgets);
-    expect(find.text('TODAY'), findsWidgets);
-    expect(find.textContaining('Care Routine'), findsOneWidget);
+    expect(find.textContaining('Care Routine'), findsWidgets);
+    expect(find.text('WATER'), findsOneWidget);
+    expect(find.text('MEALS'), findsOneWidget);
 
     // 4. Verify Bottom Nav destinations
     expect(find.text('Home'), findsOneWidget);
@@ -57,18 +58,42 @@ void main() {
     await tester.tap(find.text('Care'));
     await tester.pumpAndSettle();
     expect(find.text('Care Agenda'), findsOneWidget);
+    expect(find.textContaining('Care Consistency'), findsOneWidget);
 
     // 7. Navigate to Health tab
     await tester.tap(find.text('Health'));
     await tester.pumpAndSettle();
-    expect(find.text('Health Story'), findsOneWidget);
+    expect(find.textContaining('Health Story'), findsOneWidget);
+    expect(find.text('Daily Observations & Symptoms'), findsOneWidget);
 
     // 8. Navigate to More / Settings tab
     await tester.tap(find.text('More'));
     await tester.pumpAndSettle();
     expect(find.text('Settings & More'), findsOneWidget);
+    expect(find.text('Universal Search'), findsOneWidget);
+    expect(find.text('Unified Pet Calendar'), findsOneWidget);
     expect(find.text('Digital Emergency Pet Card'), findsOneWidget);
     expect(find.text('Lost Pet Mode'), findsOneWidget);
     expect(find.text('Adopt & Foster Discovery'), findsOneWidget);
+  });
+
+  testWidgets('Pawly Repository Universal Search returns matching entities', (WidgetTester tester) async {
+    SharedPreferences.setMockInitialValues({});
+    final repository = PawlyRepository();
+    await repository.init();
+
+    // Search for medication
+    final medResults = repository.search('Apoquel');
+    expect(medResults.isNotEmpty, isTrue);
+    expect(medResults.first.title, contains('Apoquel'));
+
+    // Search for pet Mochi
+    final petResults = repository.search('Mochi');
+    expect(petResults.isNotEmpty, isTrue);
+    expect(petResults.any((r) => r.category == 'Pet'), isTrue);
+
+    // Search for care routine walk
+    final careResults = repository.search('Walk');
+    expect(careResults.isNotEmpty, isTrue);
   });
 }

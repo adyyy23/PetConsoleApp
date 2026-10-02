@@ -108,15 +108,11 @@ class _PetCollectionCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       margin: const EdgeInsets.only(bottom: 20),
-      child: Material(
-        color: PawlyColors.surface,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(24),
-          side: const BorderSide(color: PawlyColors.border, width: 1.2),
-        ),
-        clipBehavior: Clip.antiAlias,
-        child: InkWell(
-          onTap: onTap,
+      child: GestureDetector(
+        onTap: onTap,
+        child: PawlyBubble(
+          backgroundColor: Colors.white,
+          padding: EdgeInsets.zero,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -145,22 +141,44 @@ class _PetCollectionCard extends StatelessWidget {
                           borderRadius: BorderRadius.circular(20),
                         ),
                         child: Text(
-                          pet.category,
+                          pet.category.toUpperCase(),
                           style: const TextStyle(
-                            fontSize: 11,
-                            fontWeight: FontWeight.w700,
+                            fontSize: 10,
+                            fontWeight: FontWeight.w800,
+                            letterSpacing: 0.5,
                             color: Colors.white,
                           ),
                         ),
                       ),
                     ),
+                    if (pet.nickname.isNotEmpty)
+                      Positioned(
+                        bottom: 12,
+                        left: 14,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: Colors.black.withOpacity(0.6),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Text(
+                            '“${pet.nickname}”',
+                            style: const TextStyle(
+                              fontSize: 12,
+                              fontStyle: FontStyle.italic,
+                              fontWeight: FontWeight.w600,
+                              color: PawlyColors.butterYellow,
+                            ),
+                          ),
+                        ),
+                      ),
                   ],
                 ),
               ),
 
               // Pet Details
               Padding(
-                padding: const EdgeInsets.all(20),
+                padding: const EdgeInsets.all(18),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -174,7 +192,7 @@ class _PetCollectionCard extends StatelessWidget {
                             Text(pet.name, style: PawlyTypography.titleLarge),
                             const SizedBox(height: 2),
                             Text(
-                              '${pet.breed} • ${pet.ageYears.toStringAsFixed(pet.ageYears.truncateToDouble() == pet.ageYears ? 0 : 1)} years old • ${pet.gender}',
+                              '${pet.breed} • ${pet.ageYears.toStringAsFixed(pet.ageYears.truncateToDouble() == pet.ageYears ? 0 : 1)} yrs • ${pet.gender}',
                               style: PawlyTypography.bodyMedium,
                             ),
                           ],
@@ -189,7 +207,7 @@ class _PetCollectionCard extends StatelessWidget {
                             '${pet.weightKg} kg',
                             style: const TextStyle(
                               fontSize: 12,
-                              fontWeight: FontWeight.w700,
+                              fontWeight: FontWeight.w800,
                               color: PawlyColors.espresso,
                             ),
                           ),
@@ -197,15 +215,14 @@ class _PetCollectionCard extends StatelessWidget {
                       ],
                     ),
 
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 14),
 
                     // Next routine row
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
                       decoration: BoxDecoration(
-                        color: PawlyColors.creamBg,
+                        color: PawlyColors.surfaceWarm,
                         borderRadius: BorderRadius.circular(14),
-                        border: Border.all(color: PawlyColors.borderLight),
                       ),
                       child: Row(
                         children: [
@@ -218,12 +235,12 @@ class _PetCollectionCard extends StatelessWidget {
                               overflow: TextOverflow.ellipsis,
                               style: const TextStyle(
                                 fontSize: 13,
-                                fontWeight: FontWeight.w600,
+                                fontWeight: FontWeight.w700,
                                 color: PawlyColors.espresso,
                               ),
                             ),
                           ),
-                          const Icon(Icons.arrow_forward_ios_rounded, size: 12, color: PawlyColors.mutedGrey),
+                          const Icon(Icons.arrow_forward_ios_rounded, size: 12, color: PawlyColors.warmGrey),
                         ],
                       ),
                     ),

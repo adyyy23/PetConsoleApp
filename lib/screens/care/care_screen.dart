@@ -21,6 +21,17 @@ class CareScreen extends StatefulWidget {
 
 class _CareScreenState extends State<CareScreen> {
   CareCategory? _selectedCategory;
+  int _selectedDayIndex = 4; // Friday in current week
+
+  final List<Map<String, String>> _weekDays = const [
+    {'day': 'M', 'date': '28'},
+    {'day': 'T', 'date': '29'},
+    {'day': 'W', 'date': '30'},
+    {'day': 'T', 'date': '1'},
+    {'day': 'F', 'date': '2'},
+    {'day': 'S', 'date': '3'},
+    {'day': 'S', 'date': '4'},
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -40,6 +51,7 @@ class _CareScreenState extends State<CareScreen> {
         bottom: false,
         child: CustomScrollView(
           slivers: [
+            // Top Bar
             SliverToBoxAdapter(
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(20, 16, 20, 12),
@@ -55,8 +67,7 @@ class _CareScreenState extends State<CareScreen> {
                       ],
                     ),
                     PawlyButton(
-                      label: 'New Routine',
-                      icon: Icons.add,
+                      text: '+ Add Care',
                       isSmall: true,
                       variant: PawlyButtonVariant.primary,
                       onPressed: widget.onOpenAddCare,
@@ -66,11 +77,110 @@ class _CareScreenState extends State<CareScreen> {
               ),
             ),
 
+            // Horizontal Week Selector
+            SliverToBoxAdapter(
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                child: PawlyBubble(
+                  backgroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: List.generate(_weekDays.length, (idx) {
+                      final item = _weekDays[idx];
+                      final isSelected = idx == _selectedDayIndex;
+                      return GestureDetector(
+                        onTap: () => setState(() => _selectedDayIndex = idx),
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 150),
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                          decoration: BoxDecoration(
+                            color: isSelected ? PawlyColors.forest : Colors.transparent,
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                item['day']!,
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w700,
+                                  color: isSelected ? Colors.white70 : PawlyColors.warmGrey,
+                                ),
+                              ),
+                              const SizedBox(height: 2),
+                              Text(
+                                item['date']!,
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w800,
+                                  color: isSelected ? Colors.white : PawlyColors.espresso,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    }),
+                  ),
+                ),
+              ),
+            ),
+
+            // Gentle Care Consistency Streak Banner
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                child: PawlyBubble(
+                  backgroundColor: PawlyColors.sageLight,
+                  borderColor: PawlyColors.softSage,
+                  padding: const EdgeInsets.all(14),
+                  child: Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: const BoxDecoration(
+                          color: PawlyColors.forest,
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(Icons.star_rounded, color: Colors.white, size: 16),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              'Care Consistency: 6 of last 7 days',
+                              style: TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w800,
+                                color: PawlyColors.forest,
+                              ),
+                            ),
+                            const SizedBox(height: 1),
+                            Text(
+                              '${activePet.name} is on track with scheduled wellness care.',
+                              style: const TextStyle(
+                                fontSize: 11,
+                                color: PawlyColors.forest,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+
             // Category Filter Pills
             SliverToBoxAdapter(
               child: Container(
                 height: 44,
-                margin: const EdgeInsets.only(bottom: 16),
+                margin: const EdgeInsets.only(top: 6, bottom: 12),
                 child: ListView(
                   scrollDirection: Axis.horizontal,
                   padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -79,17 +189,17 @@ class _CareScreenState extends State<CareScreen> {
                       label: const Text('All Routines'),
                       selected: _selectedCategory == null,
                       onSelected: (_) => setState(() => _selectedCategory = null),
-                      backgroundColor: PawlyColors.surface,
-                      selectedColor: PawlyColors.espresso,
+                      backgroundColor: Colors.white,
+                      selectedColor: PawlyColors.forest,
                       labelStyle: TextStyle(
                         fontSize: 12,
-                        fontWeight: _selectedCategory == null ? FontWeight.w700 : FontWeight.w500,
-                        color: _selectedCategory == null ? Colors.white : PawlyColors.charcoal,
+                        fontWeight: _selectedCategory == null ? FontWeight.w800 : FontWeight.w600,
+                        color: _selectedCategory == null ? Colors.white : PawlyColors.espresso,
                       ),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
+                        borderRadius: BorderRadius.circular(18),
                         side: BorderSide(
-                          color: _selectedCategory == null ? PawlyColors.espresso : PawlyColors.border,
+                          color: _selectedCategory == null ? PawlyColors.forest : PawlyColors.border,
                         ),
                       ),
                     ),
@@ -102,17 +212,17 @@ class _CareScreenState extends State<CareScreen> {
                           label: Text(cat.displayName),
                           selected: isSelected,
                           onSelected: (_) => setState(() => _selectedCategory = cat),
-                          backgroundColor: PawlyColors.surface,
-                          selectedColor: PawlyColors.espresso,
+                          backgroundColor: Colors.white,
+                          selectedColor: PawlyColors.forest,
                           labelStyle: TextStyle(
                             fontSize: 12,
-                            fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-                            color: isSelected ? Colors.white : PawlyColors.charcoal,
+                            fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
+                            color: isSelected ? Colors.white : PawlyColors.espresso,
                           ),
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(16),
+                            borderRadius: BorderRadius.circular(18),
                             side: BorderSide(
-                              color: isSelected ? PawlyColors.espresso : PawlyColors.border,
+                              color: isSelected ? PawlyColors.forest : PawlyColors.border,
                             ),
                           ),
                         ),
@@ -123,7 +233,7 @@ class _CareScreenState extends State<CareScreen> {
               ),
             ),
 
-            // Agenda List
+            // Care Agenda Timeline
             if (filtered.isEmpty)
               SliverFillRemaining(
                 child: EmptyStateView(
@@ -141,144 +251,51 @@ class _CareScreenState extends State<CareScreen> {
                   delegate: SliverChildListDelegate([
                     if (pending.isNotEmpty) ...[
                       const Padding(
-                        padding: EdgeInsets.only(bottom: 10, top: 4),
+                        padding: EdgeInsets.only(bottom: 12, top: 4),
                         child: Text('SCHEDULED TODAY', style: PawlyTypography.labelSmall),
                       ),
-                      ...pending.map((r) => _CareItemCard(
-                            routine: r,
-                            onToggle: () => widget.repository.toggleRoutine(r.id),
-                            onDelete: () => widget.repository.deleteRoutine(r.id),
-                          )),
-                      const SizedBox(height: 18),
+                      ...List.generate(pending.length, (idx) {
+                        final r = pending[idx];
+                        final isLast = idx == pending.length - 1 && completed.isEmpty;
+                        return CareTimelineItem(
+                          time: r.time,
+                          title: r.title,
+                          subtitle: r.notes.isNotEmpty ? r.notes : '${r.category.displayName} • ${r.recurrence}',
+                          isCompleted: false,
+                          isLast: isLast,
+                          assignedTo: r.assignedTo,
+                          onToggle: () => widget.repository.toggleRoutine(r.id),
+                        );
+                      }),
+                      const SizedBox(height: 16),
                     ],
 
                     if (completed.isNotEmpty) ...[
                       const Padding(
-                        padding: EdgeInsets.only(bottom: 10),
+                        padding: EdgeInsets.only(bottom: 12),
                         child: Text('COMPLETED TODAY', style: PawlyTypography.labelSmall),
                       ),
-                      ...completed.map((r) => _CareItemCard(
-                            routine: r,
-                            onToggle: () => widget.repository.toggleRoutine(r.id),
-                            onDelete: () => widget.repository.deleteRoutine(r.id),
-                          )),
+                      ...List.generate(completed.length, (idx) {
+                        final r = completed[idx];
+                        final isLast = idx == completed.length - 1;
+                        return CareTimelineItem(
+                          time: r.time,
+                          title: r.title,
+                          subtitle: r.completedAt.isNotEmpty
+                              ? 'Completed at ${r.completedAt}'
+                              : (r.notes.isNotEmpty ? r.notes : '${r.category.displayName} • ${r.recurrence}'),
+                          isCompleted: true,
+                          isLast: isLast,
+                          assignedTo: r.assignedTo,
+                          onToggle: () => widget.repository.toggleRoutine(r.id),
+                        );
+                      }),
                     ],
                   ]),
                 ),
               ),
           ],
         ),
-      ),
-    );
-  }
-}
-
-class _CareItemCard extends StatelessWidget {
-  final CareRoutine routine;
-  final VoidCallback onToggle;
-  final VoidCallback onDelete;
-
-  const _CareItemCard({
-    required this.routine,
-    required this.onToggle,
-    required this.onDelete,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: routine.isCompleted ? PawlyColors.creamBg : PawlyColors.surface,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: routine.isCompleted ? PawlyColors.borderLight : PawlyColors.border,
-          width: 1.2,
-        ),
-      ),
-      child: Row(
-        children: [
-          // Circular Complete Check
-          GestureDetector(
-            onTap: onToggle,
-            child: AnimatedContainer(
-              duration: const Duration(milliseconds: 150),
-              width: 28,
-              height: 28,
-              decoration: BoxDecoration(
-                color: routine.isCompleted ? PawlyColors.forest : Colors.white,
-                shape: BoxShape.circle,
-                border: Border.all(
-                  color: routine.isCompleted ? PawlyColors.forest : PawlyColors.border,
-                  width: 2,
-                ),
-              ),
-              child: routine.isCompleted
-                  ? const Icon(Icons.check, size: 18, color: Colors.white)
-                  : null,
-            ),
-          ),
-          const SizedBox(width: 14),
-
-          // Content
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Text(
-                      routine.time,
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w800,
-                        color: routine.isCompleted ? PawlyColors.mutedGrey : PawlyColors.forest,
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Text(
-                      routine.category.displayName,
-                      style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: PawlyColors.mutedGrey),
-                    ),
-                    const SizedBox(width: 8),
-                    Text(
-                      '• ${routine.recurrence}',
-                      style: const TextStyle(fontSize: 11, color: PawlyColors.mutedGrey),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  routine.title,
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w700,
-                    decoration: routine.isCompleted ? TextDecoration.lineThrough : null,
-                    color: routine.isCompleted ? PawlyColors.mutedGrey : PawlyColors.espresso,
-                  ),
-                ),
-                if (routine.notes.isNotEmpty) ...[
-                  const SizedBox(height: 2),
-                  Text(
-                    routine.notes,
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: routine.isCompleted ? PawlyColors.mutedGrey : PawlyColors.warmGrey,
-                    ),
-                  ),
-                ],
-              ],
-            ),
-          ),
-
-          IconButton(
-            icon: const Icon(Icons.close, size: 16, color: PawlyColors.mutedGrey),
-            onPressed: onDelete,
-            padding: EdgeInsets.zero,
-            constraints: const BoxConstraints(),
-          ),
-        ],
       ),
     );
   }

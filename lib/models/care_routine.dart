@@ -5,6 +5,7 @@ enum CareCategory {
   exercise,
   grooming,
   vaccination,
+  training,
   other,
 }
 
@@ -23,6 +24,8 @@ extension CareCategoryX on CareCategory {
         return 'Grooming';
       case CareCategory.vaccination:
         return 'Vaccination';
+      case CareCategory.training:
+        return 'Training';
       case CareCategory.other:
         return 'Routine';
     }
@@ -39,7 +42,9 @@ class CareRoutine {
   final String priority; // High, Medium, Low
   final bool isCompleted;
   final String notes;
-  final String recurrence; // Daily, Weekly, Once
+  final String recurrence; // Daily, Weekdays, Every 2 weeks, Every 30 days, Monthly, Once
+  final String assignedTo; // e.g. "Me", "David (Family)", "Sarah (Sitter)"
+  final String completedAt; // e.g. "08:14 AM"
 
   const CareRoutine({
     required this.id,
@@ -52,6 +57,8 @@ class CareRoutine {
     this.isCompleted = false,
     this.notes = '',
     this.recurrence = 'Daily',
+    this.assignedTo = 'Me',
+    this.completedAt = '',
   });
 
   CareRoutine copyWith({
@@ -65,6 +72,8 @@ class CareRoutine {
     bool? isCompleted,
     String? notes,
     String? recurrence,
+    String? assignedTo,
+    String? completedAt,
   }) {
     return CareRoutine(
       id: id ?? this.id,
@@ -77,6 +86,8 @@ class CareRoutine {
       isCompleted: isCompleted ?? this.isCompleted,
       notes: notes ?? this.notes,
       recurrence: recurrence ?? this.recurrence,
+      assignedTo: assignedTo ?? this.assignedTo,
+      completedAt: completedAt ?? this.completedAt,
     );
   }
 
@@ -91,6 +102,8 @@ class CareRoutine {
     'isCompleted': isCompleted,
     'notes': notes,
     'recurrence': recurrence,
+    'assignedTo': assignedTo,
+    'completedAt': completedAt,
   };
 
   factory CareRoutine.fromJson(Map<String, dynamic> json) => CareRoutine(
@@ -107,5 +120,7 @@ class CareRoutine {
     isCompleted: json['isCompleted'] as bool? ?? false,
     notes: json['notes'] as String? ?? '',
     recurrence: json['recurrence'] as String? ?? 'Daily',
+    assignedTo: json['assignedTo'] as String? ?? 'Me',
+    completedAt: json['completedAt'] as String? ?? '',
   );
 }

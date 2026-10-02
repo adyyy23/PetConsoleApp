@@ -23,6 +23,8 @@ import 'screens/pets/pet_space_screen.dart';
 import 'screens/profile/profile_settings_screen.dart';
 import 'screens/splash/splash_screen.dart';
 import 'screens/vaccination/vaccination_passport_screen.dart';
+import 'screens/calendar/pet_calendar_screen.dart';
+import 'screens/search/universal_search_screen.dart';
 import 'theme/pawly_colors.dart';
 import 'theme/pawly_theme.dart';
 
@@ -209,6 +211,8 @@ class _PawlyMainScaffoldState extends State<PawlyMainScaffold> {
                 onOpenPetSpace: _openPetSpace,
                 onOpenAppointments: () => _push(AppointmentsScreen(repository: widget.repository)),
                 onOpenWeight: () => _push(WeightGrowthScreen(repository: widget.repository)),
+                onOpenSearch: () => _push(UniversalSearchScreen(repository: widget.repository)),
+                onOpenCalendar: () => _push(PetCalendarScreen(repository: widget.repository)),
               ),
 
               // 1: PETS

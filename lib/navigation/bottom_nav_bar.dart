@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import '../theme/pawly_colors.dart';
 
@@ -15,51 +16,59 @@ class PawlyBottomNavBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: const BoxDecoration(
-        color: PawlyColors.surface,
-        border: Border(
-          top: BorderSide(color: PawlyColors.border, width: 1),
-        ),
-      ),
-      child: SafeArea(
-        top: false,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              _NavItem(
-                icon: Icons.home_rounded,
-                label: 'Home',
-                isSelected: currentDestination == PawlyNavDestination.home,
-                onTap: () => onDestinationSelected(PawlyNavDestination.home),
+    return ClipRect(
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
+        child: Container(
+          decoration: BoxDecoration(
+            color: PawlyColors.frostedWarmWhite,
+            border: Border(
+              top: BorderSide(
+                color: PawlyColors.border.withOpacity(0.6),
+                width: 1,
               ),
-              _NavItem(
-                icon: Icons.pets_rounded,
-                label: 'Pets',
-                isSelected: currentDestination == PawlyNavDestination.pets,
-                onTap: () => onDestinationSelected(PawlyNavDestination.pets),
+            ),
+          ),
+          child: SafeArea(
+            top: false,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  _NavItem(
+                    icon: Icons.home_rounded,
+                    label: 'Home',
+                    isSelected: currentDestination == PawlyNavDestination.home,
+                    onTap: () => onDestinationSelected(PawlyNavDestination.home),
+                  ),
+                  _NavItem(
+                    icon: Icons.pets_rounded,
+                    label: 'Pets',
+                    isSelected: currentDestination == PawlyNavDestination.pets,
+                    onTap: () => onDestinationSelected(PawlyNavDestination.pets),
+                  ),
+                  _NavItem(
+                    icon: Icons.check_circle_outline_rounded,
+                    label: 'Care',
+                    isSelected: currentDestination == PawlyNavDestination.care,
+                    onTap: () => onDestinationSelected(PawlyNavDestination.care),
+                  ),
+                  _NavItem(
+                    icon: Icons.favorite_border_rounded,
+                    label: 'Health',
+                    isSelected: currentDestination == PawlyNavDestination.health,
+                    onTap: () => onDestinationSelected(PawlyNavDestination.health),
+                  ),
+                  _NavItem(
+                    icon: Icons.grid_view_rounded,
+                    label: 'More',
+                    isSelected: currentDestination == PawlyNavDestination.more,
+                    onTap: () => onDestinationSelected(PawlyNavDestination.more),
+                  ),
+                ],
               ),
-              _NavItem(
-                icon: Icons.check_circle_outline_rounded,
-                label: 'Care',
-                isSelected: currentDestination == PawlyNavDestination.care,
-                onTap: () => onDestinationSelected(PawlyNavDestination.care),
-              ),
-              _NavItem(
-                icon: Icons.favorite_border_rounded,
-                label: 'Health',
-                isSelected: currentDestination == PawlyNavDestination.health,
-                onTap: () => onDestinationSelected(PawlyNavDestination.health),
-              ),
-              _NavItem(
-                icon: Icons.grid_view_rounded,
-                label: 'More',
-                isSelected: currentDestination == PawlyNavDestination.more,
-                onTap: () => onDestinationSelected(PawlyNavDestination.more),
-              ),
-            ],
+            ),
           ),
         ),
       ),
@@ -84,15 +93,20 @@ class _NavItem extends StatelessWidget {
   Widget build(BuildContext context) {
     final color = isSelected ? PawlyColors.forest : PawlyColors.mutedGrey;
 
-    return InkWell(
+    return GestureDetector(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(16),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
+      behavior: HitTestBehavior.opaque,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+        decoration: BoxDecoration(
+          color: isSelected ? PawlyColors.forest.withOpacity(0.12) : Colors.transparent,
+          borderRadius: BorderRadius.circular(20),
+        ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(icon, size: 23, color: color),
+            Icon(icon, size: 22, color: color),
             const SizedBox(height: 3),
             Text(
               label,

@@ -13,6 +13,16 @@ class Pet {
   final String birthday;
   final String category; // Companion, Rescue, Foster, Service
 
+  // Personality Profile fields
+  final String nickname;
+  final String favoriteFood;
+  final String favoriteToy;
+  final String favoriteActivity;
+  final String temperament;
+  final List<String> likes;
+  final List<String> dislikes;
+  final String funFact;
+
   const Pet({
     required this.id,
     required this.name,
@@ -27,6 +37,14 @@ class Pet {
     this.microchipNumber = '',
     this.birthday = '',
     this.category = 'Companion',
+    this.nickname = '',
+    this.favoriteFood = '',
+    this.favoriteToy = '',
+    this.favoriteActivity = '',
+    this.temperament = 'Gentle, friendly & curious',
+    this.likes = const [],
+    this.dislikes = const [],
+    this.funFact = '',
   });
 
   String get species => animalType;
@@ -46,6 +64,14 @@ class Pet {
     String? microchipNumber,
     String? birthday,
     String? category,
+    String? nickname,
+    String? favoriteFood,
+    String? favoriteToy,
+    String? favoriteActivity,
+    String? temperament,
+    List<String>? likes,
+    List<String>? dislikes,
+    String? funFact,
   }) {
     return Pet(
       id: id ?? this.id,
@@ -61,6 +87,14 @@ class Pet {
       microchipNumber: microchipNumber ?? this.microchipNumber,
       birthday: birthday ?? this.birthday,
       category: category ?? this.category,
+      nickname: nickname ?? this.nickname,
+      favoriteFood: favoriteFood ?? this.favoriteFood,
+      favoriteToy: favoriteToy ?? this.favoriteToy,
+      favoriteActivity: favoriteActivity ?? this.favoriteActivity,
+      temperament: temperament ?? this.temperament,
+      likes: likes ?? this.likes,
+      dislikes: dislikes ?? this.dislikes,
+      funFact: funFact ?? this.funFact,
     );
   }
 
@@ -78,6 +112,14 @@ class Pet {
     'microchipNumber': microchipNumber,
     'birthday': birthday,
     'category': category,
+    'nickname': nickname,
+    'favoriteFood': favoriteFood,
+    'favoriteToy': favoriteToy,
+    'favoriteActivity': favoriteActivity,
+    'temperament': temperament,
+    'likes': likes,
+    'dislikes': dislikes,
+    'funFact': funFact,
   };
 
   factory Pet.fromJson(Map<String, dynamic> json) => Pet(
@@ -94,5 +136,13 @@ class Pet {
     microchipNumber: json['microchipNumber'] as String? ?? '',
     birthday: json['birthday'] as String? ?? '',
     category: json['category'] as String? ?? 'Companion',
+    nickname: json['nickname'] as String? ?? '',
+    favoriteFood: json['favoriteFood'] as String? ?? '',
+    favoriteToy: json['favoriteToy'] as String? ?? '',
+    favoriteActivity: json['favoriteActivity'] as String? ?? '',
+    temperament: json['temperament'] as String? ?? 'Gentle, friendly & curious',
+    likes: (json['likes'] as List?)?.map((e) => e.toString()).toList() ?? const [],
+    dislikes: (json['dislikes'] as List?)?.map((e) => e.toString()).toList() ?? const [],
+    funFact: json['funFact'] as String? ?? '',
   );
 }

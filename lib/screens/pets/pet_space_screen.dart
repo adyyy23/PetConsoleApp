@@ -42,7 +42,15 @@ class PetSpaceScreen extends StatefulWidget {
 
 class _PetSpaceScreenState extends State<PetSpaceScreen> {
   int _selectedTabIndex = 0;
-  final List<String> _tabs = const ['About', 'Care', 'Health', 'Passport', 'Memories', 'Wallet'];
+  final List<String> _tabs = const [
+    'Personality',
+    'Journey',
+    'Care',
+    'Health',
+    'Passport',
+    'Memories',
+    'Wallet'
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -56,6 +64,7 @@ class _PetSpaceScreenState extends State<PetSpaceScreen> {
     final memories = widget.repository.activePetMemories;
     final documents = widget.repository.activePetDocuments;
     final vaccines = widget.repository.activePetVaccinations;
+    final milestones = widget.repository.activePetMilestones;
 
     return Scaffold(
       backgroundColor: PawlyColors.creamBg,
@@ -137,6 +146,18 @@ class _PetSpaceScreenState extends State<PetSpaceScreen> {
                             color: Colors.white.withOpacity(0.9),
                           ),
                         ),
+                        if (pet.nickname.isNotEmpty) ...[
+                          const SizedBox(height: 4),
+                          Text(
+                            '“${pet.nickname}”',
+                            style: const TextStyle(
+                              fontSize: 13,
+                              fontStyle: FontStyle.italic,
+                              fontWeight: FontWeight.w600,
+                              color: PawlyColors.butterYellow,
+                            ),
+                          ),
+                        ],
                       ],
                     ),
                   ),
@@ -148,7 +169,7 @@ class _PetSpaceScreenState extends State<PetSpaceScreen> {
           // Horizontal Space Navigation Tabs
           SliverToBoxAdapter(
             child: Container(
-              height: 50,
+              height: 48,
               margin: const EdgeInsets.only(top: 14, bottom: 8),
               child: ListView.separated(
                 scrollDirection: Axis.horizontal,
@@ -161,17 +182,17 @@ class _PetSpaceScreenState extends State<PetSpaceScreen> {
                     label: Text(_tabs[index]),
                     selected: isSelected,
                     onSelected: (_) => setState(() => _selectedTabIndex = index),
-                    backgroundColor: PawlyColors.surface,
-                    selectedColor: PawlyColors.espresso,
+                    backgroundColor: Colors.white,
+                    selectedColor: PawlyColors.forest,
                     labelStyle: TextStyle(
                       fontSize: 13,
-                      fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-                      color: isSelected ? Colors.white : PawlyColors.charcoal,
+                      fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
+                      color: isSelected ? Colors.white : PawlyColors.espresso,
                     ),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(18),
+                      borderRadius: BorderRadius.circular(20),
                       side: BorderSide(
-                        color: isSelected ? PawlyColors.espresso : PawlyColors.border,
+                        color: isSelected ? PawlyColors.forest : PawlyColors.border,
                       ),
                     ),
                   );
@@ -189,25 +210,175 @@ class _PetSpaceScreenState extends State<PetSpaceScreen> {
               child: Builder(
                 builder: (context) {
                   switch (_selectedTabIndex) {
-                    // TAB 0: ABOUT
+                    // TAB 0: PERSONALITY PROFILE
                     case 0:
                       return Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          _SpaceCard(
-                            title: 'About ${pet.name}',
-                            child: Text(
-                              pet.notes.isNotEmpty
-                                  ? pet.notes
-                                  : '${pet.name} is a cherished family member.',
-                              style: PawlyTypography.bodyLarge,
+                          // Pet Bio & Quote
+                          PawlyBubble(
+                            backgroundColor: Colors.white,
+                            padding: const EdgeInsets.all(20),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Row(
+                                  children: [
+                                    Icon(Icons.favorite_rounded, color: PawlyColors.terracotta, size: 20),
+                                    SizedBox(width: 8),
+                                    Text('Personality & Temperament', style: PawlyTypography.titleMedium),
+                                  ],
+                                ),
+                                const SizedBox(height: 12),
+                                Text(
+                                  pet.notes.isNotEmpty
+                                      ? pet.notes
+                                      : '${pet.name} is a beloved companion with a heart of gold.',
+                                  style: PawlyTypography.bodyLarge,
+                                ),
+                                if (pet.temperament.isNotEmpty) ...[
+                                  const SizedBox(height: 14),
+                                  Wrap(
+                                    spacing: 8,
+                                    runSpacing: 8,
+                                    children: pet.temperament.split(',').map((t) {
+                                      return Container(
+                                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                        decoration: BoxDecoration(
+                                          color: PawlyColors.forestLight,
+                                          borderRadius: BorderRadius.circular(16),
+                                        ),
+                                        child: Text(
+                                          t.trim(),
+                                          style: const TextStyle(
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.w700,
+                                            color: PawlyColors.forest,
+                                          ),
+                                        ),
+                                      );
+                                    }).toList(),
+                                  ),
+                                ],
+                              ],
                             ),
                           ),
+
                           const SizedBox(height: 16),
-                          _SpaceCard(
-                            title: 'Vitals & Identification',
+
+                          // Loves & Not a Fan Of
+                          PawlyBubble(
+                            backgroundColor: Colors.white,
+                            padding: const EdgeInsets.all(20),
                             child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
+                                const Text('LOVES', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: PawlyColors.forest, letterSpacing: 0.8)),
+                                const SizedBox(height: 8),
+                                Wrap(
+                                  spacing: 8,
+                                  runSpacing: 8,
+                                  children: (pet.likes.isNotEmpty
+                                          ? pet.likes
+                                          : const ['Salmon treats', 'Belly rubs', 'Morning park runs'])
+                                      .map((item) => Container(
+                                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                            decoration: BoxDecoration(
+                                              color: PawlyColors.sageLight,
+                                              borderRadius: BorderRadius.circular(14),
+                                            ),
+                                            child: Row(
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                const Icon(Icons.thumb_up_alt_outlined, size: 14, color: PawlyColors.forest),
+                                                const SizedBox(width: 6),
+                                                Text(
+                                                  item.trim(),
+                                                  style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: PawlyColors.forest),
+                                                ),
+                                              ],
+                                            ),
+                                          ))
+                                      .toList(),
+                                ),
+                                const SizedBox(height: 18),
+                                const Text('NOT A FAN OF', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: PawlyColors.terracotta, letterSpacing: 0.8)),
+                                const SizedBox(height: 8),
+                                Wrap(
+                                  spacing: 8,
+                                  runSpacing: 8,
+                                  children: (pet.dislikes.isNotEmpty
+                                          ? pet.dislikes
+                                          : const ['Vacuum cleaner', 'Cold rain storms', 'Ear cleaning'])
+                                      .map((item) => Container(
+                                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                            decoration: BoxDecoration(
+                                              color: PawlyColors.terracottaLight,
+                                              borderRadius: BorderRadius.circular(14),
+                                            ),
+                                            child: Row(
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                const Icon(Icons.thumb_down_alt_outlined, size: 14, color: PawlyColors.terracotta),
+                                                const SizedBox(width: 6),
+                                                Text(
+                                                  item.trim(),
+                                                  style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: PawlyColors.terracotta),
+                                                ),
+                                              ],
+                                            ),
+                                          ))
+                                      .toList(),
+                                ),
+                              ],
+                            ),
+                          ),
+
+                          const SizedBox(height: 16),
+
+                          // Fun Fact Callout Bubble
+                          if (pet.funFact.isNotEmpty)
+                            PawlyBubble(
+                              backgroundColor: PawlyColors.honeyLight,
+                              borderColor: PawlyColors.butterYellow,
+                              padding: const EdgeInsets.all(18),
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Container(
+                                    padding: const EdgeInsets.all(8),
+                                    decoration: const BoxDecoration(
+                                      color: PawlyColors.butterYellow,
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: const Icon(Icons.lightbulb_outline_rounded, color: PawlyColors.espresso, size: 20),
+                                  ),
+                                  const SizedBox(width: 14),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        const Text('Fun Fact', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 14, color: PawlyColors.espresso)),
+                                        const SizedBox(height: 4),
+                                        Text(pet.funFact, style: const TextStyle(fontSize: 13, color: PawlyColors.espresso, height: 1.4)),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+
+                          const SizedBox(height: 16),
+
+                          // Identification & Vitals
+                          PawlyBubble(
+                            backgroundColor: Colors.white,
+                            padding: const EdgeInsets.all(20),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text('Vitals & Identification', style: PawlyTypography.titleMedium),
+                                const SizedBox(height: 12),
                                 _InfoRow(label: 'Species', value: pet.animalType),
                                 _InfoRow(label: 'Breed', value: pet.breed),
                                 _InfoRow(label: 'Sex', value: pet.gender),
@@ -220,43 +391,119 @@ class _PetSpaceScreenState extends State<PetSpaceScreen> {
                               ],
                             ),
                           ),
+
                           const SizedBox(height: 16),
-                          // Emergency Quick Action
-                          Container(
-                            padding: const EdgeInsets.all(18),
-                            decoration: BoxDecoration(
-                              color: PawlyColors.forestLight,
-                              borderRadius: BorderRadius.circular(20),
-                              border: Border.all(color: PawlyColors.forestBorder),
-                            ),
-                            child: Row(
-                              children: [
-                                const Icon(Icons.shield_outlined, color: PawlyColors.forest),
-                                const SizedBox(width: 14),
-                                const Expanded(
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Text('Emergency Pet Card', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 15, color: PawlyColors.espresso)),
-                                      SizedBox(height: 2),
-                                      Text('Quick-show screen with clinic and allergy info', style: TextStyle(fontSize: 12, color: PawlyColors.charcoal)),
-                                    ],
+
+                          // Emergency Pass Banner
+                          GestureDetector(
+                            onTap: widget.onOpenEmergencyCard,
+                            child: const PawlyBubble(
+                              backgroundColor: PawlyColors.forestLight,
+                              borderColor: PawlyColors.forestBorder,
+                              padding: EdgeInsets.all(18),
+                              child: Row(
+                                children: [
+                                  Icon(Icons.shield_outlined, color: PawlyColors.forest),
+                                  SizedBox(width: 14),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text('Emergency Digital Pass', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 15, color: PawlyColors.espresso)),
+                                        SizedBox(height: 2),
+                                        Text('Instant vet clinic, allergies, and contact pass', style: TextStyle(fontSize: 12, color: PawlyColors.warmGrey)),
+                                      ],
+                                    ),
                                   ),
-                                ),
-                                PawlyButton(
-                                  label: 'View',
-                                  isSmall: true,
-                                  variant: PawlyButtonVariant.primary,
-                                  onPressed: widget.onOpenEmergencyCard,
-                                ),
-                              ],
+                                  Icon(Icons.chevron_right_rounded, color: PawlyColors.forest),
+                                ],
+                              ),
                             ),
                           ),
                         ],
                       );
 
-                    // TAB 1: CARE
+                    // TAB 1: JOURNEY / MILESTONES
                     case 1:
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text('${pet.name}’s Journey', style: PawlyTypography.titleMedium),
+                              Text(
+                                '${milestones.length} milestones',
+                                style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: PawlyColors.forest),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 14),
+                          ...milestones.map((m) => Container(
+                                margin: const EdgeInsets.only(bottom: 12),
+                                child: PawlyBubble(
+                                  backgroundColor: Colors.white,
+                                  padding: const EdgeInsets.all(16),
+                                  child: Row(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                                        decoration: BoxDecoration(
+                                          color: PawlyColors.forestLight,
+                                          borderRadius: BorderRadius.circular(12),
+                                        ),
+                                        child: Text(
+                                          m.year,
+                                          style: const TextStyle(
+                                            fontSize: 13,
+                                            fontWeight: FontWeight.w800,
+                                            color: PawlyColors.forest,
+                                          ),
+                                        ),
+                                      ),
+                                      const SizedBox(width: 14),
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              m.title,
+                                              style: const TextStyle(
+                                                fontSize: 15,
+                                                fontWeight: FontWeight.w800,
+                                                color: PawlyColors.espresso,
+                                              ),
+                                            ),
+                                            const SizedBox(height: 3),
+                                            Text(
+                                              m.subtitle,
+                                              style: const TextStyle(fontSize: 13, color: PawlyColors.warmGrey),
+                                            ),
+                                            if (m.date.isNotEmpty) ...[
+                                              const SizedBox(height: 4),
+                                              Text(
+                                                m.date,
+                                                style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: PawlyColors.mutedGrey),
+                                              ),
+                                            ],
+                                          ],
+                                        ),
+                                      ),
+                                      if (m.isAutomated)
+                                        const Tooltip(
+                                          message: 'Automated milestone',
+                                          child: Icon(Icons.verified_outlined, size: 18, color: PawlyColors.forest),
+                                        ),
+                                    ],
+                                  ),
+                                ),
+                              )),
+                        ],
+                      );
+
+                    // TAB 2: CARE
+                    case 2:
                       return Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -282,47 +529,45 @@ class _PetSpaceScreenState extends State<PetSpaceScreen> {
                           else
                             ...routines.map((r) => Container(
                                   margin: const EdgeInsets.only(bottom: 10),
-                                  padding: const EdgeInsets.all(16),
-                                  decoration: BoxDecoration(
-                                    color: PawlyColors.surface,
-                                    borderRadius: BorderRadius.circular(18),
-                                    border: Border.all(color: PawlyColors.border),
-                                  ),
-                                  child: Row(
-                                    children: [
-                                      Icon(
-                                        r.isCompleted ? Icons.check_circle : Icons.radio_button_unchecked,
-                                        color: r.isCompleted ? PawlyColors.forest : PawlyColors.mutedGrey,
-                                      ),
-                                      const SizedBox(width: 14),
-                                      Expanded(
-                                        child: Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              r.title,
-                                              style: TextStyle(
-                                                fontSize: 15,
-                                                fontWeight: FontWeight.w700,
-                                                decoration: r.isCompleted ? TextDecoration.lineThrough : null,
-                                                color: r.isCompleted ? PawlyColors.mutedGrey : PawlyColors.espresso,
-                                              ),
-                                            ),
-                                            Text(
-                                              '${r.time} • ${r.category.displayName} • ${r.recurrence}',
-                                              style: const TextStyle(fontSize: 12, color: PawlyColors.warmGrey),
-                                            ),
-                                          ],
+                                  child: PawlyBubble(
+                                    backgroundColor: Colors.white,
+                                    padding: const EdgeInsets.all(16),
+                                    child: Row(
+                                      children: [
+                                        Icon(
+                                          r.isCompleted ? Icons.check_circle : Icons.radio_button_unchecked,
+                                          color: r.isCompleted ? PawlyColors.forest : PawlyColors.mutedGrey,
                                         ),
-                                      ),
-                                    ],
+                                        const SizedBox(width: 14),
+                                        Expanded(
+                                          child: Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                r.title,
+                                                style: TextStyle(
+                                                  fontSize: 15,
+                                                  fontWeight: FontWeight.w700,
+                                                  decoration: r.isCompleted ? TextDecoration.lineThrough : null,
+                                                  color: r.isCompleted ? PawlyColors.mutedGrey : PawlyColors.espresso,
+                                                ),
+                                              ),
+                                              Text(
+                                                '${r.time} • ${r.category.displayName} • ${r.recurrence}',
+                                                style: const TextStyle(fontSize: 12, color: PawlyColors.warmGrey),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                 )),
                         ],
                       );
 
-                    // TAB 2: HEALTH
-                    case 2:
+                    // TAB 3: HEALTH
+                    case 3:
                       return Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -339,36 +584,34 @@ class _PetSpaceScreenState extends State<PetSpaceScreen> {
                           const SizedBox(height: 8),
                           ...healthEvents.map((h) => Container(
                                 margin: const EdgeInsets.only(bottom: 12),
-                                padding: const EdgeInsets.all(16),
-                                decoration: BoxDecoration(
-                                  color: PawlyColors.surface,
-                                  borderRadius: BorderRadius.circular(18),
-                                  border: Border.all(color: PawlyColors.border),
-                                ),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        PawlyBadge(label: h.type, variant: PawlyBadgeVariant.clay),
-                                        Text(h.date, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: PawlyColors.mutedGrey)),
-                                      ],
-                                    ),
-                                    const SizedBox(height: 8),
-                                    Text(h.title, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: PawlyColors.espresso)),
-                                    const SizedBox(height: 4),
-                                    Text(h.notes, style: PawlyTypography.bodyMedium),
-                                    const SizedBox(height: 8),
-                                    Text('Vet: ${h.veterinarian}', style: const TextStyle(fontSize: 11, color: PawlyColors.mutedGrey)),
-                                  ],
+                                child: PawlyBubble(
+                                  backgroundColor: Colors.white,
+                                  padding: const EdgeInsets.all(16),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Row(
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          PawlyBadge(label: h.type, variant: PawlyBadgeVariant.clay),
+                                          Text(h.date, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: PawlyColors.mutedGrey)),
+                                        ],
+                                      ),
+                                      const SizedBox(height: 8),
+                                      Text(h.title, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: PawlyColors.espresso)),
+                                      const SizedBox(height: 4),
+                                      Text(h.notes, style: PawlyTypography.bodyMedium),
+                                      const SizedBox(height: 8),
+                                      Text('Vet: ${h.veterinarian}', style: const TextStyle(fontSize: 11, color: PawlyColors.mutedGrey)),
+                                    ],
+                                  ),
                                 ),
                               )),
                         ],
                       );
 
-                    // TAB 3: PASSPORT
-                    case 3:
+                    // TAB 4: PASSPORT
+                    case 4:
                       return Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -385,43 +628,41 @@ class _PetSpaceScreenState extends State<PetSpaceScreen> {
                           const SizedBox(height: 8),
                           ...vaccines.map((v) => Container(
                                 margin: const EdgeInsets.only(bottom: 10),
-                                padding: const EdgeInsets.all(16),
-                                decoration: BoxDecoration(
-                                  color: PawlyColors.surface,
-                                  borderRadius: BorderRadius.circular(18),
-                                  border: Border.all(color: PawlyColors.border),
-                                ),
-                                child: Row(
-                                  children: [
-                                    Expanded(
-                                      child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: [
-                                          Text(v.vaccineName, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: PawlyColors.espresso)),
-                                          const SizedBox(height: 2),
-                                          Text('Next Due: ${v.nextDueDate} • ${v.clinic}', style: const TextStyle(fontSize: 12, color: PawlyColors.warmGrey)),
-                                        ],
+                                child: PawlyBubble(
+                                  backgroundColor: Colors.white,
+                                  padding: const EdgeInsets.all(16),
+                                  child: Row(
+                                    children: [
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Text(v.vaccineName, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: PawlyColors.espresso)),
+                                            const SizedBox(height: 2),
+                                            Text('Next Due: ${v.nextDueDate} • ${v.clinic}', style: const TextStyle(fontSize: 12, color: PawlyColors.warmGrey)),
+                                          ],
+                                        ),
                                       ),
-                                    ),
-                                    PawlyBadge(
-                                      label: v.status == VaccineStatus.current ? 'Current' : 'Due Soon',
-                                      variant: v.status == VaccineStatus.current ? PawlyBadgeVariant.sage : PawlyBadgeVariant.honey,
-                                    ),
-                                  ],
+                                      PawlyBadge(
+                                        label: v.status == VaccineStatus.current ? 'Current' : 'Due Soon',
+                                        variant: v.status == VaccineStatus.current ? PawlyBadgeVariant.sage : PawlyBadgeVariant.honey,
+                                      ),
+                                    ],
+                                  ),
                                 ),
                               )),
                         ],
                       );
 
-                    // TAB 4: MEMORIES
-                    case 4:
+                    // TAB 5: MEMORIES
+                    case 5:
                       return Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              const Text('Memories & Milestones', style: PawlyTypography.titleMedium),
+                              const Text('Memories & Moments', style: PawlyTypography.titleMedium),
                               TextButton(
                                 onPressed: widget.onOpenMemories,
                                 child: const Text('+ Add Photo', style: TextStyle(fontWeight: FontWeight.w700, color: PawlyColors.forest)),
@@ -432,9 +673,15 @@ class _PetSpaceScreenState extends State<PetSpaceScreen> {
                           ...memories.map((m) => Container(
                                 margin: const EdgeInsets.only(bottom: 16),
                                 decoration: BoxDecoration(
-                                  color: PawlyColors.surface,
-                                  borderRadius: BorderRadius.circular(20),
-                                  border: Border.all(color: PawlyColors.border),
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(24),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: PawlyColors.espresso.withOpacity(0.04),
+                                      blurRadius: 10,
+                                      offset: const Offset(0, 4),
+                                    ),
+                                  ],
                                 ),
                                 clipBehavior: Clip.antiAlias,
                                 child: Column(
@@ -470,8 +717,8 @@ class _PetSpaceScreenState extends State<PetSpaceScreen> {
                         ],
                       );
 
-                    // TAB 5: WALLET
-                    case 5:
+                    // TAB 6: WALLET
+                    case 6:
                       return Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -488,26 +735,24 @@ class _PetSpaceScreenState extends State<PetSpaceScreen> {
                           const SizedBox(height: 8),
                           ...documents.map((d) => Container(
                                 margin: const EdgeInsets.only(bottom: 10),
-                                padding: const EdgeInsets.all(16),
-                                decoration: BoxDecoration(
-                                  color: PawlyColors.surface,
-                                  borderRadius: BorderRadius.circular(18),
-                                  border: Border.all(color: PawlyColors.border),
-                                ),
-                                child: Row(
-                                  children: [
-                                    const Icon(Icons.picture_as_pdf_outlined, color: PawlyColors.clay, size: 28),
-                                    const SizedBox(width: 14),
-                                    Expanded(
-                                      child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: [
-                                          Text(d.title, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: PawlyColors.espresso)),
-                                          Text('${d.category} • ${d.fileType}', style: const TextStyle(fontSize: 12, color: PawlyColors.warmGrey)),
-                                        ],
+                                child: PawlyBubble(
+                                  backgroundColor: Colors.white,
+                                  padding: const EdgeInsets.all(16),
+                                  child: Row(
+                                    children: [
+                                      const Icon(Icons.picture_as_pdf_outlined, color: PawlyColors.terracotta, size: 28),
+                                      const SizedBox(width: 14),
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Text(d.title, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: PawlyColors.espresso)),
+                                            Text('${d.category} • ${d.fileType}', style: const TextStyle(fontSize: 12, color: PawlyColors.warmGrey)),
+                                          ],
+                                        ),
                                       ),
-                                    ),
-                                  ],
+                                    ],
+                                  ),
                                 ),
                               )),
                         ],
@@ -520,34 +765,6 @@ class _PetSpaceScreenState extends State<PetSpaceScreen> {
               ),
             ),
           ),
-        ],
-      ),
-    );
-  }
-}
-
-class _SpaceCard extends StatelessWidget {
-  final String title;
-  final Widget child;
-
-  const _SpaceCard({required this.title, required this.child});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: PawlyColors.surface,
-        borderRadius: BorderRadius.circular(22),
-        border: Border.all(color: PawlyColors.border),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(title, style: PawlyTypography.titleMedium),
-          const SizedBox(height: 12),
-          child,
         ],
       ),
     );
@@ -574,7 +791,7 @@ class _InfoRow extends StatelessWidget {
             style: TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w600,
-              color: isAlert ? PawlyColors.clay : PawlyColors.espresso,
+              color: isAlert ? PawlyColors.terracotta : PawlyColors.espresso,
             ),
           ),
         ],

@@ -23,6 +23,10 @@ class PawlyRepository extends ChangeNotifier {
   List<MemoryEntry> _memories = [];
   List<DocumentItem> _documents = [];
   List<VetPrepItem> _vetPrepItems = [];
+  List<PetMilestone> _milestones = [];
+  List<SymptomNote> _symptomNotes = [];
+  List<CareCircleMember> _careCircle = [];
+  WellnessSnapshot _wellnessSnapshot = SampleData.defaultWellness;
   EmergencyCardData _emergencyCard = SampleData.defaultEmergency;
 
   bool _isLostPetModeEnabled = false;
@@ -65,6 +69,16 @@ class PawlyRepository extends ChangeNotifier {
 
   List<DocumentItem> get activePetDocuments =>
       _documents.where((d) => d.petId == _selectedPetId).toList();
+
+  List<PetMilestone> get activePetMilestones =>
+      _milestones.where((m) => m.petId == _selectedPetId).toList();
+
+  List<SymptomNote> get activePetSymptomNotes =>
+      _symptomNotes.where((s) => s.petId == _selectedPetId).toList();
+
+  List<CareCircleMember> get careCircle => List.unmodifiable(_careCircle);
+
+  WellnessSnapshot get activePetWellness => _wellnessSnapshot;
 
   List<VetPrepItem> get activeVetPrepItems => _vetPrepItems;
 
@@ -142,6 +156,10 @@ class PawlyRepository extends ChangeNotifier {
     _memories = List.from(SampleData.initialMemories);
     _documents = List.from(SampleData.initialDocuments);
     _vetPrepItems = List.from(SampleData.initialVetPrep);
+    _milestones = List.from(SampleData.initialMilestones);
+    _symptomNotes = List.from(SampleData.initialSymptomNotes);
+    _careCircle = List.from(SampleData.initialCareCircle);
+    _wellnessSnapshot = SampleData.defaultWellness;
     _emergencyCard = SampleData.defaultEmergency;
     _isLostPetModeEnabled = _prefs.getBool('pawly_lost_pet_mode') ?? false;
   }
@@ -290,6 +308,165 @@ class PawlyRepository extends ChangeNotifier {
     _isLostPetModeEnabled = !_isLostPetModeEnabled;
     _prefs.setBool('pawly_lost_pet_mode', _isLostPetModeEnabled);
     notifyListeners();
+  }
+
+  // Milestones
+  void addMilestone(PetMilestone milestone) {
+    _milestones.insert(0, milestone);
+    notifyListeners();
+  }
+
+  // Symptom / Observation notes
+  void addSymptomNote(SymptomNote note) {
+    _symptomNotes.insert(0, note);
+    notifyListeners();
+  }
+
+  // Care Circle
+  void addCareCircleMember(CareCircleMember member) {
+    _careCircle.add(member);
+    notifyListeners();
+  }
+
+  void removeCareCircleMember(String id) {
+    _careCircle.removeWhere((m) => m.id == id);
+    notifyListeners();
+  }
+
+  // Wellness Snapshot
+  void updateWellnessSnapshot(WellnessSnapshot snapshot) {
+    _wellnessSnapshot = snapshot;
+    notifyListeners();
+  }
+
+  // Universal Search
+  List<SearchResultItem> search(String query) {
+    if (query.trim().isEmpty) return [];
+    final q = query.toLowerCase().trim();
+    final List<SearchResultItem> results = [];
+
+    // Search Pets
+    for (final pet in _pets) {
+      if (pet.name.toLowerCase().contains(q) ||
+          pet.breed.toLowerCase().contains(q) ||
+          pet.species.toLowerCase().contains(q) ||
+          pet.nickname.toLowerCase().contains(q) ||
+          pet.temperament.toLowerCase().contains(q)) {
+        results.add(SearchResultItem(
+          title: pet.name,
+          subtitle: '${pet.breed} • ${pet.ageYears} yrs',
+          category: 'Pet',
+          petName: pet.name,
+          originalObject: pet,
+        ));
+      }
+    }
+
+    // Search Care Routines
+    for (final routine in _routines) {
+      if (routine.title.toLowerCase().contains(q) ||
+          routine.notes.toLowerCase().contains(q) ||
+          routine.category.name.toLowerCase().contains(q)) {
+        final pet = _pets.firstWhere((p) => p.id == routine.petId, orElse: () => activePet);
+        results.add(SearchResultItem(
+          title: routine.title,
+          subtitle: '${routine.time} • ${routine.recurrence} • ${routine.notes}',
+          category: 'Care',
+          date: routine.date,
+          petName: pet.name,
+          originalObject: routine,
+        ));
+      }
+    }
+
+    // Search Appointments
+    for (final appt in _appointments) {
+      if (appt.purpose.toLowerCase().contains(q) ||
+          appt.clinic.toLowerCase().contains(q) ||
+          appt.vetName.toLowerCase().contains(q) ||
+          appt.notes.toLowerCase().contains(q)) {
+        final pet = _pets.firstWhere((p) => p.id == appt.petId, orElse: () => activePet);
+        results.add(SearchResultItem(
+          title: appt.purpose,
+          subtitle: '${appt.clinic} • ${appt.vetName}',
+          category: 'Appointment',
+          date: appt.date,
+          petName: pet.name,
+          originalObject: appt,
+        ));
+      }
+    }
+
+    // Search Medications
+    for (final med in _medications) {
+      if (med.name.toLowerCase().contains(q) ||
+          med.dosage.toLowerCase().contains(q) ||
+          med.frequency.toLowerCase().contains(q) ||
+          med.instructions.toLowerCase().contains(q)) {
+        final pet = _pets.firstWhere((p) => p.id == med.petId, orElse: () => activePet);
+        results.add(SearchResultItem(
+          title: med.name,
+          subtitle: '${med.dosage} • ${med.frequency}',
+          category: 'Medication',
+          date: med.startDate,
+          petName: pet.name,
+          originalObject: med,
+        ));
+      }
+    }
+
+    // Search Health Events
+    for (final ev in _healthEvents) {
+      if (ev.title.toLowerCase().contains(q) ||
+          ev.type.toLowerCase().contains(q) ||
+          ev.notes.toLowerCase().contains(q) ||
+          ev.clinic.toLowerCase().contains(q)) {
+        final pet = _pets.firstWhere((p) => p.id == ev.petId, orElse: () => activePet);
+        results.add(SearchResultItem(
+          title: ev.title,
+          subtitle: '${ev.type} • ${ev.clinic}',
+          category: 'Health',
+          date: ev.date,
+          petName: pet.name,
+          originalObject: ev,
+        ));
+      }
+    }
+
+    // Search Memories
+    for (final mem in _memories) {
+      if (mem.title.toLowerCase().contains(q) ||
+          mem.caption.toLowerCase().contains(q) ||
+          mem.milestoneType.toLowerCase().contains(q)) {
+        final pet = _pets.firstWhere((p) => p.id == mem.petId, orElse: () => activePet);
+        results.add(SearchResultItem(
+          title: mem.title,
+          subtitle: mem.caption,
+          category: 'Memory',
+          date: mem.date,
+          petName: pet.name,
+          originalObject: mem,
+        ));
+      }
+    }
+
+    // Search Documents
+    for (final doc in _documents) {
+      if (doc.title.toLowerCase().contains(q) ||
+          doc.category.toLowerCase().contains(q)) {
+        final pet = _pets.firstWhere((p) => p.id == doc.petId, orElse: () => activePet);
+        results.add(SearchResultItem(
+          title: doc.title,
+          subtitle: '${doc.category} • ${doc.fileType}',
+          category: 'Document',
+          date: doc.dateAdded,
+          petName: pet.name,
+          originalObject: doc,
+        ));
+      }
+    }
+
+    return results;
   }
 
   // Profile
