@@ -11,6 +11,10 @@ export interface Pet {
   weightKg: number;
   gender: 'Male' | 'Female';
   avatarBg: string;
+  imageUrl?: string;
+  notes?: string;
+  birthday?: string;
+  microchipNumber?: string;
   availableForAdoption?: boolean;
 }
 
@@ -34,6 +38,7 @@ export interface Appointment {
   clinic: string;
   purpose: 'Annual Checkup' | 'Vaccination Booster' | 'Dental Cleaning' | 'Dermatology' | 'Surgery Follow-up' | 'Emergency';
   status: 'Scheduled' | 'Completed' | 'Cancelled';
+  notes?: string;
 }
 
 export interface AdoptionRecord {
@@ -44,6 +49,7 @@ export interface AdoptionRecord {
   adopterName?: string;
   adoptionDate?: string;
   status: 'Available' | 'Application Pending' | 'Adopted';
+  inquiryContact?: string;
 }
 
 export interface HealthRecord {
@@ -54,6 +60,7 @@ export interface HealthRecord {
   title: string;
   notes: string;
   veterinarian: string;
+  clinic?: string;
 }
 
 export interface AppNotification {
@@ -63,4 +70,11 @@ export interface AppNotification {
   timestamp: string;
   read: boolean;
   type: 'warning' | 'info' | 'success';
+}
+
+export interface User {
+  id: string;
+  name: string;
+  email: string;
+  avatarUrl?: string;
 }
