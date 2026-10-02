@@ -93,6 +93,9 @@ class MedicationScreen extends StatelessWidget {
               onPressed: () {
                 final name = nameController.text.trim();
                 if (name.isNotEmpty) {
+                  final now = DateTime.now();
+                  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                  final dateStr = '${months[now.month - 1]} ${now.day.toString().padLeft(2, '0')}, ${now.year}';
                   repository.addMedication(
                     Medication(
                       id: 'med_${DateTime.now().millisecondsSinceEpoch}',
@@ -101,7 +104,8 @@ class MedicationScreen extends StatelessWidget {
                       dosage: dosageController.text.trim().isEmpty ? 'As directed' : dosageController.text.trim(),
                       frequency: freqController.text.trim(),
                       instructions: instructionsController.text.trim(),
-                      startDate: 'Today',
+                      startDate: dateStr,
+                      endDate: 'Ongoing',
                     ),
                   );
                   Navigator.of(ctx).pop();

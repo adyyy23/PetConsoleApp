@@ -22,8 +22,9 @@ class _PetCalendarScreenState extends State<PetCalendarScreen> {
   @override
   void initState() {
     super.initState();
-    _selectedMonth = DateTime(2026, 10, 1);
-    _selectedDay = DateTime(2026, 10, 2);
+    final now = DateTime.now();
+    _selectedMonth = DateTime(now.year, now.month, 1);
+    _selectedDay = DateTime(now.year, now.month, now.day);
   }
 
   void _prevMonth() {
@@ -183,7 +184,15 @@ class _PetCalendarScreenState extends State<PetCalendarScreen> {
                       child: Row(
                         children: [
                           DateBubble(
-                            month: 'OCT',
+                            month: () {
+                              final parts = appt.date.split('-');
+                              if (parts.length >= 2) {
+                                final m = int.tryParse(parts[1]) ?? 1;
+                                const months = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
+                                return months[(m - 1).clamp(0, 11)];
+                              }
+                              return 'APPT';
+                            }(),
                             day: appt.date.split('-').last,
                           ),
                           const SizedBox(width: 12),

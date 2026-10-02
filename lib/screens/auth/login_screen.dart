@@ -6,12 +6,14 @@ import '../../widgets/widgets.dart';
 
 class LoginScreen extends StatefulWidget {
   final VoidCallback onLoginSuccess;
+  final VoidCallback? onExploreDemo;
   final VoidCallback onNavigateToSignup;
   final VoidCallback onNavigateToForgotPassword;
 
   const LoginScreen({
     super.key,
     required this.onLoginSuccess,
+    this.onExploreDemo,
     required this.onNavigateToSignup,
     required this.onNavigateToForgotPassword,
   });
@@ -58,7 +60,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
               const SizedBox(height: 28),
 
-              // 1-Click Demo Login Box (8px Card)
+              // 1-Click Explore Demo Box (8px Card)
               PawlyCard(
                 backgroundColor: PawlyColors.surfaceWarm,
                 padding: const EdgeInsets.all(14),
@@ -69,26 +71,26 @@ class _LoginScreenState extends State<LoginScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Quick Portfolio Demo',
+                            'Explore Demo',
                             style: TextStyle(
-                              fontSize: 12,
+                              fontSize: 13,
                               fontWeight: FontWeight.w800,
                               color: PawlyColors.black,
                             ),
                           ),
                           SizedBox(height: 2),
                           Text(
-                            'Jump straight into Lady’s household with preloaded pets & routines.',
+                            'Tour Pawly with seeded sample pets, care routines & medical records.',
                             style: PawlyTypography.caption,
                           ),
                         ],
                       ),
                     ),
                     const SizedBox(width: 12),
-                    PawlyButton(text: 'Demo Enter',
-                      onPressed: widget.onLoginSuccess,
+                    PawlyButton(
+                      text: 'Demo Enter',
+                      onPressed: widget.onExploreDemo ?? widget.onLoginSuccess,
                       isSmall: true,
-                      
                     ),
                   ],
                 ),

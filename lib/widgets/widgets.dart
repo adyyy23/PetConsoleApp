@@ -492,37 +492,40 @@ class EmptyStateView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 40),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(
-            icon ?? Icons.pets_outlined,
-            size: 40,
-            color: PawlyColors.tertiary,
-          ),
-          const SizedBox(height: 16),
-          Text(
-            title,
-            style: PawlyTypography.titleLarge,
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: 8),
-          Text(
-            subtitle,
-            style: PawlyTypography.bodyMedium,
-            textAlign: TextAlign.center,
-          ),
-          if (_ctaLabel != null && _ctaAction != null) ...[
-            const SizedBox(height: 24),
-            PawlyButton(
-              text: _ctaLabel!,
-              onPressed: _ctaAction!,
-              isSmall: true,
+    return Center(
+      child: SingleChildScrollView(
+        physics: const BouncingScrollPhysics(),
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              icon ?? Icons.pets_outlined,
+              size: 36,
+              color: PawlyColors.tertiary,
             ),
+            const SizedBox(height: 12),
+            Text(
+              title,
+              style: PawlyTypography.titleMedium,
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 6),
+            Text(
+              subtitle,
+              style: PawlyTypography.bodyMedium,
+              textAlign: TextAlign.center,
+            ),
+            if (_ctaLabel != null && _ctaAction != null) ...[
+              const SizedBox(height: 18),
+              PawlyButton(
+                text: _ctaLabel!,
+                onPressed: _ctaAction!,
+                isSmall: true,
+              ),
+            ],
           ],
-        ],
+        ),
       ),
     );
   }
@@ -539,6 +542,8 @@ class CareTimelineItem extends StatelessWidget {
   final bool isLast;
   final String? assignedTo;
   final VoidCallback onToggle;
+  final VoidCallback? onDelete;
+  final VoidCallback? onTap;
 
   const CareTimelineItem({
     super.key,
@@ -549,11 +554,13 @@ class CareTimelineItem extends StatelessWidget {
     this.isLast = false,
     this.assignedTo,
     required this.onToggle,
+    this.onDelete,
+    this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
+    final content = Padding(
       padding: EdgeInsets.only(bottom: isLast ? 0 : 14),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -607,6 +614,14 @@ class CareTimelineItem extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 10),
+          // Actions: Delete & Toggle
+          if (onDelete != null)
+            IconButton(
+              icon: const Icon(Icons.delete_outline_rounded, size: 18, color: PawlyColors.tertiary),
+              padding: EdgeInsets.zero,
+              constraints: const BoxConstraints(minWidth: 28, minHeight: 28),
+              onPressed: onDelete,
+            ),
           // Toggle
           GestureDetector(
             onTap: onToggle,
@@ -630,6 +645,7 @@ class CareTimelineItem extends StatelessWidget {
         ],
       ),
     );
+    return onTap != null ? GestureDetector(onTap: onTap, child: content) : content;
   }
 }
 

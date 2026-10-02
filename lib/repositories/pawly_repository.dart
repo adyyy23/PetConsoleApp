@@ -1,16 +1,19 @@
-import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import '../database/app_database.dart';
 import '../models/models.dart';
+import 'demo_data_seeder.dart';
 import 'sample_data.dart';
 
 class PawlyRepository extends ChangeNotifier {
+  final AppDatabase _database = AppDatabase();
   late SharedPreferences _prefs;
   bool _isInitialized = false;
 
-  UserProfile _user = SampleData.defaultUser;
+  final UserProfile _user = SampleData.defaultUser;
   List<Pet> _pets = [];
-  String _selectedPetId = 'pet_mochi';
+  String _selectedPetId = '';
 
   List<CareRoutine> _routines = [];
   List<Appointment> _appointments = [];
@@ -19,26 +22,44 @@ class PawlyRepository extends ChangeNotifier {
   List<VaccinationRecord> _vaccinations = [];
   List<Medication> _medications = [];
   List<MemoryEntry> _memories = [];
-  List<DocumentItem> _documents = [];
-  List<VetPrepItem> _vetPrepItems = [];
-  List<PetMilestone> _milestones = [];
+  final List<DocumentItem> _documents = [];
+  final List<VetPrepItem> _vetPrepItems = [];
+  final List<PetMilestone> _milestones = [];
   List<SymptomNote> _symptomNotes = [];
-  List<CareCircleMember> _careCircle = [];
-  WellnessSnapshot _wellnessSnapshot = SampleData.defaultWellness;
+  final List<CareCircleMember> _careCircle = [];
+  final WellnessSnapshot _wellnessSnapshot = SampleData.defaultWellness;
   EmergencyCardData _emergencyCard = SampleData.defaultEmergency;
 
   bool _isLostPetModeEnabled = false;
+  bool _isDemoMode = false;
 
   // Getters
   bool get isInitialized => _isInitialized;
   UserProfile get user => _user;
   List<Pet> get pets => List.unmodifiable(_pets);
   String get selectedPetId => _selectedPetId;
+  bool get isDemoMode => _isDemoMode;
 
+  /// Returns the currently active pet, or null if no pets exist.
+  Pet? get selectedPet {
+    if (_pets.isEmpty) return null;
+    final found = _pets.where((p) => p.id == _selectedPetId).toList();
+    return found.isNotEmpty ? found.first : _pets.first;
+  }
+
+  /// Backward-compatible getter: returns selectedPet or a fallback empty placeholder
   Pet get activePet {
-    return _pets.firstWhere(
-      (p) => p.id == _selectedPetId,
-      orElse: () => _pets.isNotEmpty ? _pets.first : SampleData.initialPets.first,
+    final pet = selectedPet;
+    if (pet != null) return pet;
+    return const Pet(
+      id: 'placeholder',
+      name: 'No Pet Added',
+      animalType: 'Pet',
+      breed: 'Companion',
+      ageYears: 0,
+      weightKg: 0,
+      gender: '',
+      imageUrl: '',
     );
   }
 
@@ -50,6 +71,7 @@ class PawlyRepository extends ChangeNotifier {
   List<Appointment> get activePetAppointments =>
       _appointments.where((a) => a.petId == _selectedPetId).toList();
 
+  List<HealthEvent> get allHealthEvents => List.unmodifiable(_healthEvents);
   List<HealthEvent> get activePetHealthEvents =>
       _healthEvents.where((h) => h.petId == _selectedPetId).toList();
 
@@ -80,7 +102,6 @@ class PawlyRepository extends ChangeNotifier {
 
   List<VetPrepItem> get activeVetPrepItems => _vetPrepItems;
 
-  Pet? get selectedPet => activePet;
   List<Appointment> appointmentsForPet(String petId) =>
       _appointments.where((a) => a.petId == petId).toList();
   List<MemoryEntry> memoriesForPet(String petId) =>
@@ -94,199 +115,312 @@ class PawlyRepository extends ChangeNotifier {
   EmergencyCardData get emergencyCard => _emergencyCard;
   bool get isLostPetModeEnabled => _isLostPetModeEnabled;
 
-  // Initialization
+  // ───────────────────────────────────────────────────────────────────────────
+  // INITIALIZATION
+  // ───────────────────────────────────────────────────────────────────────────
+
   Future<void> init() async {
     _prefs = await SharedPreferences.getInstance();
-    _loadFromStorage();
+    await _database.init();
+    await _loadFromDatabase();
     _isInitialized = true;
     notifyListeners();
   }
 
-  void _loadFromStorage() {
-    // Pets
-    final petsJson = _prefs.getString('pawly_pets');
-    if (petsJson != null) {
-      try {
-        final List list = jsonDecode(petsJson);
-        _pets = list.map((e) => Pet.fromJson(e)).toList();
-      } catch (_) {
-        _pets = List.from(SampleData.initialPets);
-      }
-    } else {
-      _pets = List.from(SampleData.initialPets);
-    }
+  Future<void> _loadFromDatabase() async {
+    _pets = await _database.getAllPets();
+    _routines = await _database.getAllRoutines();
+    _healthEvents = await _database.getAllHealthRecords();
+    _weightHistory = await _database.getAllWeightEntries();
+    _vaccinations = await _database.getAllVaccinations();
+    _medications = await _database.getAllMedications();
+    _appointments = await _database.getAllAppointments();
+    _memories = await _database.getAllMemories();
+    _symptomNotes = await _database.getAllDailyNotes();
 
-    // Selected Pet ID
-    _selectedPetId = _prefs.getString('pawly_selected_pet_id') ??
-        (_pets.isNotEmpty ? _pets.first.id : 'pet_mochi');
-
-    // Routines
-    final routinesJson = _prefs.getString('pawly_routines');
-    if (routinesJson != null) {
-      try {
-        final List list = jsonDecode(routinesJson);
-        _routines = list.map((e) => CareRoutine.fromJson(e)).toList();
-      } catch (_) {
-        _routines = List.from(SampleData.initialRoutines);
-      }
-    } else {
-      _routines = List.from(SampleData.initialRoutines);
-    }
-
-    // Appointments
-    final apptsJson = _prefs.getString('pawly_appointments');
-    if (apptsJson != null) {
-      try {
-        final List list = jsonDecode(apptsJson);
-        _appointments = list.map((e) => Appointment.fromJson(e)).toList();
-      } catch (_) {
-        _appointments = List.from(SampleData.initialAppointments);
-      }
-    } else {
-      _appointments = List.from(SampleData.initialAppointments);
-    }
-
-    // Other entities initialized with rich defaults
-    _healthEvents = List.from(SampleData.initialHealthEvents);
-    _weightHistory = List.from(SampleData.initialWeightHistory);
-    _vaccinations = List.from(SampleData.initialVaccinations);
-    _medications = List.from(SampleData.initialMedications);
-    _memories = List.from(SampleData.initialMemories);
-    _documents = List.from(SampleData.initialDocuments);
-    _vetPrepItems = List.from(SampleData.initialVetPrep);
-    _milestones = List.from(SampleData.initialMilestones);
-    _symptomNotes = List.from(SampleData.initialSymptomNotes);
-    _careCircle = List.from(SampleData.initialCareCircle);
-    _wellnessSnapshot = SampleData.defaultWellness;
-    _emergencyCard = SampleData.defaultEmergency;
+    _isDemoMode = _prefs.getBool('pawly_is_demo') ?? false;
     _isLostPetModeEnabled = _prefs.getBool('pawly_lost_pet_mode') ?? false;
+
+    final savedPetId = _prefs.getString('pawly_selected_pet_id');
+    if (savedPetId != null && _pets.any((p) => p.id == savedPetId)) {
+      _selectedPetId = savedPetId;
+    } else {
+      _selectedPetId = _pets.isNotEmpty ? _pets.first.id : '';
+    }
   }
 
-  // --- ACTIONS ---
+  Future<void> setDemoMode(bool isDemo) async {
+    _isDemoMode = isDemo;
+    await _prefs.setBool('pawly_is_demo', isDemo);
+    notifyListeners();
+  }
+
+  Future<void> seedDemoData() async {
+    await clearAllData();
+    await DemoDataSeeder.seed(this);
+  }
+
+  Future<void> clearAllData() async {
+    await _database.clearAll();
+    _pets.clear();
+    _routines.clear();
+    _appointments.clear();
+    _healthEvents.clear();
+    _weightHistory.clear();
+    _vaccinations.clear();
+    _medications.clear();
+    _memories.clear();
+    _documents.clear();
+    _symptomNotes.clear();
+    _selectedPetId = '';
+    _isDemoMode = false;
+    await _prefs.remove('pawly_is_demo');
+    await _prefs.remove('pawly_selected_pet_id');
+    notifyListeners();
+  }
+
+  // ───────────────────────────────────────────────────────────────────────────
+  // PETS CRUD
+  // ───────────────────────────────────────────────────────────────────────────
 
   void selectPet(String petId) {
+    if (_selectedPetId == petId) return;
     _selectedPetId = petId;
     _prefs.setString('pawly_selected_pet_id', petId);
     notifyListeners();
   }
 
-  void addPet(Pet pet) {
+  Future<void> addPet(Pet pet) async {
     _pets.insert(0, pet);
     _selectedPetId = pet.id;
-    _savePets();
+    await _prefs.setString('pawly_selected_pet_id', pet.id);
+    await _database.insertPet(pet);
     notifyListeners();
   }
 
-  void updatePet(Pet pet) {
+  Future<void> updatePet(Pet pet) async {
     final idx = _pets.indexWhere((p) => p.id == pet.id);
     if (idx != -1) {
       _pets[idx] = pet;
-      _savePets();
+      await _database.updatePet(pet);
       notifyListeners();
     }
   }
 
-  void deletePet(String petId) {
+  Future<void> deletePet(String petId) async {
     _pets.removeWhere((p) => p.id == petId);
     _routines.removeWhere((r) => r.petId == petId);
     _appointments.removeWhere((a) => a.petId == petId);
-    if (_selectedPetId == petId && _pets.isNotEmpty) {
-      _selectedPetId = _pets.first.id;
+    _healthEvents.removeWhere((h) => h.petId == petId);
+    _weightHistory.removeWhere((w) => w.petId == petId);
+    _vaccinations.removeWhere((v) => v.petId == petId);
+    _medications.removeWhere((m) => m.petId == petId);
+    _memories.removeWhere((m) => m.petId == petId);
+    _symptomNotes.removeWhere((s) => s.petId == petId);
+
+    if (_selectedPetId == petId) {
+      _selectedPetId = _pets.isNotEmpty ? _pets.first.id : '';
+      await _prefs.setString('pawly_selected_pet_id', _selectedPetId);
     }
-    _savePets();
-    _saveRoutines();
+
+    await _database.deletePet(petId);
     notifyListeners();
   }
 
-  // Care Routine Actions
-  void toggleRoutine(String id) {
-    final idx = _routines.indexWhere((r) => r.id == id);
+  // ───────────────────────────────────────────────────────────────────────────
+  // CARE ROUTINES CRUD
+  // ───────────────────────────────────────────────────────────────────────────
+
+  Future<void> addCareRoutine(CareRoutine routine) async {
+    _routines.add(routine);
+    await _database.insertRoutine(routine);
+    notifyListeners();
+  }
+
+  Future<void> addRoutine(CareRoutine routine) => addCareRoutine(routine);
+
+  Future<void> updateCareRoutine(CareRoutine routine) async {
+    final idx = _routines.indexWhere((r) => r.id == routine.id);
     if (idx != -1) {
-      final item = _routines[idx];
-      _routines[idx] = item.copyWith(isCompleted: !item.isCompleted);
-      _saveRoutines();
+      _routines[idx] = routine;
+      await _database.insertRoutine(routine);
       notifyListeners();
     }
   }
 
-  void addRoutine(CareRoutine routine) {
-    _routines.insert(0, routine);
-    _saveRoutines();
+  Future<void> deleteRoutine(String routineId) async {
+    _routines.removeWhere((r) => r.id == routineId);
+    await _database.deleteRoutine(routineId);
     notifyListeners();
   }
 
-  void deleteRoutine(String id) {
-    _routines.removeWhere((r) => r.id == id);
-    _saveRoutines();
-    notifyListeners();
-  }
-
-  // Appointments
-  void addAppointment(Appointment appt) {
-    _appointments.insert(0, appt);
-    _saveAppointments();
-    notifyListeners();
-  }
-
-  void toggleAppointmentCompleted(String id) {
-    final idx = _appointments.indexWhere((a) => a.id == id);
+  Future<void> toggleRoutine(String routineId) async {
+    final idx = _routines.indexWhere((r) => r.id == routineId);
     if (idx != -1) {
-      final appt = _appointments[idx];
-      _appointments[idx] = appt.copyWith(isCompleted: !appt.isCompleted);
-      _saveAppointments();
+      final current = _routines[idx];
+      final newStatus = !current.isCompleted;
+      final updated = current.copyWith(
+        isCompleted: newStatus,
+        completedAt: newStatus ? _formatTimeNow() : '',
+      );
+      _routines[idx] = updated;
+      await _database.insertRoutine(updated);
       notifyListeners();
     }
   }
 
-  // Health
-  void addHealthEvent(HealthEvent event) {
+  // ───────────────────────────────────────────────────────────────────────────
+  // HEALTH RECORDS CRUD
+  // ───────────────────────────────────────────────────────────────────────────
+
+  Future<void> addHealthEvent(HealthEvent event) async {
     _healthEvents.insert(0, event);
+    await _database.insertHealthRecord(event);
     notifyListeners();
   }
 
-  // Weight & Growth
-  void addWeightEntry(WeightEntry entry) {
+  Future<void> addHealthRecord(HealthEvent event) => addHealthEvent(event);
+
+  Future<void> deleteHealthEvent(String eventId) async {
+    _healthEvents.removeWhere((h) => h.id == eventId);
+    await _database.deleteHealthRecord(eventId);
+    notifyListeners();
+  }
+
+  // ───────────────────────────────────────────────────────────────────────────
+  // WEIGHT ENTRIES CRUD
+  // ───────────────────────────────────────────────────────────────────────────
+
+  Future<void> addWeightRecord(WeightEntry entry) async {
     _weightHistory.insert(0, entry);
+    await _database.insertWeightEntry(entry);
+
     // Also update pet's current weight
-    final idx = _pets.indexWhere((p) => p.id == entry.petId);
-    if (idx != -1) {
-      _pets[idx] = _pets[idx].copyWith(weightKg: entry.weightKg);
-      _savePets();
+    final petIdx = _pets.indexWhere((p) => p.id == entry.petId);
+    if (petIdx != -1) {
+      final updatedPet = _pets[petIdx].copyWith(weightKg: entry.weightKg);
+      _pets[petIdx] = updatedPet;
+      await _database.updatePet(updatedPet);
     }
+
     notifyListeners();
   }
 
-  // Vaccination
-  void addVaccination(VaccinationRecord record) {
-    _vaccinations.insert(0, record);
+  Future<void> addWeightEntry(WeightEntry entry) => addWeightRecord(entry);
+
+  // ───────────────────────────────────────────────────────────────────────────
+  // VACCINATIONS CRUD
+  // ───────────────────────────────────────────────────────────────────────────
+
+  Future<void> addVaccination(VaccinationRecord vac) async {
+    _vaccinations.insert(0, vac);
+    await _database.insertVaccination(vac);
     notifyListeners();
   }
 
-  // Medication
-  void addMedication(Medication med) {
+  // ───────────────────────────────────────────────────────────────────────────
+  // MEDICATIONS CRUD
+  // ───────────────────────────────────────────────────────────────────────────
+
+  Future<void> addMedication(Medication med) async {
     _medications.insert(0, med);
+    await _database.insertMedication(med);
     notifyListeners();
   }
 
-  // Memories
-  void addMemory(MemoryEntry memory) {
+  Future<void> updateMedication(Medication med) async {
+    final idx = _medications.indexWhere((m) => m.id == med.id);
+    if (idx != -1) {
+      _medications[idx] = med;
+      await _database.insertMedication(med);
+      notifyListeners();
+    }
+  }
+
+  // ───────────────────────────────────────────────────────────────────────────
+  // APPOINTMENTS CRUD
+  // ───────────────────────────────────────────────────────────────────────────
+
+  Future<void> addAppointment(Appointment appt) async {
+    _appointments.add(appt);
+    await _database.insertAppointment(appt);
+    notifyListeners();
+  }
+
+  Future<void> updateAppointment(Appointment appt) async {
+    final idx = _appointments.indexWhere((a) => a.id == appt.id);
+    if (idx != -1) {
+      _appointments[idx] = appt;
+      await _database.insertAppointment(appt);
+      notifyListeners();
+    }
+  }
+
+  Future<void> deleteAppointment(String apptId) async {
+    _appointments.removeWhere((a) => a.id == apptId);
+    await _database.deleteAppointment(apptId);
+    notifyListeners();
+  }
+
+  Future<void> toggleAppointmentCompleted(String apptId) async {
+    final idx = _appointments.indexWhere((a) => a.id == apptId);
+    if (idx != -1) {
+      final updated = _appointments[idx].copyWith(
+        isCompleted: !_appointments[idx].isCompleted,
+      );
+      _appointments[idx] = updated;
+      await _database.insertAppointment(updated);
+      notifyListeners();
+    }
+  }
+
+  // ───────────────────────────────────────────────────────────────────────────
+  // MEMORIES CRUD
+  // ───────────────────────────────────────────────────────────────────────────
+
+  Future<void> addMemory(MemoryEntry memory) async {
     _memories.insert(0, memory);
+    await _database.insertMemory(memory);
     notifyListeners();
   }
 
-  // Documents
+  // ───────────────────────────────────────────────────────────────────────────
+  // DAILY NOTES CRUD (Owner Wellness Observations)
+  // ───────────────────────────────────────────────────────────────────────────
+
+  Future<void> addSymptomNote(SymptomNote note) async {
+    _symptomNotes.insert(0, note);
+    await _database.insertDailyNote(note);
+    notifyListeners();
+  }
+
+  Future<void> addDailyNote(SymptomNote note) => addSymptomNote(note);
+
+  // ───────────────────────────────────────────────────────────────────────────
+  // EMERGENCY & LOST PET
+  // ───────────────────────────────────────────────────────────────────────────
+
+  void toggleLostPetMode(bool enabled) {
+    _isLostPetModeEnabled = enabled;
+    _prefs.setBool('pawly_lost_pet_mode', enabled);
+    notifyListeners();
+  }
+
+  void updateEmergencyCard(EmergencyCardData data) {
+    _emergencyCard = data;
+    notifyListeners();
+  }
+
   void addDocument(DocumentItem doc) {
     _documents.insert(0, doc);
     notifyListeners();
   }
 
-  // Vet Prep Item Toggle
-  void toggleVetPrepItem(String id) {
-    final idx = _vetPrepItems.indexWhere((item) => item.id == id);
+  void toggleVetPrepItem(String itemId) {
+    final idx = _vetPrepItems.indexWhere((i) => i.id == itemId);
     if (idx != -1) {
-      _vetPrepItems[idx] = _vetPrepItems[idx].copyWith(
-        isChecked: !_vetPrepItems[idx].isChecked,
-      );
+      final item = _vetPrepItems[idx];
+      _vetPrepItems[idx] = item.copyWith(isChecked: !item.isChecked);
       notifyListeners();
     }
   }
@@ -296,63 +430,23 @@ class PawlyRepository extends ChangeNotifier {
     notifyListeners();
   }
 
-  // Emergency Card
-  void updateEmergencyCard(EmergencyCardData card) {
-    _emergencyCard = card;
-    notifyListeners();
-  }
+  // ───────────────────────────────────────────────────────────────────────────
+  // UNIVERSAL SEARCH
+  // ───────────────────────────────────────────────────────────────────────────
 
-  void toggleLostPetMode() {
-    _isLostPetModeEnabled = !_isLostPetModeEnabled;
-    _prefs.setBool('pawly_lost_pet_mode', _isLostPetModeEnabled);
-    notifyListeners();
-  }
-
-  // Milestones
-  void addMilestone(PetMilestone milestone) {
-    _milestones.insert(0, milestone);
-    notifyListeners();
-  }
-
-  // Symptom / Observation notes
-  void addSymptomNote(SymptomNote note) {
-    _symptomNotes.insert(0, note);
-    notifyListeners();
-  }
-
-  // Care Circle
-  void addCareCircleMember(CareCircleMember member) {
-    _careCircle.add(member);
-    notifyListeners();
-  }
-
-  void removeCareCircleMember(String id) {
-    _careCircle.removeWhere((m) => m.id == id);
-    notifyListeners();
-  }
-
-  // Wellness Snapshot
-  void updateWellnessSnapshot(WellnessSnapshot snapshot) {
-    _wellnessSnapshot = snapshot;
-    notifyListeners();
-  }
-
-  // Universal Search
   List<SearchResultItem> search(String query) {
     if (query.trim().isEmpty) return [];
-    final q = query.toLowerCase().trim();
-    final List<SearchResultItem> results = [];
+    final q = query.toLowerCase();
+    final results = <SearchResultItem>[];
 
-    // Search Pets
+    // 1. Pets
     for (final pet in _pets) {
       if (pet.name.toLowerCase().contains(q) ||
           pet.breed.toLowerCase().contains(q) ||
-          pet.species.toLowerCase().contains(q) ||
-          pet.nickname.toLowerCase().contains(q) ||
-          pet.temperament.toLowerCase().contains(q)) {
+          pet.animalType.toLowerCase().contains(q)) {
         results.add(SearchResultItem(
           title: pet.name,
-          subtitle: '${pet.breed} • ${pet.ageYears} yrs',
+          subtitle: '${pet.animalType} • ${pet.breed} • ${pet.weightKg} kg',
           category: 'Pet',
           petName: pet.name,
           originalObject: pet,
@@ -360,7 +454,7 @@ class PawlyRepository extends ChangeNotifier {
       }
     }
 
-    // Search Care Routines
+    // 2. Care Routines
     for (final routine in _routines) {
       if (routine.title.toLowerCase().contains(q) ||
           routine.notes.toLowerCase().contains(q) ||
@@ -368,34 +462,33 @@ class PawlyRepository extends ChangeNotifier {
         final pet = _pets.firstWhere((p) => p.id == routine.petId, orElse: () => activePet);
         results.add(SearchResultItem(
           title: routine.title,
-          subtitle: '${routine.time} • ${routine.recurrence} • ${routine.notes}',
-          category: 'Care',
-          date: routine.date,
+          subtitle: '${routine.time} • ${routine.category.displayName} • ${routine.recurrence}',
+          category: 'Care Routine',
           petName: pet.name,
           originalObject: routine,
         ));
       }
     }
 
-    // Search Appointments
-    for (final appt in _appointments) {
-      if (appt.purpose.toLowerCase().contains(q) ||
-          appt.clinic.toLowerCase().contains(q) ||
-          appt.vetName.toLowerCase().contains(q) ||
-          appt.notes.toLowerCase().contains(q)) {
-        final pet = _pets.firstWhere((p) => p.id == appt.petId, orElse: () => activePet);
+    // 3. Health Records
+    for (final event in _healthEvents) {
+      if (event.title.toLowerCase().contains(q) ||
+          event.notes.toLowerCase().contains(q) ||
+          event.type.toLowerCase().contains(q) ||
+          event.clinic.toLowerCase().contains(q) ||
+          event.veterinarian.toLowerCase().contains(q)) {
+        final pet = _pets.firstWhere((p) => p.id == event.petId, orElse: () => activePet);
         results.add(SearchResultItem(
-          title: appt.purpose,
-          subtitle: '${appt.clinic} • ${appt.vetName}',
-          category: 'Appointment',
-          date: appt.date,
+          title: event.title,
+          subtitle: '${event.date} • ${event.type} • ${event.clinic}',
+          category: 'Health Record',
           petName: pet.name,
-          originalObject: appt,
+          originalObject: event,
         ));
       }
     }
 
-    // Search Medications
+    // 4. Medications
     for (final med in _medications) {
       if (med.name.toLowerCase().contains(q) ||
           med.dosage.toLowerCase().contains(q) ||
@@ -404,62 +497,74 @@ class PawlyRepository extends ChangeNotifier {
         final pet = _pets.firstWhere((p) => p.id == med.petId, orElse: () => activePet);
         results.add(SearchResultItem(
           title: med.name,
-          subtitle: '${med.dosage} • ${med.frequency}',
+          subtitle: '${med.dosage} • ${med.frequency} • ${med.isActive ? 'Active' : 'Paused'}',
           category: 'Medication',
-          date: med.startDate,
           petName: pet.name,
           originalObject: med,
         ));
       }
     }
 
-    // Search Health Events
-    for (final ev in _healthEvents) {
-      if (ev.title.toLowerCase().contains(q) ||
-          ev.type.toLowerCase().contains(q) ||
-          ev.notes.toLowerCase().contains(q) ||
-          ev.clinic.toLowerCase().contains(q)) {
-        final pet = _pets.firstWhere((p) => p.id == ev.petId, orElse: () => activePet);
+    // 5. Vaccinations
+    for (final vac in _vaccinations) {
+      if (vac.vaccineName.toLowerCase().contains(q) ||
+          vac.clinic.toLowerCase().contains(q) ||
+          vac.veterinarian.toLowerCase().contains(q)) {
+        final pet = _pets.firstWhere((p) => p.id == vac.petId, orElse: () => activePet);
         results.add(SearchResultItem(
-          title: ev.title,
-          subtitle: '${ev.type} • ${ev.clinic}',
-          category: 'Health',
-          date: ev.date,
+          title: vac.vaccineName,
+          subtitle: 'Given: ${vac.dateAdministered} • Due: ${vac.nextDueDate}',
+          category: 'Vaccination',
           petName: pet.name,
-          originalObject: ev,
+          originalObject: vac,
         ));
       }
     }
 
-    // Search Memories
-    for (final mem in _memories) {
-      if (mem.title.toLowerCase().contains(q) ||
-          mem.caption.toLowerCase().contains(q) ||
-          mem.milestoneType.toLowerCase().contains(q)) {
-        final pet = _pets.firstWhere((p) => p.id == mem.petId, orElse: () => activePet);
+    // 6. Appointments
+    for (final appt in _appointments) {
+      if (appt.purpose.toLowerCase().contains(q) ||
+          appt.clinic.toLowerCase().contains(q) ||
+          appt.vetName.toLowerCase().contains(q) ||
+          appt.notes.toLowerCase().contains(q)) {
+        final pet = _pets.firstWhere((p) => p.id == appt.petId, orElse: () => activePet);
         results.add(SearchResultItem(
-          title: mem.title,
-          subtitle: mem.caption,
+          title: appt.purpose,
+          subtitle: '${appt.date} at ${appt.time} • ${appt.clinic}',
+          category: 'Appointment',
+          petName: pet.name,
+          originalObject: appt,
+        ));
+      }
+    }
+
+    // 7. Memories
+    for (final memory in _memories) {
+      if (memory.title.toLowerCase().contains(q) ||
+          memory.caption.toLowerCase().contains(q)) {
+        final pet = _pets.firstWhere((p) => p.id == memory.petId, orElse: () => activePet);
+        results.add(SearchResultItem(
+          title: memory.title,
+          subtitle: '${memory.date} • ${memory.caption}',
           category: 'Memory',
-          date: mem.date,
           petName: pet.name,
-          originalObject: mem,
+          originalObject: memory,
         ));
       }
     }
 
-    // Search Documents
-    for (final doc in _documents) {
-      if (doc.title.toLowerCase().contains(q) ||
-          doc.category.toLowerCase().contains(q)) {
-        final pet = _pets.firstWhere((p) => p.id == doc.petId, orElse: () => activePet);
+    // 8. Daily Notes
+    for (final note in _symptomNotes) {
+      if (note.notes.toLowerCase().contains(q) ||
+          note.appetite.toLowerCase().contains(q) ||
+          note.energy.toLowerCase().contains(q)) {
+        final pet = _pets.firstWhere((p) => p.id == note.petId, orElse: () => activePet);
         results.add(SearchResultItem(
-          title: doc.title,
-          subtitle: '${doc.category} • ${doc.fileType}',
-          category: 'Document',
-          date: doc.dateAdded,
+          title: 'Daily Note • ${note.date}',
+          subtitle: 'Appetite: ${note.appetite} • Energy: ${note.energy}',
+          category: 'Daily Note',
           petName: pet.name,
-          originalObject: doc,
+          originalObject: note,
         ));
       }
     }
@@ -467,31 +572,11 @@ class PawlyRepository extends ChangeNotifier {
     return results;
   }
 
-  // Profile
-  void updateUserProfile(UserProfile profile) {
-    _user = profile;
-    notifyListeners();
-  }
-
-  // Storage helpers
-  void _savePets() {
-    _prefs.setString(
-      'pawly_pets',
-      jsonEncode(_pets.map((p) => p.toJson()).toList()),
-    );
-  }
-
-  void _saveRoutines() {
-    _prefs.setString(
-      'pawly_routines',
-      jsonEncode(_routines.map((r) => r.toJson()).toList()),
-    );
-  }
-
-  void _saveAppointments() {
-    _prefs.setString(
-      'pawly_appointments',
-      jsonEncode(_appointments.map((a) => a.toJson()).toList()),
-    );
+  String _formatTimeNow() {
+    final now = DateTime.now();
+    final hour = now.hour > 12 ? now.hour - 12 : (now.hour == 0 ? 12 : now.hour);
+    final min = now.minute.toString().padLeft(2, '0');
+    final ampm = now.hour >= 12 ? 'PM' : 'AM';
+    return '$hour:$min $ampm';
   }
 }

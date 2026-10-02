@@ -597,7 +597,15 @@ class HomeScreen extends StatelessWidget {
                       child: Row(
                         children: [
                           DateBubble(
-                            month: 'OCT',
+                            month: () {
+                              final parts = upcomingAppt.date.split('-');
+                              if (parts.length >= 2) {
+                                final m = int.tryParse(parts[1]) ?? 1;
+                                const months = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
+                                return months[(m - 1).clamp(0, 11)];
+                              }
+                              return 'APPT';
+                            }(),
                             day: upcomingAppt.date.split('-').last,
                             color: PawlyColors.black,
                           ),

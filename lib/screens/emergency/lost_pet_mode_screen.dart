@@ -80,7 +80,7 @@ class LostPetModeScreen extends StatelessWidget {
                       Switch(
                         value: isLost,
                         activeColor: PawlyColors.alertRose,
-                        onChanged: (_) => repository.toggleLostPetMode(),
+                        onChanged: (val) => repository.toggleLostPetMode(val),
                       ),
                     ],
                   ),

@@ -40,7 +40,7 @@ class _AddCareScreenState extends State<AddCareScreen> {
       petId: _selectedPetId,
       title: title,
       time: _timeController.text.trim(),
-      date: '2026-10-02',
+      date: DateTime.now().toIso8601String().substring(0, 10),
       category: _selectedCategory,
       priority: _priority,
       recurrence: _recurrence,

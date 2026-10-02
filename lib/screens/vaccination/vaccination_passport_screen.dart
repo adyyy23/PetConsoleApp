@@ -79,12 +79,15 @@ class VaccinationPassportScreen extends StatelessWidget {
               onPressed: () {
                 final name = nameController.text.trim();
                 if (name.isNotEmpty) {
+                  final now = DateTime.now();
+                  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                  final dateStr = '${months[now.month - 1]} ${now.day.toString().padLeft(2, '0')}, ${now.year}';
                   repository.addVaccination(
                     VaccinationRecord(
                       id: 'v_${DateTime.now().millisecondsSinceEpoch}',
                       petId: repository.activePet.id,
                       vaccineName: name,
-                      dateAdministered: 'Today',
+                      dateAdministered: dateStr,
                       nextDueDate: nextDueController.text.trim(),
                       veterinarian: 'Dr. Sarah Ramos, DVM',
                       clinic: clinicController.text.trim(),

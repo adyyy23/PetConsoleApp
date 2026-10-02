@@ -31,7 +31,7 @@ void main() {
     await tester.pump(const Duration(milliseconds: 300));
 
     // 1. Verify Onboarding
-    expect(find.textContaining('Their whole world'), findsOneWidget);
+    expect(find.textContaining('Everything about them'), findsOneWidget);
 
     // Tap "Skip" on Onboarding to proceed to Login
     await tester.tap(find.text('Skip'));
@@ -65,14 +65,14 @@ void main() {
     // 6. Navigate to Care tab
     await tester.tap(find.text('Care'));
     await tester.pumpAndSettle();
-    expect(find.text('Care Agenda'), findsOneWidget);
-    expect(find.textContaining('Care Consistency'), findsOneWidget);
+    expect(find.text('Care'), findsWidgets);
+    expect(find.text('+ Add Care'), findsOneWidget);
 
     // 7. Navigate to Health tab
     await tester.tap(find.text('Health'));
     await tester.pumpAndSettle();
-    expect(find.textContaining('Health Story'), findsOneWidget);
-    expect(find.text('Daily Observations & Symptoms'), findsOneWidget);
+    expect(find.text('Health Records'), findsWidgets);
+    expect(find.text('Daily Notes'), findsOneWidget);
 
     // 8. Navigate to More / Settings tab
     await tester.tap(find.text('More'));
@@ -97,6 +97,7 @@ void main() {
     SharedPreferences.setMockInitialValues({});
     final repository = PawlyRepository();
     await repository.init();
+    await repository.seedDemoData();
 
     // Search for medication
     final medResults = repository.search('Apoquel');

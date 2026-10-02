@@ -99,11 +99,14 @@ class _WeightGrowthScreenState extends State<WeightGrowthScreen> {
               onPressed: () {
                 final w = double.tryParse(weightController.text.trim());
                 if (w != null && w > 0) {
+                  final now = DateTime.now();
+                  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                  final dateStr = '${months[now.month - 1]} ${now.day.toString().padLeft(2, '0')}, ${now.year}';
                   widget.repository.addWeightEntry(
                     WeightEntry(
                       id: 'w_${DateTime.now().millisecondsSinceEpoch}',
                       petId: widget.repository.activePet.id,
-                      date: 'Today',
+                      date: dateStr,
                       weightKg: w,
                       note: noteController.text.trim().isEmpty ? 'Regular check' : noteController.text.trim(),
                     ),

@@ -96,6 +96,10 @@ class _PawlyAppState extends State<PawlyApp> {
               _goTo(AppFlowState.main);
             }
           },
+          onExploreDemo: () async {
+            await widget.repository.seedDemoData();
+            _goTo(AppFlowState.main);
+          },
           onNavigateToSignup: () => _goTo(AppFlowState.signup),
           onNavigateToForgotPassword: () => _goTo(AppFlowState.forgotPassword),
         );

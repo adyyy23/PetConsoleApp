@@ -65,7 +65,7 @@ class _CareScreenState extends State<CareScreen> {
                         children: [
                           Text('EVERYDAY ROUTINES • ${activePet.name.toUpperCase()}', style: PawlyTypography.eyebrow, overflow: TextOverflow.ellipsis),
                           const SizedBox(height: 2),
-                          const Text('Care Agenda', style: PawlyTypography.displayMedium, overflow: TextOverflow.ellipsis),
+                          const Text('Care', style: PawlyTypography.displayMedium, overflow: TextOverflow.ellipsis),
                         ],
                       ),
                     ),
@@ -130,46 +130,55 @@ class _CareScreenState extends State<CareScreen> {
               ),
             ),
 
-            // Gentle Care Consistency Streak Banner (8px Card)
+            // Real Care Progress Banner
             SliverToBoxAdapter(
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 6),
                 child: PawlyCard(
                   backgroundColor: PawlyColors.surfaceWarm,
                   padding: const EdgeInsets.all(14),
-                  child: Row(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(7),
-                        decoration: BoxDecoration(
-                          color: PawlyColors.black,
-                          borderRadius: AppTokens.rSm,
+                  child: Builder(builder: (context) {
+                    final routineCount = allRoutines.length;
+                    final doneCount = allRoutines.where((r) => r.isCompleted).length;
+                    final pct = routineCount == 0 ? 0 : ((doneCount / routineCount) * 100).round();
+                    return Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(7),
+                          decoration: BoxDecoration(
+                            color: PawlyColors.black,
+                            borderRadius: AppTokens.rSm,
+                          ),
+                          child: const Icon(Icons.check_circle_outline_rounded, color: Colors.white, size: 16),
                         ),
-                        child: const Icon(Icons.star_rounded, color: Colors.white, size: 16),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Text(
-                              'Care Consistency: 6 of last 7 days',
-                              style: TextStyle(
-                                fontSize: 13,
-                                fontWeight: FontWeight.w800,
-                                color: PawlyColors.black,
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                routineCount > 0
+                                    ? '$doneCount of $routineCount completed ($pct%)'
+                                    : 'No routines scheduled today',
+                                style: const TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w800,
+                                  color: PawlyColors.black,
+                                ),
                               ),
-                            ),
-                            const SizedBox(height: 2),
-                            Text(
-                              '${activePet.name} is on track with scheduled wellness care.',
-                              style: PawlyTypography.bodyMedium,
-                            ),
-                          ],
+                              const SizedBox(height: 2),
+                              Text(
+                                routineCount > 0
+                                    ? '${activePet.name} has $doneCount routine${doneCount == 1 ? '' : 's'} completed.'
+                                    : 'Add everyday care routines for feeding, walks, or meds.',
+                                style: PawlyTypography.bodyMedium,
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
-                    ],
-                  ),
+                      ],
+                    );
+                  }),
                 ),
               ),
             ),
@@ -237,6 +246,7 @@ class _CareScreenState extends State<CareScreen> {
                           isLast: isLast,
                           assignedTo: r.assignedTo,
                           onToggle: () => widget.repository.toggleRoutine(r.id),
+                          onDelete: () => widget.repository.deleteRoutine(r.id),
                         );
                       }),
                       const SizedBox(height: 16),
@@ -260,6 +270,7 @@ class _CareScreenState extends State<CareScreen> {
                           isLast: isLast,
                           assignedTo: r.assignedTo,
                           onToggle: () => widget.repository.toggleRoutine(r.id),
+                          onDelete: () => widget.repository.deleteRoutine(r.id),
                         );
                       }),
                     ],

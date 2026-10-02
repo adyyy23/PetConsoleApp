@@ -28,10 +28,18 @@ class _AddHealthEventScreenState extends State<AddHealthEventScreen> {
     final title = _titleController.text.trim();
     if (title.isEmpty) return;
 
+    final now = DateTime.now();
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    final dateStr = '${months[now.month - 1]} ${now.day.toString().padLeft(2, '0')}, ${now.year}';
+
+    final petId = widget.repository.selectedPetId.isNotEmpty
+        ? widget.repository.selectedPetId
+        : widget.repository.activePet.id;
+
     final event = HealthEvent(
       id: 'health_${DateTime.now().millisecondsSinceEpoch}',
-      petId: widget.repository.selectedPetId,
-      date: 'Today',
+      petId: petId,
+      date: dateStr,
       title: title,
       type: _eventType,
       notes: _notesController.text.trim(),

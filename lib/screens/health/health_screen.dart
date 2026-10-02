@@ -150,10 +150,13 @@ class HealthScreen extends StatelessWidget {
                 child: PawlyButton(
                   text: 'Save Observation Note',
                   onPressed: () {
+                    final now = DateTime.now();
+                    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                    final dateStr = '${months[now.month - 1]} ${now.day.toString().padLeft(2, '0')}, ${now.year}';
                     repository.addSymptomNote(SymptomNote(
                       id: 'sym_${DateTime.now().millisecondsSinceEpoch}',
                       petId: repository.activePet.id,
-                      date: 'Oct 02, 2026',
+                      date: dateStr,
                       appetite: appetite,
                       energy: energy,
                       stool: stool,
@@ -197,7 +200,7 @@ class HealthScreen extends StatelessWidget {
                         children: [
                           Text('MEDICAL & WELLNESS • ${activePet.name.toUpperCase()}', style: PawlyTypography.eyebrow, overflow: TextOverflow.ellipsis),
                           const SizedBox(height: 2),
-                          Text('${activePet.name}’s Health Story', style: PawlyTypography.displayMedium, overflow: TextOverflow.ellipsis),
+                          const Text('Health Records', style: PawlyTypography.displayMedium, overflow: TextOverflow.ellipsis),
                         ],
                       ),
                     ),
@@ -249,13 +252,13 @@ class HealthScreen extends StatelessWidget {
               ),
             ),
 
-            // Daily Observations & Symptoms Journal
+            // Daily Notes
             SliverToBoxAdapter(
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(20, 4, 20, 8),
                 child: SectionHeader(
                   eyebrow: 'WELLNESS JOURNAL',
-                  title: 'Daily Observations & Symptoms',
+                  title: 'Daily Notes',
                   action: TextButton(
                     onPressed: () => _showAddObservationSheet(context),
                     child: const Text('+ Log Note', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: PawlyColors.black)),
