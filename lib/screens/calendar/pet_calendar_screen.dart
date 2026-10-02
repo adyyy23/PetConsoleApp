@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import '../../theme/pawly_colors.dart';
 import '../../theme/pawly_typography.dart';
+import '../../theme/app_tokens.dart';
 import '../../widgets/widgets.dart';
 import '../../repositories/pawly_repository.dart';
-import '../../models/care_routine.dart';
+import '../../models/models.dart';
 
 class PetCalendarScreen extends StatefulWidget {
   final PawlyRepository repository;
@@ -21,7 +22,6 @@ class _PetCalendarScreenState extends State<PetCalendarScreen> {
   @override
   void initState() {
     super.initState();
-    // Default to October 2026 to match realistic sample dataset
     _selectedMonth = DateTime(2026, 10, 1);
     _selectedDay = DateTime(2026, 10, 2);
   }
@@ -58,62 +58,42 @@ class _PetCalendarScreenState extends State<PetCalendarScreen> {
     final pet = widget.repository.activePet;
     final selectedDateStr = _formatDateString(_selectedDay);
 
-    // Filter routines for pet
     final routines = widget.repository.activePetRoutines.where((r) {
       return r.date == selectedDateStr;
     }).toList();
 
-    // Filter appointments for pet
     final appointments = widget.repository.activePetAppointments.where((a) {
       return a.date == selectedDateStr;
     }).toList();
 
-    // Filter medications
     final medications = widget.repository.activePetMedications;
 
     return Scaffold(
-      backgroundColor: PawlyColors.creamBg,
-      appBar: AppBar(
-        backgroundColor: PawlyColors.creamBg,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 20, color: PawlyColors.espresso),
-          onPressed: () => Navigator.pop(context),
-        ),
-        title: Text(
-          '${pet.name}’s Calendar',
-          style: PawlyTypography.titleMedium,
-        ),
-        centerTitle: true,
-      ),
+      backgroundColor: PawlyColors.background,
+      appBar: PawlyAppBar(title: '${pet.name}’s Calendar'),
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.fromLTRB(20, 8, 20, 32),
+          padding: const EdgeInsets.fromLTRB(20, 12, 20, 32),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Month Selector Header
-              PawlyBubble(
-                backgroundColor: PawlyColors.surfaceWarm,
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              // Month Selector Header (8px Card)
+              PawlyCard(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     IconButton(
-                      icon: const Icon(Icons.chevron_left_rounded, color: PawlyColors.espresso),
+                      icon: const Icon(Icons.chevron_left_rounded, color: PawlyColors.black),
                       onPressed: _prevMonth,
                       visualDensity: VisualDensity.compact,
                     ),
                     Text(
                       _formatMonthYear(_selectedMonth),
-                      style: const TextStyle(
-                        fontSize: 17,
-                        fontWeight: FontWeight.w800,
-                        color: PawlyColors.espresso,
-                      ),
+                      style: PawlyTypography.titleMedium,
                     ),
                     IconButton(
-                      icon: const Icon(Icons.chevron_right_rounded, color: PawlyColors.espresso),
+                      icon: const Icon(Icons.chevron_right_rounded, color: PawlyColors.black),
                       onPressed: _nextMonth,
                       visualDensity: VisualDensity.compact,
                     ),
@@ -121,12 +101,11 @@ class _PetCalendarScreenState extends State<PetCalendarScreen> {
                 ),
               ),
 
-              const SizedBox(height: 16),
+              const SizedBox(height: 12),
 
-              // Calendar Grid Box
-              PawlyBubble(
-                backgroundColor: Colors.white,
-                padding: const EdgeInsets.all(16),
+              // Calendar Grid Box (8px Card)
+              PawlyCard(
+                padding: const EdgeInsets.all(14),
                 child: Column(
                   children: [
                     // Day of week labels
@@ -148,7 +127,7 @@ class _PetCalendarScreenState extends State<PetCalendarScreen> {
                 ),
               ),
 
-              const SizedBox(height: 24),
+              const SizedBox(height: 20),
 
               // Agenda for Selected Day
               Row(
@@ -156,48 +135,37 @@ class _PetCalendarScreenState extends State<PetCalendarScreen> {
                 children: [
                   Text(
                     'Agenda for ${_selectedDay.month}/${_selectedDay.day}/${_selectedDay.year}',
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w800,
-                      color: PawlyColors.espresso,
-                    ),
+                    style: PawlyTypography.titleSmall,
                   ),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                     decoration: BoxDecoration(
-                      color: PawlyColors.forestLight,
-                      borderRadius: BorderRadius.circular(12),
+                      color: PawlyColors.softGrey,
+                      borderRadius: AppRadius.rSm,
+                      border: Border.all(color: PawlyColors.border, width: 0.8),
                     ),
                     child: Text(
                       '${routines.length + appointments.length} events',
                       style: const TextStyle(
-                        fontSize: 12,
+                        fontSize: 11,
                         fontWeight: FontWeight.w700,
-                        color: PawlyColors.forest,
+                        color: PawlyColors.black,
                       ),
                     ),
                   ),
                 ],
               ),
 
-              const SizedBox(height: 12),
+              const SizedBox(height: 10),
 
               if (routines.isEmpty && appointments.isEmpty)
-                PawlyBubble(
-                  backgroundColor: PawlyColors.surfaceWarm,
-                  padding: const EdgeInsets.all(20),
+                const PawlyCard(
+                  padding: EdgeInsets.all(16),
                   child: Row(
                     children: [
-                      Container(
-                        padding: const EdgeInsets.all(10),
-                        decoration: const BoxDecoration(
-                          color: PawlyColors.sageLight,
-                          shape: BoxShape.circle,
-                        ),
-                        child: const Icon(Icons.event_available_rounded, color: PawlyColors.forest, size: 20),
-                      ),
-                      const SizedBox(width: 14),
-                      const Expanded(
+                      Icon(Icons.event_available_rounded, color: PawlyColors.black, size: 20),
+                      SizedBox(width: 12),
+                      Expanded(
                         child: Text(
                           'No scheduled appointments or care routines on this day.',
                           style: PawlyTypography.bodyMedium,
@@ -209,51 +177,40 @@ class _PetCalendarScreenState extends State<PetCalendarScreen> {
 
               // Appointments
               ...appointments.map((appt) => Container(
-                    margin: const EdgeInsets.only(bottom: 10),
-                    child: PawlyBubble(
-                      backgroundColor: PawlyColors.terracottaLight,
-                      borderColor: PawlyColors.terracotta.withOpacity(0.3),
-                      padding: const EdgeInsets.all(16),
+                    margin: const EdgeInsets.only(bottom: 8),
+                    child: PawlyCard(
+                      padding: const EdgeInsets.all(14),
                       child: Row(
                         children: [
                           DateBubble(
                             month: 'OCT',
                             day: appt.date.split('-').last,
-                            color: PawlyColors.terracotta,
                           ),
-                          const SizedBox(width: 14),
+                          const SizedBox(width: 12),
                           Expanded(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
                                   appt.purpose,
-                                  style: const TextStyle(
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.w800,
-                                    color: PawlyColors.espresso,
-                                  ),
+                                  style: PawlyTypography.titleSmall,
                                 ),
                                 const SizedBox(height: 2),
                                 Text(
                                   '${appt.time} • ${appt.clinic}',
-                                  style: const TextStyle(
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w600,
-                                    color: PawlyColors.terracotta,
-                                  ),
+                                  style: PawlyTypography.bodySmall,
                                 ),
                                 if (appt.vetName.isNotEmpty) ...[
                                   const SizedBox(height: 2),
                                   Text(
                                     'With ${appt.vetName}',
-                                    style: const TextStyle(fontSize: 12, color: PawlyColors.warmGrey),
+                                    style: PawlyTypography.caption,
                                   ),
                                 ],
                               ],
                             ),
                           ),
-                          const Icon(Icons.medical_services_outlined, color: PawlyColors.terracotta, size: 22),
+                          const Icon(Icons.medical_services_outlined, color: PawlyColors.black, size: 18),
                         ],
                       ),
                     ),
@@ -261,95 +218,49 @@ class _PetCalendarScreenState extends State<PetCalendarScreen> {
 
               // Routines
               ...routines.map((routine) => Container(
-                    margin: const EdgeInsets.only(bottom: 10),
-                    child: PawlyBubble(
-                      backgroundColor: routine.isCompleted ? PawlyColors.surfaceWarm : Colors.white,
-                      borderColor: PawlyColors.border,
-                      padding: const EdgeInsets.all(16),
-                      child: Row(
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                            decoration: BoxDecoration(
-                              color: PawlyColors.forestLight,
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            child: Text(
-                              routine.time,
-                              style: const TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w800,
-                                color: PawlyColors.forest,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 14),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  routine.title,
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w700,
-                                    decoration: routine.isCompleted ? TextDecoration.lineThrough : null,
-                                    color: routine.isCompleted ? PawlyColors.mutedGrey : PawlyColors.espresso,
-                                  ),
-                                ),
-                                const SizedBox(height: 2),
-                                Text(
-                                  '${routine.category.displayName} • ${routine.recurrence}',
-                                  style: const TextStyle(fontSize: 12, color: PawlyColors.warmGrey),
-                                ),
-                              ],
-                            ),
-                          ),
-                          if (routine.isCompleted)
-                            const Icon(Icons.check_circle_rounded, color: PawlyColors.forest, size: 22),
-                        ],
-                      ),
+                    margin: const EdgeInsets.only(bottom: 8),
+                    child: CareTimelineItem(
+                      time: routine.time,
+                      title: routine.title,
+                      subtitle: '${routine.category.displayName} • ${routine.recurrence}',
+                      isCompleted: routine.isCompleted,
+                      assignedTo: routine.assignedTo,
+                      onToggle: () => widget.repository.toggleRoutine(routine.id),
                     ),
                   )),
 
-              const SizedBox(height: 20),
+              const SizedBox(height: 16),
 
-              // Active Medications Banner
+              // Active Medications
               if (medications.isNotEmpty) ...[
-                const Text(
-                  'Ongoing Medications',
-                  style: TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w800,
-                    color: PawlyColors.espresso,
-                  ),
-                ),
-                const SizedBox(height: 10),
+                const Text('ONGOING MEDICATIONS', style: PawlyTypography.eyebrow),
+                const SizedBox(height: 8),
                 ...medications.map((m) => Container(
                       margin: const EdgeInsets.only(bottom: 8),
-                      child: PawlyBubble(
-                        backgroundColor: PawlyColors.honeyLight,
-                        borderColor: PawlyColors.butterYellow,
-                        padding: const EdgeInsets.all(14),
+                      child: PawlyCard(
+                        padding: const EdgeInsets.all(12),
                         child: Row(
                           children: [
-                            const Icon(Icons.medication_outlined, color: PawlyColors.espresso, size: 20),
-                            const SizedBox(width: 12),
+                            Container(
+                              padding: const EdgeInsets.all(6),
+                              decoration: BoxDecoration(
+                                color: PawlyColors.softGrey,
+                                borderRadius: AppRadius.rSm,
+                              ),
+                              child: const Icon(Icons.medication_outlined, color: PawlyColors.black, size: 16),
+                            ),
+                            const SizedBox(width: 10),
                             Expanded(
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
                                     m.name,
-                                    style: const TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w800,
-                                      color: PawlyColors.espresso,
-                                    ),
+                                    style: PawlyTypography.titleSmall,
                                   ),
                                   Text(
                                     '${m.dosage} • ${m.frequency}',
-                                    style: const TextStyle(fontSize: 12, color: PawlyColors.espresso),
+                                    style: PawlyTypography.caption,
                                   ),
                                 ],
                               ),
@@ -369,16 +280,14 @@ class _PetCalendarScreenState extends State<PetCalendarScreen> {
   Widget _buildMonthGrid() {
     final firstDayOfMonth = DateTime(_selectedMonth.year, _selectedMonth.month, 1);
     final daysInMonth = DateTime(_selectedMonth.year, _selectedMonth.month + 1, 0).day;
-    final leadingBlanks = firstDayOfMonth.weekday % 7; // Sunday = 0
+    final leadingBlanks = firstDayOfMonth.weekday % 7;
 
     final List<Widget> dayWidgets = [];
 
-    // Empty blank slots
     for (int i = 0; i < leadingBlanks; i++) {
       dayWidgets.add(const SizedBox(width: 38, height: 38));
     }
 
-    // Days
     for (int day = 1; day <= daysInMonth; day++) {
       final date = DateTime(_selectedMonth.year, _selectedMonth.month, day);
       final isSelected = date.year == _selectedDay.year &&
@@ -387,7 +296,6 @@ class _PetCalendarScreenState extends State<PetCalendarScreen> {
 
       final dateStr = _formatDateString(date);
 
-      // Check if routines exist on this date
       final hasRoutines = widget.repository.activePetRoutines.any((r) => r.date == dateStr);
       final hasAppts = widget.repository.activePetAppointments.any((a) => a.date == dateStr);
 
@@ -402,8 +310,8 @@ class _PetCalendarScreenState extends State<PetCalendarScreen> {
             width: 38,
             height: 38,
             decoration: BoxDecoration(
-              color: isSelected ? PawlyColors.forest : Colors.transparent,
-              shape: BoxShape.circle,
+              color: isSelected ? PawlyColors.black : Colors.transparent,
+              borderRadius: AppRadius.rSm,
             ),
             child: Stack(
               alignment: Alignment.center,
@@ -411,9 +319,9 @@ class _PetCalendarScreenState extends State<PetCalendarScreen> {
                 Text(
                   '$day',
                   style: TextStyle(
-                    fontSize: 13,
+                    fontSize: 12,
                     fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
-                    color: isSelected ? Colors.white : PawlyColors.espresso,
+                    color: isSelected ? Colors.white : PawlyColors.black,
                   ),
                 ),
                 if (hasRoutines || hasAppts)
@@ -424,21 +332,21 @@ class _PetCalendarScreenState extends State<PetCalendarScreen> {
                       children: [
                         if (hasRoutines)
                           Container(
-                            width: 4,
-                            height: 4,
+                            width: 3,
+                            height: 3,
                             margin: const EdgeInsets.symmetric(horizontal: 1),
                             decoration: BoxDecoration(
-                              color: isSelected ? Colors.white : PawlyColors.forest,
+                              color: isSelected ? Colors.white : PawlyColors.charcoal,
                               shape: BoxShape.circle,
                             ),
                           ),
                         if (hasAppts)
                           Container(
-                            width: 4,
-                            height: 4,
+                            width: 3,
+                            height: 3,
                             margin: const EdgeInsets.symmetric(horizontal: 1),
                             decoration: BoxDecoration(
-                              color: isSelected ? PawlyColors.butterYellow : PawlyColors.terracotta,
+                              color: isSelected ? Colors.white70 : PawlyColors.black,
                               shape: BoxShape.circle,
                             ),
                           ),
@@ -473,11 +381,7 @@ class _WeekDayLabel extends StatelessWidget {
       child: Center(
         child: Text(
           label,
-          style: const TextStyle(
-            fontSize: 12,
-            fontWeight: FontWeight.w700,
-            color: PawlyColors.warmGrey,
-          ),
+          style: PawlyTypography.labelSmall.copyWith(fontSize: 10),
         ),
       ),
     );

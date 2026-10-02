@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../theme/pawly_colors.dart';
 import '../../theme/pawly_typography.dart';
+import '../../theme/app_tokens.dart';
 import '../../widgets/widgets.dart';
 
 class ForgotPasswordScreen extends StatefulWidget {
@@ -19,12 +20,11 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: PawlyColors.creamBg,
-      appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_rounded),
-          onPressed: widget.onBackToLogin,
-        ),
+      backgroundColor: PawlyColors.background,
+      appBar: PawlyAppBar(
+        title: '',
+        onBack: widget.onBackToLogin,
+        showBottomBorder: false,
       ),
       body: SafeArea(
         child: Padding(
@@ -39,34 +39,30 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                 style: PawlyTypography.bodyLarge,
               ),
 
-              const SizedBox(height: 32),
+              const SizedBox(height: 28),
 
               if (_sent) ...[
-                Container(
-                  padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    color: PawlyColors.forestLight,
-                    borderRadius: BorderRadius.circular(18),
-                    border: Border.all(color: PawlyColors.forestBorder),
-                  ),
+                PawlyCard(
+                  backgroundColor: PawlyColors.surfaceWarm,
+                  padding: const EdgeInsets.all(16),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const Row(
                         children: [
-                          Icon(Icons.check_circle, color: PawlyColors.forest, size: 20),
+                          Icon(Icons.check_circle, color: PawlyColors.black, size: 18),
                           SizedBox(width: 8),
                           Text(
                             'Reset Link Sent',
                             style: TextStyle(
-                              fontSize: 15,
+                              fontSize: 14,
                               fontWeight: FontWeight.w700,
-                              color: PawlyColors.forest,
+                              color: PawlyColors.black,
                             ),
                           ),
                         ],
                       ),
-                      const SizedBox(height: 8),
+                      const SizedBox(height: 6),
                       Text(
                         'We sent recovery instructions to ${_emailController.text.trim()}. Check your inbox or spam folder.',
                         style: PawlyTypography.bodyMedium,
@@ -82,26 +78,30 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                   onPressed: widget.onBackToLogin,
                 ),
               ] else ...[
-                const Text('Email address', style: PawlyTypography.labelLarge),
-                const SizedBox(height: 8),
+                const Text('EMAIL ADDRESS', style: PawlyTypography.eyebrow),
+                const SizedBox(height: 6),
                 TextField(
                   controller: _emailController,
                   keyboardType: TextInputType.emailAddress,
+                  style: PawlyTypography.bodyLarge,
                   decoration: InputDecoration(
                     hintText: 'you@example.com',
+                    hintStyle: PawlyTypography.bodyMedium,
                     filled: true,
-                    fillColor: PawlyColors.surface,
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: const BorderSide(color: PawlyColors.border)),
+                    fillColor: Colors.white,
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                    border: OutlineInputBorder(borderRadius: AppRadius.rMd, borderSide: const BorderSide(color: PawlyColors.border)),
+                    enabledBorder: OutlineInputBorder(borderRadius: AppRadius.rMd, borderSide: const BorderSide(color: PawlyColors.border)),
+                    focusedBorder: OutlineInputBorder(borderRadius: AppRadius.rMd, borderSide: const BorderSide(color: PawlyColors.black, width: 1.5)),
                   ),
                 ),
-                const SizedBox(height: 28),
+                const SizedBox(height: 24),
                 PawlyButton(
                   label: 'Send Recovery Email',
                   isFullWidth: true,
                   variant: PawlyButtonVariant.primary,
                   onPressed: () {
-                    if (_emailController.text.isNotEmpty) {
+                    if (_emailController.text.trim().isNotEmpty) {
                       setState(() => _sent = true);
                     }
                   },

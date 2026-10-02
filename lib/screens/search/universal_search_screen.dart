@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../theme/pawly_colors.dart';
 import '../../theme/pawly_typography.dart';
+import '../../theme/app_tokens.dart';
 import '../../widgets/widgets.dart';
 import '../../repositories/pawly_repository.dart';
 import '../../models/models.dart';
@@ -70,27 +71,6 @@ class _UniversalSearchScreenState extends State<UniversalSearchScreen> {
     }
   }
 
-  Color _getCategoryColor(String category) {
-    switch (category) {
-      case 'Care':
-        return PawlyColors.forest;
-      case 'Health':
-        return PawlyColors.terracotta;
-      case 'Medication':
-        return PawlyColors.honey;
-      case 'Appointment':
-        return PawlyColors.slate;
-      case 'Memory':
-        return PawlyColors.rose;
-      case 'Document':
-        return PawlyColors.warmGrey;
-      case 'Pet':
-        return PawlyColors.forest;
-      default:
-        return PawlyColors.espresso;
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final filteredResults = _selectedCategory == 'All'
@@ -98,60 +78,44 @@ class _UniversalSearchScreenState extends State<UniversalSearchScreen> {
         : _results.where((r) => r.category == _selectedCategory).toList();
 
     return Scaffold(
-      backgroundColor: PawlyColors.creamBg,
-      appBar: AppBar(
-        backgroundColor: PawlyColors.creamBg,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 20, color: PawlyColors.espresso),
-          onPressed: () => Navigator.pop(context),
-        ),
-        title: const Text('Universal Search', style: PawlyTypography.titleMedium),
-        centerTitle: true,
-      ),
+      backgroundColor: PawlyColors.background,
+      appBar: const PawlyAppBar(title: 'Universal Search'),
       body: SafeArea(
         child: Column(
           children: [
-            // Search Input Field
+            // Search Input Field (Clean 8px container)
             Padding(
-              padding: const EdgeInsets.fromLTRB(20, 8, 20, 12),
+              padding: const EdgeInsets.fromLTRB(20, 12, 20, 10),
               child: Container(
                 decoration: BoxDecoration(
                   color: Colors.white,
-                  borderRadius: BorderRadius.circular(24),
-                  border: Border.all(color: PawlyColors.border, width: 1.2),
+                  borderRadius: AppRadius.rMd,
+                  border: Border.all(color: PawlyColors.border, width: 1.0),
                 ),
                 child: TextField(
                   controller: _searchController,
                   autofocus: true,
-                  style: const TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w600,
-                    color: PawlyColors.espresso,
-                  ),
+                  style: PawlyTypography.bodyLarge,
                   decoration: InputDecoration(
                     hintText: 'Search routines, medications, records...',
-                    hintStyle: const TextStyle(
-                      fontSize: 14,
-                      color: PawlyColors.mutedGrey,
-                    ),
-                    prefixIcon: const Icon(Icons.search_rounded, color: PawlyColors.forest),
+                    hintStyle: PawlyTypography.bodyMedium,
+                    prefixIcon: const Icon(Icons.search_rounded, color: PawlyColors.black, size: 20),
                     suffixIcon: _searchController.text.isNotEmpty
                         ? IconButton(
-                            icon: const Icon(Icons.clear_rounded, size: 18, color: PawlyColors.warmGrey),
+                            icon: const Icon(Icons.clear_rounded, size: 18, color: PawlyColors.textMuted),
                             onPressed: () => _searchController.clear(),
                           )
                         : null,
                     border: InputBorder.none,
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
                   ),
                 ),
               ),
             ),
 
-            // Category Filter Pills
+            // Category Filter Pills (6px)
             SizedBox(
-              height: 38,
+              height: 36,
               child: ListView.separated(
                 scrollDirection: Axis.horizontal,
                 padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -163,20 +127,22 @@ class _UniversalSearchScreenState extends State<UniversalSearchScreen> {
                   return GestureDetector(
                     onTap: () => setState(() => _selectedCategory = cat),
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                       decoration: BoxDecoration(
-                        color: isSelected ? PawlyColors.forest : Colors.white,
-                        borderRadius: BorderRadius.circular(20),
+                        color: isSelected ? PawlyColors.black : Colors.white,
+                        borderRadius: AppRadius.rSm,
                         border: Border.all(
-                          color: isSelected ? PawlyColors.forest : PawlyColors.border,
+                          color: isSelected ? PawlyColors.black : PawlyColors.border,
+                          width: 1.0,
                         ),
                       ),
+                      alignment: Alignment.center,
                       child: Text(
                         cat,
                         style: TextStyle(
                           fontSize: 12,
-                          fontWeight: FontWeight.w700,
-                          color: isSelected ? Colors.white : PawlyColors.warmGrey,
+                          fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
+                          color: isSelected ? Colors.white : PawlyColors.black,
                         ),
                       ),
                     ),
@@ -185,7 +151,7 @@ class _UniversalSearchScreenState extends State<UniversalSearchScreen> {
               ),
             ),
 
-            const SizedBox(height: 14),
+            const SizedBox(height: 12),
 
             // Search Content
             Expanded(
@@ -197,31 +163,23 @@ class _UniversalSearchScreenState extends State<UniversalSearchScreen> {
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             Container(
-                              padding: const EdgeInsets.all(18),
-                              decoration: const BoxDecoration(
-                                color: PawlyColors.surfaceWarm,
-                                shape: BoxShape.circle,
+                              padding: const EdgeInsets.all(14),
+                              decoration: BoxDecoration(
+                                color: PawlyColors.softGrey,
+                                borderRadius: AppRadius.rMd,
                               ),
-                              child: const Icon(Icons.search_rounded, size: 40, color: PawlyColors.forest),
+                              child: const Icon(Icons.search_rounded, size: 32, color: PawlyColors.black),
                             ),
                             const SizedBox(height: 16),
                             const Text(
                               'Search Across Everything',
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w800,
-                                color: PawlyColors.espresso,
-                              ),
+                              style: PawlyTypography.titleMedium,
                             ),
                             const SizedBox(height: 6),
                             const Text(
                               'Search pet profiles, care schedules, vet checkups, medications, memories, and documents.',
                               textAlign: TextAlign.center,
-                              style: TextStyle(
-                                fontSize: 13,
-                                color: PawlyColors.warmGrey,
-                                height: 1.4,
-                              ),
+                              style: PawlyTypography.bodyMedium,
                             ),
                           ],
                         ),
@@ -234,20 +192,16 @@ class _UniversalSearchScreenState extends State<UniversalSearchScreen> {
                             child: Column(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                const Icon(Icons.search_off_rounded, size: 44, color: PawlyColors.mutedGrey),
+                                const Icon(Icons.search_off_rounded, size: 36, color: PawlyColors.textMuted),
                                 const SizedBox(height: 12),
                                 Text(
                                   'No results for "${_searchController.text}"',
-                                  style: const TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w800,
-                                    color: PawlyColors.espresso,
-                                  ),
+                                  style: PawlyTypography.titleSmall,
                                 ),
                                 const SizedBox(height: 4),
                                 const Text(
                                   'Try checking your spelling or choosing another category.',
-                                  style: TextStyle(fontSize: 13, color: PawlyColors.warmGrey),
+                                  style: PawlyTypography.bodySmall,
                                 ),
                               ],
                             ),
@@ -256,25 +210,23 @@ class _UniversalSearchScreenState extends State<UniversalSearchScreen> {
                       : ListView.separated(
                           padding: const EdgeInsets.fromLTRB(20, 4, 20, 24),
                           itemCount: filteredResults.length,
-                          separatorBuilder: (_, __) => const SizedBox(height: 10),
+                          separatorBuilder: (_, __) => const SizedBox(height: 8),
                           itemBuilder: (context, idx) {
                             final item = filteredResults[idx];
                             final icon = _getCategoryIcon(item.category);
-                            final color = _getCategoryColor(item.category);
 
-                            return PawlyBubble(
-                              backgroundColor: Colors.white,
+                            return PawlyCard(
                               padding: const EdgeInsets.all(14),
                               child: Row(
                                 children: [
                                   Container(
-                                    width: 38,
-                                    height: 38,
+                                    width: 36,
+                                    height: 36,
                                     decoration: BoxDecoration(
-                                      color: color.withOpacity(0.12),
-                                      borderRadius: BorderRadius.circular(12),
+                                      color: PawlyColors.softGrey,
+                                      borderRadius: AppRadius.rSm,
                                     ),
-                                    child: Icon(icon, color: color, size: 18),
+                                    child: Icon(icon, color: PawlyColors.black, size: 18),
                                   ),
                                   const SizedBox(width: 12),
                                   Expanded(
@@ -289,48 +241,24 @@ class _UniversalSearchScreenState extends State<UniversalSearchScreen> {
                                                 item.title,
                                                 maxLines: 1,
                                                 overflow: TextOverflow.ellipsis,
-                                                style: const TextStyle(
-                                                  fontSize: 14,
-                                                  fontWeight: FontWeight.w800,
-                                                  color: PawlyColors.espresso,
-                                                ),
+                                                style: PawlyTypography.titleSmall,
                                               ),
                                             ),
-                                            Container(
-                                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                                              decoration: BoxDecoration(
-                                                color: color.withOpacity(0.1),
-                                                borderRadius: BorderRadius.circular(10),
-                                              ),
-                                              child: Text(
-                                                item.category,
-                                                style: TextStyle(
-                                                  fontSize: 10,
-                                                  fontWeight: FontWeight.w800,
-                                                  color: color,
-                                                ),
-                                              ),
-                                            ),
+                                            PawlyBadge(label: item.category),
                                           ],
                                         ),
-                                        const SizedBox(height: 3),
+                                        const SizedBox(height: 2),
                                         Text(
                                           item.subtitle,
                                           maxLines: 1,
                                           overflow: TextOverflow.ellipsis,
-                                          style: const TextStyle(
-                                            fontSize: 12,
-                                            color: PawlyColors.warmGrey,
-                                          ),
+                                          style: PawlyTypography.bodySmall,
                                         ),
                                         if (item.date.isNotEmpty) ...[
                                           const SizedBox(height: 2),
                                           Text(
                                             item.date,
-                                            style: const TextStyle(
-                                              fontSize: 11,
-                                              color: PawlyColors.mutedGrey,
-                                            ),
+                                            style: PawlyTypography.caption,
                                           ),
                                         ],
                                       ],

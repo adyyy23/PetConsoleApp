@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../theme/pawly_colors.dart';
 import '../../theme/pawly_typography.dart';
+import '../../theme/app_tokens.dart';
 
 class SplashScreen extends StatefulWidget {
   final VoidCallback onFinish;
@@ -23,39 +24,39 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: PawlyColors.creamBg,
+      backgroundColor: PawlyColors.background,
       body: Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             Container(
-              width: 72,
-              height: 72,
+              width: 64,
+              height: 64,
               decoration: BoxDecoration(
-                color: PawlyColors.forest,
-                borderRadius: BorderRadius.circular(22),
-                boxShadow: [
-                  BoxShadow(
-                    color: PawlyColors.forest.withOpacity(0.18),
-                    blurRadius: 16,
-                    offset: const Offset(0, 6),
-                  ),
-                ],
+                color: PawlyColors.black,
+                borderRadius: AppRadius.rMd,
               ),
               child: const Center(
-                child: Icon(Icons.pets, size: 36, color: Colors.white),
+                child: Icon(Icons.pets, size: 30, color: Colors.white),
               ),
             ),
             const SizedBox(height: 20),
             const Text('Pawly', style: PawlyTypography.displayMedium),
             const SizedBox(height: 6),
             const Text(
-              'Everything your pet needs',
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-                color: PawlyColors.warmGrey,
-                letterSpacing: 0.2,
+              'Fetching today’s care...',
+              style: PawlyTypography.caption,
+            ),
+            const SizedBox(height: 28),
+            SizedBox(
+              width: 90,
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(2),
+                child: const LinearProgressIndicator(
+                  minHeight: 2,
+                  backgroundColor: PawlyColors.softGrey,
+                  valueColor: AlwaysStoppedAnimation<Color>(PawlyColors.black),
+                ),
               ),
             ),
           ],

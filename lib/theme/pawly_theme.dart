@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'pawly_colors.dart';
 import 'pawly_typography.dart';
+import 'app_tokens.dart';
 
 class PawlyTheme {
   PawlyTheme._();
@@ -9,16 +10,16 @@ class PawlyTheme {
   static ThemeData get lightTheme {
     return ThemeData(
       useMaterial3: true,
-      scaffoldBackgroundColor: PawlyColors.creamBg,
-      primaryColor: PawlyColors.forest,
+      scaffoldBackgroundColor: PawlyColors.background,
+      primaryColor: PawlyColors.black,
       colorScheme: const ColorScheme.light(
-        primary: PawlyColors.forest,
+        primary: PawlyColors.black,
         onPrimary: Colors.white,
-        secondary: PawlyColors.clay,
+        secondary: PawlyColors.charcoal,
         onSecondary: Colors.white,
         surface: PawlyColors.surface,
-        onSurface: PawlyColors.espresso,
-        error: PawlyColors.rose,
+        onSurface: PawlyColors.black,
+        error: PawlyColors.alert,
       ),
       appBarTheme: const AppBarTheme(
         backgroundColor: Colors.transparent,
@@ -27,27 +28,46 @@ class PawlyTheme {
         systemOverlayStyle: SystemUiOverlayStyle.dark,
         centerTitle: false,
         titleTextStyle: PawlyTypography.titleLarge,
-        iconTheme: IconThemeData(color: PawlyColors.espresso),
+        iconTheme: IconThemeData(color: PawlyColors.black, size: 20),
       ),
       bottomSheetTheme: const BottomSheetThemeData(
         backgroundColor: PawlyColors.surface,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+          borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadius.xl)),
         ),
       ),
       cardTheme: CardTheme(
         color: PawlyColors.surface,
         elevation: 0,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: AppRadius.rMd,
           side: const BorderSide(color: PawlyColors.border, width: 1),
         ),
         margin: EdgeInsets.zero,
       ),
+      inputDecorationTheme: InputDecorationTheme(
+        filled: true,
+        fillColor: PawlyColors.surface,
+        contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+        border: OutlineInputBorder(
+          borderRadius: AppRadius.rSm,
+          borderSide: const BorderSide(color: PawlyColors.border, width: 1.0),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: AppRadius.rSm,
+          borderSide: const BorderSide(color: PawlyColors.border, width: 1.0),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: AppRadius.rSm,
+          borderSide: const BorderSide(color: PawlyColors.black, width: 1.2),
+        ),
+        hintStyle: const TextStyle(fontSize: 14, color: PawlyColors.textMuted),
+        labelStyle: const TextStyle(fontSize: 13, color: PawlyColors.textSecondary),
+      ),
       dividerTheme: const DividerThemeData(
-        color: PawlyColors.borderLight,
+        color: PawlyColors.border,
         thickness: 1,
-        space: 24,
+        space: 1,
       ),
     );
   }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../repositories/pawly_repository.dart';
 import '../../theme/pawly_colors.dart';
 import '../../theme/pawly_typography.dart';
+import '../../theme/app_tokens.dart';
 import '../../widgets/widgets.dart';
 
 class LostPetModeScreen extends StatelessWidget {
@@ -23,34 +24,20 @@ class LostPetModeScreen extends StatelessWidget {
 
         return Scaffold(
           backgroundColor: PawlyColors.background,
-          appBar: AppBar(
-            backgroundColor: PawlyColors.surface,
-            elevation: 0,
-            leading: IconButton(
-              icon: const Icon(Icons.arrow_back_ios_new_rounded, color: PawlyColors.textPrimary, size: 20),
-              onPressed: () => Navigator.pop(context),
-            ),
-            title: Text(
-              'Lost Pet Alert Mode',
-              style: PawlyTypography.titleMedium.copyWith(
-                fontWeight: FontWeight.w700,
-                color: PawlyColors.textPrimary,
-              ),
-            ),
-          ),
+          appBar: const PawlyAppBar(title: 'Lost Pet Alert Mode'),
           body: SingleChildScrollView(
             padding: const EdgeInsets.all(20),
             child: Column(
               children: [
                 // Toggle status switch card
                 Container(
-                  padding: const EdgeInsets.all(20),
+                  padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: isLost ? PawlyColors.alertRose.withOpacity(0.08) : PawlyColors.surface,
-                    borderRadius: BorderRadius.circular(20),
+                    color: isLost ? PawlyColors.alertLight : Colors.white,
+                    borderRadius: AppRadius.rMd,
                     border: Border.all(
-                      color: isLost ? PawlyColors.alertRose : PawlyColors.border,
-                      width: isLost ? 2 : 1,
+                      color: isLost ? PawlyColors.alert : PawlyColors.border,
+                      width: isLost ? 1.5 : 1.0,
                     ),
                   ),
                   child: Row(

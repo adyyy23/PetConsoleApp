@@ -3,67 +3,86 @@ import 'package:flutter/material.dart';
 class PawlyColors {
   PawlyColors._();
 
-  // Backgrounds & Surfaces (Warm Cream Foundation)
-  static const Color creamBg = Color(0xFFFAF7F2);
-  static const Color background = creamBg;
-  static const Color warmWhite = Color(0xFFFCFAF7);
-  static const Color surface = Color(0xFFFFFFFF);
-  static const Color surfaceWarm = Color(0xFFF5EFE6);
-  static const Color surfaceMuted = Color(0xFFEBE4DA);
+  // Foundation & Neutrals (Editorial Black & White with Warm Neutrals)
+  static const Color black = Color(0xFF111111);
+  static const Color pureBlack = Color(0xFF000000);
+  static const Color charcoal = Color(0xFF222222);
+  static const Color darkGrey = Color(0xFF383838);
+  static const Color midGrey = Color(0xFF6E6E6E);
+  static const Color warmGrey = Color(0xFF76726D);
+  static const Color lightGrey = Color(0xFFE8E5DF);
+  static const Color softGrey = Color(0xFFF3F1EC);
+  static const Color offWhite = Color(0xFFFAF9F6);
+  static const Color warmWhite = Color(0xFFF6F5F1);
+  static const Color white = Color(0xFFFFFFFF);
+
+  // Backgrounds & Surfaces
+  static const Color background = offWhite;
+  static const Color creamBg = offWhite;
+  static const Color surface = white;
+  static const Color surfaceWarm = softGrey;
+  static const Color surfaceMuted = lightGrey;
 
   // Typography
-  static const Color espresso = Color(0xFF1E1A18);
-  static const Color deepEspresso = espresso;
-  static const Color textPrimary = espresso;
-  static const Color charcoal = Color(0xFF2C2623);
-  static const Color warmGrey = Color(0xFF6B635B);
-  static const Color textSecondary = warmGrey;
-  static const Color mutedGrey = Color(0xFF948C84);
-  static const Color textMuted = mutedGrey;
-  static const Color border = Color(0xFFE5DDD3);
-  static const Color borderLight = Color(0xFFEFE9E1);
+  static const Color textPrimary = black;
+  static const Color textSecondary = midGrey;
+  static const Color textMuted = Color(0xFF98948E);
+  static const Color espresso = black;
+  static const Color deepEspresso = black;
+  static const Color mutedGrey = textMuted;
 
-  // Brand Accents
-  // Forest & Soft Sage
-  static const Color forest = Color(0xFF2D5742);
-  static const Color forestLight = Color(0xFFE9F2ED);
-  static const Color forestBorder = Color(0xFFC6DEC0);
-  static const Color softSage = Color(0xFFDCE8DF);
-  static const Color sageLight = forestLight;
-  static const Color sageBg = Color(0xFFEEF4F0);
+  // Borders & Dividers (Very subtle neutral borders)
+  static const Color border = Color(0xFFE6E3DC);
+  static const Color borderLight = Color(0xFFEFECE5);
+  static const Color borderDark = Color(0xFF2E2E2E);
 
-  // Terracotta / Warm Clay
-  static const Color clay = Color(0xFFC0593B);
-  static const Color warmClay = clay;
-  static const Color terracotta = clay;
-  static const Color clayLight = Color(0xFFFBEFEB);
-  static const Color terracottaLight = clayLight;
-  static const Color clayBorder = Color(0xFFF4D4C7);
-  static const Color terracottaBorder = clayBorder;
+  // Primary Action Accent (Strictly Editorial Black / Charcoal - NO GREEN)
+  static const Color primary = black;
+  static const Color primarySubtle = softGrey;
+  static const Color secondary = charcoal;
 
-  // Butter Yellow & Honey / Amber
-  static const Color butterYellow = Color(0xFFF6E7B4);
-  static const Color butterBg = Color(0xFFFDF8E8);
-  static const Color honey = Color(0xFFB57722);
-  static const Color warmHoney = honey;
-  static const Color honeyLight = Color(0xFFFDF5E9);
-  static const Color honeyBorder = Color(0xFFF8E3C0);
+  // Subtle Status Tones (Restrained, low-saturation)
+  static const Color alert = Color(0xFFB33927);
+  static const Color alertLight = Color(0xFFFAF0EE);
+  static const Color tagBg = softGrey;
+  static const Color tagText = charcoal;
 
-  // Powder Blue & Slate
-  static const Color powderBlue = Color(0xFFD9E6ED);
-  static const Color powderBlueBg = Color(0xFFEFF6F9);
-  static const Color slate = Color(0xFF486E85);
-  static const Color slateLight = Color(0xFFEFF5F8);
+  // Backwards compatibility aliases mapped strictly to neutral palette (Zero green)
+  static const Color forest = black;
+  static const Color forestLight = softGrey;
+  static const Color forestBorder = border;
+  static const Color softSage = lightGrey;
+  static const Color sageLight = softGrey;
+  static const Color sageBg = offWhite;
 
-  // Alert / Rose
-  static const Color rose = Color(0xFFB83A3A);
-  static const Color alertRose = rose;
-  static const Color roseLight = Color(0xFFFDF0F0);
+  static const Color clay = charcoal;
+  static const Color warmClay = charcoal;
+  static const Color terracotta = charcoal;
+  static const Color clayLight = softGrey;
+  static const Color terracottaLight = softGrey;
+  static const Color clayBorder = border;
+  static const Color terracottaBorder = border;
 
-  // Carefully balanced translucent tones (NO excessive glassmorphism)
-  static const Color frostedWhite = Color(0xD9FFFFFF); // ~85% opacity
-  static const Color frostedWarmWhite = Color(0xE6FCFAF7); // ~90% opacity
-  static const Color frostedEspresso = Color(0xB31E1A18); // ~70% opacity
-  static const Color frostedBorder = Color(0x66FFFFFF); // 40% white border
-  static const Color frostedBorderDark = Color(0x1F1E1A18); // subtle 12% espresso border
+  static const Color butterYellow = softGrey;
+  static const Color butterBg = offWhite;
+  static const Color honey = charcoal;
+  static const Color warmHoney = charcoal;
+  static const Color honeyLight = softGrey;
+  static const Color honeyBorder = border;
+
+  static const Color powderBlue = lightGrey;
+  static const Color powderBlueBg = offWhite;
+  static const Color slate = charcoal;
+  static const Color slateLight = softGrey;
+
+  static const Color rose = alert;
+  static const Color alertRose = alert;
+  static const Color roseLight = alertLight;
+
+  // Scrim & Controlled Overlays
+  static const Color frostedWhite = Color(0xF2FFFFFF);
+  static const Color frostedWarmWhite = Color(0xF2FAF9F6);
+  static const Color frostedEspresso = Color(0xD9000000);
+  static const Color frostedBorder = Color(0x33FFFFFF);
+  static const Color frostedBorderDark = Color(0x22000000);
 }

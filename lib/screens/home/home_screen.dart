@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import '../../theme/pawly_colors.dart';
 import '../../theme/pawly_typography.dart';
+import '../../theme/app_tokens.dart';
 import '../../widgets/widgets.dart';
 import '../../repositories/pawly_repository.dart';
-import '../../models/care_routine.dart';
 import '../../models/models.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -34,9 +34,9 @@ class HomeScreen extends StatelessWidget {
 
   String _getGreeting() {
     final hour = DateTime.now().hour;
-    if (hour < 12) return 'Good morning';
-    if (hour < 18) return 'Good afternoon';
-    return 'Good evening';
+    if (hour < 12) return 'GOOD MORNING';
+    if (hour < 18) return 'GOOD AFTERNOON';
+    return 'GOOD EVENING';
   }
 
   void _showAddObservationSheet(BuildContext context) {
@@ -53,10 +53,10 @@ class HomeScreen extends StatelessWidget {
       builder: (ctx) => StatefulBuilder(
         builder: (ctx, setModalState) => Container(
           decoration: const BoxDecoration(
-            color: PawlyColors.surfaceWarm,
-            borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+            color: Colors.white,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadius.xl)),
           ),
-          padding: EdgeInsets.fromLTRB(20, 20, 20, MediaQuery.of(ctx).viewInsets.bottom + 24),
+          padding: EdgeInsets.fromLTRB(20, 16, 20, MediaQuery.of(ctx).viewInsets.bottom + 24),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -67,7 +67,7 @@ class HomeScreen extends StatelessWidget {
                   height: 4,
                   decoration: BoxDecoration(
                     color: PawlyColors.border,
-                    borderRadius: BorderRadius.circular(2),
+                    borderRadius: AppRadius.rXs,
                   ),
                 ),
               ),
@@ -77,7 +77,7 @@ class HomeScreen extends StatelessWidget {
                 style: PawlyTypography.titleMedium,
               ),
               const SizedBox(height: 16),
-              const Text('Appetite', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: PawlyColors.warmGrey)),
+              const Text('Appetite', style: PawlyTypography.labelSmall),
               const SizedBox(height: 6),
               Wrap(
                 spacing: 8,
@@ -86,10 +86,14 @@ class HomeScreen extends StatelessWidget {
                   return ChoiceChip(
                     label: Text(val),
                     selected: isSelected,
-                    selectedColor: PawlyColors.forest,
+                    selectedColor: PawlyColors.black,
                     backgroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: AppRadius.rSm,
+                      side: BorderSide(color: isSelected ? PawlyColors.black : PawlyColors.border),
+                    ),
                     labelStyle: TextStyle(
-                      color: isSelected ? Colors.white : PawlyColors.espresso,
+                      color: isSelected ? Colors.white : PawlyColors.black,
                       fontWeight: FontWeight.w700,
                       fontSize: 12,
                     ),
@@ -98,7 +102,7 @@ class HomeScreen extends StatelessWidget {
                 }).toList(),
               ),
               const SizedBox(height: 12),
-              const Text('Energy Level', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: PawlyColors.warmGrey)),
+              const Text('Energy Level', style: PawlyTypography.labelSmall),
               const SizedBox(height: 6),
               Wrap(
                 spacing: 8,
@@ -107,10 +111,14 @@ class HomeScreen extends StatelessWidget {
                   return ChoiceChip(
                     label: Text(val),
                     selected: isSelected,
-                    selectedColor: PawlyColors.forest,
+                    selectedColor: PawlyColors.black,
                     backgroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: AppRadius.rSm,
+                      side: BorderSide(color: isSelected ? PawlyColors.black : PawlyColors.border),
+                    ),
                     labelStyle: TextStyle(
-                      color: isSelected ? Colors.white : PawlyColors.espresso,
+                      color: isSelected ? Colors.white : PawlyColors.black,
                       fontWeight: FontWeight.w700,
                       fontSize: 12,
                     ),
@@ -118,41 +126,32 @@ class HomeScreen extends StatelessWidget {
                   );
                 }).toList(),
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 14),
               TextField(
                 controller: notesController,
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   hintText: 'Any symptom notes or observations...',
-                  hintStyle: const TextStyle(fontSize: 13, color: PawlyColors.mutedGrey),
-                  filled: true,
-                  fillColor: Colors.white,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(16),
-                    borderSide: const BorderSide(color: PawlyColors.border),
-                  ),
                 ),
               ),
               const SizedBox(height: 18),
-              SizedBox(
-                width: double.infinity,
-                child: PawlyButton(
-                  text: 'Save Observation Note',
-                  onPressed: () {
-                    repository.addSymptomNote(SymptomNote(
-                      id: 'sym_${DateTime.now().millisecondsSinceEpoch}',
-                      petId: repository.activePet.id,
-                      date: 'Oct 02, 2026',
-                      appetite: appetite,
-                      energy: energy,
-                      stool: stool,
-                      skin: skin,
-                      notes: notesController.text.trim().isEmpty
-                          ? 'Observed normal behavior and good health.'
-                          : notesController.text.trim(),
-                    ));
-                    Navigator.pop(ctx);
-                  },
-                ),
+              PawlyButton(
+                text: 'Save Observation Note',
+                isFullWidth: true,
+                onPressed: () {
+                  repository.addSymptomNote(SymptomNote(
+                    id: 'sym_${DateTime.now().millisecondsSinceEpoch}',
+                    petId: repository.activePet.id,
+                    date: 'Oct 02, 2026',
+                    appetite: appetite,
+                    energy: energy,
+                    stool: stool,
+                    skin: skin,
+                    notes: notesController.text.trim().isEmpty
+                        ? 'Observed normal behavior and good health.'
+                        : notesController.text.trim(),
+                  ));
+                  Navigator.pop(ctx);
+                },
               ),
             ],
           ),
@@ -165,11 +164,14 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final activePet = repository.activePet;
     final petRoutines = repository.activePetRoutines;
-    final wellness = repository.activePetWellness;
+    final completedCount = petRoutines.where((r) => r.isCompleted).length;
+    final totalCount = petRoutines.length;
 
-    final nextAppt = repository.activePetAppointments
-        .where((a) => !a.isCompleted)
-        .toList();
+    final nextPendingCare = petRoutines.where((r) => !r.isCompleted).isNotEmpty
+        ? petRoutines.firstWhere((r) => !r.isCompleted)
+        : null;
+
+    final nextAppt = repository.activePetAppointments.where((a) => !a.isCompleted).toList();
     final upcomingAppt = nextAppt.isNotEmpty ? nextAppt.first : null;
 
     final recentWeight = repository.activePetWeightHistory.isNotEmpty
@@ -180,74 +182,74 @@ class HomeScreen extends StatelessWidget {
         ? repository.activePetMemories.first
         : null;
 
-    final nextPendingCare = petRoutines.where((r) => !r.isCompleted).isNotEmpty
-        ? petRoutines.firstWhere((r) => !r.isCompleted)
-        : null;
-
     return Scaffold(
-      backgroundColor: PawlyColors.creamBg,
+      backgroundColor: PawlyColors.background,
       body: SafeArea(
         bottom: false,
         child: SingleChildScrollView(
-          padding: const EdgeInsets.only(bottom: 100),
+          padding: const EdgeInsets.only(bottom: 90),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // ========================================================
-              // TOP BAR GREETING, SEARCH, CALENDAR & PET SWITCHER
+              // TOP BAR: GREETING & APP TITLE + ACTIONS
               // ========================================================
               Padding(
-                padding: const EdgeInsets.fromLTRB(20, 16, 20, 8),
+                padding: const EdgeInsets.fromLTRB(20, 16, 20, 10),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          '${_getGreeting()}, ${repository.user.name}',
-                          style: const TextStyle(
-                            fontSize: 13,
-                            fontWeight: FontWeight.w600,
-                            color: PawlyColors.warmGrey,
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            '${_getGreeting()}, ${repository.user.name.toUpperCase()}',
+                            style: PawlyTypography.eyebrow,
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
                           ),
-                        ),
-                        const SizedBox(height: 2),
-                        const Text('Pawly Home', style: PawlyTypography.titleLarge),
-                      ],
+                          const SizedBox(height: 2),
+                          const Text('Pawly', style: PawlyTypography.displayMedium),
+                        ],
+                      ),
                     ),
+                    const SizedBox(width: 8),
                     Row(
+                      mainAxisSize: MainAxisSize.min,
                       children: [
                         if (repository.isLostPetModeEnabled)
                           Container(
                             margin: const EdgeInsets.only(right: 8),
-                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                             decoration: BoxDecoration(
-                              color: PawlyColors.roseLight,
-                              borderRadius: BorderRadius.circular(16),
-                              border: Border.all(color: PawlyColors.rose),
+                              color: PawlyColors.alertLight,
+                              borderRadius: AppRadius.rXs,
+                              border: Border.all(color: PawlyColors.alert),
                             ),
                             child: const Row(
                               children: [
-                                Icon(Icons.warning_amber_rounded, size: 14, color: PawlyColors.rose),
+                                Icon(Icons.warning_amber_rounded, size: 12, color: PawlyColors.alert),
                                 SizedBox(width: 4),
-                                Text('Lost Mode', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: PawlyColors.rose)),
+                                Text(
+                                  'LOST MODE',
+                                  style: TextStyle(fontSize: 10, fontWeight: FontWeight.w800, color: PawlyColors.alert),
+                                ),
                               ],
                             ),
                           ),
-
-                        // Search icon button
                         IconButton(
-                          icon: const Icon(Icons.search_rounded, color: PawlyColors.espresso, size: 22),
+                          icon: const Icon(Icons.search_rounded, size: 22, color: PawlyColors.black),
                           onPressed: onOpenSearch,
-                          visualDensity: VisualDensity.compact,
+                          padding: EdgeInsets.zero,
+                          constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
                         ),
-
-                        // Calendar icon button
+                        const SizedBox(width: 6),
                         IconButton(
-                          icon: const Icon(Icons.calendar_month_outlined, color: PawlyColors.forest, size: 22),
+                          icon: const Icon(Icons.calendar_month_outlined, size: 22, color: PawlyColors.black),
                           onPressed: onOpenCalendar,
-                          visualDensity: VisualDensity.compact,
+                          padding: EdgeInsets.zero,
+                          constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
                         ),
                       ],
                     ),
@@ -255,7 +257,9 @@ class HomeScreen extends StatelessWidget {
                 ),
               ),
 
-              // Circular Pet Switcher: (Mochi) (Luna) (Milo) (+)
+              // ========================================================
+              // PET SWITCHER (Clean Editorial Row)
+              // ========================================================
               PetSwitcher(
                 pets: repository.pets,
                 selectedPetId: repository.selectedPetId,
@@ -266,320 +270,206 @@ class HomeScreen extends StatelessWidget {
               const SizedBox(height: 16),
 
               // ========================================================
-              // HERO VISUAL COMPOSITION: ACTIVE PET WITH TRANSLUCENT BUBBLES
+              // LARGE FEATURED PET HERO (8-10px Radius, Editorial Dark Scrim)
               // ========================================================
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: GestureDetector(
                   onTap: () => onOpenPetSpace(activePet.id),
                   child: Container(
-                    height: 290,
+                    height: 260,
                     decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(32),
-                      boxShadow: [
-                        BoxShadow(
-                          color: PawlyColors.espresso.withOpacity(0.08),
-                          blurRadius: 24,
-                          offset: const Offset(0, 10),
-                        ),
-                      ],
+                      color: PawlyColors.black,
+                      borderRadius: AppRadius.rLg,
                     ),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(32),
-                      child: Stack(
-                        fit: StackFit.expand,
-                        children: [
-                          // Pet Photo
-                          Image.network(
-                            activePet.imageUrl,
-                            fit: BoxFit.cover,
-                            errorBuilder: (_, __, ___) => Container(
-                              color: PawlyColors.surfaceWarm,
-                              child: const Icon(Icons.pets, size: 60, color: PawlyColors.forest),
+                    clipBehavior: Clip.antiAlias,
+                    child: Stack(
+                      fit: StackFit.expand,
+                      children: [
+                        // Pet Photograph
+                        Image.network(
+                          activePet.imageUrl,
+                          fit: BoxFit.cover,
+                          errorBuilder: (_, __, ___) => Container(
+                            color: PawlyColors.softGrey,
+                            child: const Center(
+                              child: Icon(Icons.pets, size: 48, color: PawlyColors.black),
                             ),
                           ),
+                        ),
 
-                          // Subtle darkening gradient for layered bubble contrast
-                          Positioned.fill(
-                            child: DecoratedBox(
-                              decoration: BoxDecoration(
-                                gradient: LinearGradient(
-                                  begin: Alignment.topCenter,
-                                  end: Alignment.bottomCenter,
-                                  colors: [
-                                    Colors.black.withOpacity(0.2),
-                                    Colors.transparent,
-                                    Colors.black.withOpacity(0.65),
-                                  ],
-                                  stops: const [0.0, 0.4, 1.0],
-                                ),
+                        // Controlled Dark Scrim for 100% WCAG Contrast
+                        Positioned.fill(
+                          child: DecoratedBox(
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                begin: Alignment.topCenter,
+                                end: Alignment.bottomCenter,
+                                colors: [
+                                  Colors.transparent,
+                                  Colors.black.withOpacity(0.3),
+                                  Colors.black.withOpacity(0.85),
+                                ],
+                                stops: const [0.3, 0.6, 1.0],
                               ),
                             ),
                           ),
+                        ),
 
-                          // Top-Left: Species / Category Badge
-                          Positioned(
-                            top: 16,
-                            left: 16,
-                            child: PhotoOverlayBubble(
-                              child: Text(
-                                activePet.category.toUpperCase(),
-                                style: const TextStyle(
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.w800,
-                                  letterSpacing: 0.5,
-                                  color: Colors.white,
-                                ),
-                              ),
+                        // Species Badge (Top-Left)
+                        Positioned(
+                          top: 14,
+                          left: 14,
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                            decoration: BoxDecoration(
+                              color: Colors.black.withOpacity(0.65),
+                              borderRadius: AppRadius.rXs,
                             ),
-                          ),
-
-                          // Top-Right: Pet Space Link Action
-                          const Positioned(
-                            top: 16,
-                            right: 16,
-                            child: PhotoOverlayBubble(
-                              padding: EdgeInsets.all(8),
-                              child: Icon(
-                                Icons.arrow_outward_rounded,
-                                size: 16,
+                            child: Text(
+                              activePet.category.toUpperCase(),
+                              style: const TextStyle(
+                                fontSize: 10,
+                                fontWeight: FontWeight.w800,
+                                letterSpacing: 0.6,
                                 color: Colors.white,
                               ),
                             ),
                           ),
+                        ),
 
-                          // Center-Right: Metric Bubbles (Weight & Age)
-                          Positioned(
-                            top: 60,
-                            right: 16,
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.end,
-                              children: [
-                                PhotoOverlayBubble(
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.end,
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Text(
-                                        '${activePet.weightKg} KG',
-                                        style: const TextStyle(
-                                          fontSize: 13,
-                                          fontWeight: FontWeight.w900,
-                                          color: Colors.white,
-                                        ),
-                                      ),
-                                      const Text(
-                                        'Healthy range',
-                                        style: TextStyle(fontSize: 10, color: Colors.white70),
-                                      ),
-                                    ],
-                                  ),
+                        // View Space Arrow (Top-Right)
+                        Positioned(
+                          top: 14,
+                          right: 14,
+                          child: Container(
+                            padding: const EdgeInsets.all(6),
+                            decoration: BoxDecoration(
+                              color: Colors.black.withOpacity(0.65),
+                              borderRadius: AppRadius.rXs,
+                            ),
+                            child: const Icon(
+                              Icons.arrow_outward_rounded,
+                              size: 14,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+
+                        // Pet Editorial Details (Bottom)
+                        Positioned(
+                          bottom: 16,
+                          left: 16,
+                          right: 16,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                activePet.name.toUpperCase(),
+                                style: const TextStyle(
+                                  fontSize: 28,
+                                  fontWeight: FontWeight.w900,
+                                  letterSpacing: -0.5,
+                                  color: Colors.white,
+                                  height: 1.1,
                                 ),
+                              ),
+                              const SizedBox(height: 2),
+                              Text(
+                                '${activePet.breed}  ·  ${activePet.ageYears.toStringAsFixed(activePet.ageYears.truncateToDouble() == activePet.ageYears ? 0 : 1)} years  ·  ${activePet.weightKg} kg',
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w500,
+                                  color: Colors.white.withOpacity(0.9),
+                                ),
+                              ),
+                              if (nextPendingCare != null) ...[
                                 const SizedBox(height: 8),
-                                PhotoOverlayBubble(
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.end,
+                                Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white.withOpacity(0.18),
+                                    borderRadius: AppRadius.rXs,
+                                    border: Border.all(color: Colors.white24),
+                                  ),
+                                  child: Row(
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
-                                      Text(
-                                        '${activePet.ageYears.toStringAsFixed(activePet.ageYears.truncateToDouble() == activePet.ageYears ? 0 : 1)} YEARS',
-                                        style: const TextStyle(
-                                          fontSize: 13,
-                                          fontWeight: FontWeight.w900,
+                                      Container(
+                                        width: 6,
+                                        height: 6,
+                                        decoration: const BoxDecoration(
                                           color: Colors.white,
+                                          shape: BoxShape.circle,
                                         ),
                                       ),
-                                      Text(
-                                        activePet.temperament.isNotEmpty
-                                            ? activePet.temperament.split(',').first
-                                            : 'Companion',
-                                        style: const TextStyle(fontSize: 10, color: Colors.white70),
+                                      const SizedBox(width: 6),
+                                      Flexible(
+                                        child: Text(
+                                          'Next care: ${nextPendingCare.time} · ${nextPendingCare.title}',
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                          style: const TextStyle(
+                                            fontSize: 11,
+                                            fontWeight: FontWeight.w700,
+                                            color: Colors.white,
+                                          ),
+                                        ),
                                       ),
                                     ],
                                   ),
                                 ),
                               ],
-                            ),
+                            ],
                           ),
-
-                          // Bottom: Pet Name, Breed, and Next Care Overlaid Frosted Pill
-                          Positioned(
-                            bottom: 16,
-                            left: 16,
-                            right: 16,
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Text(
-                                  activePet.name.toUpperCase(),
-                                  style: const TextStyle(
-                                    fontSize: 30,
-                                    fontWeight: FontWeight.w900,
-                                    letterSpacing: -0.5,
-                                    color: Colors.white,
-                                  ),
-                                ),
-                                const SizedBox(height: 2),
-                                Text(
-                                  activePet.breed,
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w600,
-                                    color: Colors.white.withOpacity(0.9),
-                                  ),
-                                ),
-                                if (nextPendingCare != null) ...[
-                                  const SizedBox(height: 10),
-                                  PhotoOverlayBubble(
-                                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                                    child: Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        Container(
-                                          width: 8,
-                                          height: 8,
-                                          decoration: const BoxDecoration(
-                                            color: PawlyColors.butterYellow,
-                                            shape: BoxShape.circle,
-                                          ),
-                                        ),
-                                        const SizedBox(width: 8),
-                                        Flexible(
-                                          child: Text(
-                                            'Next care: ${nextPendingCare.time} · ${nextPendingCare.title}',
-                                            maxLines: 1,
-                                            overflow: TextOverflow.ellipsis,
-                                            style: const TextStyle(
-                                              fontSize: 12,
-                                              fontWeight: FontWeight.w700,
-                                              color: Colors.white,
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ],
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
                   ),
-                ),
-              ),
-
-              const SizedBox(height: 20),
-
-              // ========================================================
-              // DAILY WELLNESS SNAPSHOT ROW
-              // ========================================================
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: MetricBubble(
-                        label: 'WATER',
-                        value: '${wellness.waterCupsDrank}/${wellness.waterCupsTarget}',
-                        unit: 'cups',
-                        color: PawlyColors.powderBlue,
-                        icon: Icons.water_drop_outlined,
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: MetricBubble(
-                        label: 'MEALS',
-                        value: '${wellness.mealsCompleted}/${wellness.mealsTarget}',
-                        unit: 'fed',
-                        color: PawlyColors.sageLight,
-                        icon: Icons.restaurant_outlined,
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: MetricBubble(
-                        label: 'WALK',
-                        value: '${wellness.walkMinutes}',
-                        unit: 'min',
-                        color: PawlyColors.butterYellow,
-                        icon: Icons.directions_walk_rounded,
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: MetricBubble(
-                        label: 'MED',
-                        value: '${wellness.medicationCompleted}/${wellness.medicationTarget}',
-                        unit: 'doses',
-                        color: PawlyColors.terracottaLight,
-                        icon: Icons.medication_outlined,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-
-              const SizedBox(height: 20),
-
-              // ========================================================
-              // CONTEXTUAL QUICK ACTION BUBBLES
-              // ========================================================
-              SizedBox(
-                height: 42,
-                child: ListView(
-                  scrollDirection: Axis.horizontal,
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                  children: [
-                    _QuickActionPill(
-                      icon: Icons.add_circle_outline_rounded,
-                      label: '+ Care',
-                      onTap: onOpenAddCare,
-                      isPrimary: true,
-                    ),
-                    const SizedBox(width: 8),
-                    _QuickActionPill(
-                      icon: Icons.monitor_weight_outlined,
-                      label: '+ Weight',
-                      onTap: onOpenWeight,
-                    ),
-                    const SizedBox(width: 8),
-                    _QuickActionPill(
-                      icon: Icons.edit_note_rounded,
-                      label: '+ Note',
-                      onTap: () => _showAddObservationSheet(context),
-                    ),
-                    const SizedBox(width: 8),
-                    _QuickActionPill(
-                      icon: Icons.calendar_today_outlined,
-                      label: '+ Appointment',
-                      onTap: onOpenAppointments,
-                    ),
-                    const SizedBox(width: 8),
-                    _QuickActionPill(
-                      icon: Icons.photo_library_outlined,
-                      label: 'Memories',
-                      onTap: () => onOpenPetSpace(activePet.id),
-                    ),
-                  ],
                 ),
               ),
 
               const SizedBox(height: 24),
 
               // ========================================================
-              // TODAY'S CARE TIMELINE
+              // TODAY CARE SECTION (Editorial Hierarchy, Progress & Next Task)
               // ========================================================
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: SectionHeader(
-                  title: 'Today’s Care Routine',
-                  subtitle: 'Daily agenda for ${activePet.name}',
-                  actionText: 'View All',
-                  onAction: onOpenCareTab,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text('TODAY', style: PawlyTypography.eyebrow),
+                          const SizedBox(height: 2),
+                          Text(
+                            '${activePet.name}’s Care',
+                            style: PawlyTypography.titleMedium,
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    GestureDetector(
+                      onTap: onOpenCareTab,
+                      child: Text(
+                        '$completedCount of $totalCount completed',
+                        style: const TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w700,
+                          color: PawlyColors.black,
+                          decoration: TextDecoration.underline,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
 
@@ -588,25 +478,27 @@ class HomeScreen extends StatelessWidget {
               if (petRoutines.isEmpty)
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
-                  child: PawlyBubble(
-                    backgroundColor: PawlyColors.surfaceWarm,
-                    padding: const EdgeInsets.all(20),
+                  child: Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: AppRadius.rMd,
+                      border: Border.all(color: PawlyColors.border),
+                    ),
                     child: Row(
                       children: [
-                        Container(
-                          padding: const EdgeInsets.all(10),
-                          decoration: const BoxDecoration(
-                            color: PawlyColors.forestLight,
-                            shape: BoxShape.circle,
-                          ),
-                          child: const Icon(Icons.check, color: PawlyColors.forest, size: 20),
-                        ),
-                        const SizedBox(width: 14),
+                        const Icon(Icons.check_circle_outline_rounded, size: 20, color: PawlyColors.black),
+                        const SizedBox(width: 12),
                         const Expanded(
                           child: Text(
-                            'No scheduled routines for today.',
+                            'No care routines scheduled for today.',
                             style: PawlyTypography.bodyMedium,
                           ),
+                        ),
+                        PawlyButton(
+                          text: '+ Add',
+                          isSmall: true,
+                          onPressed: onOpenAddCare,
                         ),
                       ],
                     ),
@@ -616,57 +508,100 @@ class HomeScreen extends StatelessWidget {
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: Column(
-                    children: List.generate(petRoutines.length, (idx) {
-                      final routine = petRoutines[idx];
-                      final isLast = idx == petRoutines.length - 1;
-
-                      return CareTimelineItem(
-                        time: routine.time,
-                        title: routine.title,
-                        subtitle: routine.notes.isNotEmpty
-                            ? routine.notes
-                            : '${routine.category.displayName} • ${routine.recurrence}',
-                        isCompleted: routine.isCompleted,
-                        isLast: isLast,
-                        assignedTo: routine.assignedTo,
-                        onToggle: () => repository.toggleRoutine(routine.id),
-                      );
-                    }),
+                    children: List.generate(
+                      petRoutines.length > 3 ? 3 : petRoutines.length,
+                      (idx) {
+                        final routine = petRoutines[idx];
+                        return CareTimelineItem(
+                          time: routine.time,
+                          title: routine.title,
+                          subtitle: routine.notes.isNotEmpty
+                              ? routine.notes
+                              : '${routine.category.displayName} · ${routine.recurrence}',
+                          isCompleted: routine.isCompleted,
+                          assignedTo: routine.assignedTo,
+                          onToggle: () => repository.toggleRoutine(routine.id),
+                        );
+                      },
+                    ),
                   ),
                 ),
+
+              const SizedBox(height: 16),
+
+              // ========================================================
+              // QUICK ACTIONS (Clean 6-8px Buttons)
+              // ========================================================
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 20),
+                child: Text('QUICK ACTIONS', style: PawlyTypography.eyebrow),
+              ),
+              const SizedBox(height: 8),
+
+              SizedBox(
+                height: 38,
+                child: ListView(
+                  scrollDirection: Axis.horizontal,
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  children: [
+                    _ActionChip(
+                      icon: Icons.add,
+                      label: 'Add Care',
+                      isPrimary: true,
+                      onTap: onOpenAddCare,
+                    ),
+                    const SizedBox(width: 8),
+                    _ActionChip(
+                      icon: Icons.monitor_weight_outlined,
+                      label: 'Log Weight',
+                      onTap: onOpenWeight,
+                    ),
+                    const SizedBox(width: 8),
+                    _ActionChip(
+                      icon: Icons.edit_note_rounded,
+                      label: 'Add Note',
+                      onTap: () => _showAddObservationSheet(context),
+                    ),
+                    const SizedBox(width: 8),
+                    _ActionChip(
+                      icon: Icons.calendar_today_outlined,
+                      label: 'Appointment',
+                      onTap: onOpenAppointments,
+                    ),
+                  ],
+                ),
+              ),
 
               const SizedBox(height: 24),
 
               // ========================================================
-              // UPCOMING VET VISIT (Circular Date Block & Vet Prep)
+              // UPCOMING: VET VISIT & CARE
               // ========================================================
               if (upcomingAppt != null) ...[
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                  child: SectionHeader(
-                    title: 'Upcoming Vet Visit',
-                    subtitle: 'Preparation & notes ready',
-                    actionText: 'Manage',
-                    onAction: onOpenAppointments,
-                  ),
+                const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 20),
+                  child: Text('UPCOMING', style: PawlyTypography.eyebrow),
                 ),
-                const SizedBox(height: 10),
+                const SizedBox(height: 8),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: GestureDetector(
                     onTap: onOpenAppointments,
-                    child: PawlyBubble(
-                      backgroundColor: PawlyColors.terracottaLight,
-                      borderColor: PawlyColors.terracotta.withOpacity(0.3),
-                      padding: const EdgeInsets.all(18),
+                    child: Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: AppRadius.rMd,
+                        border: Border.all(color: PawlyColors.border, width: 1.0),
+                      ),
                       child: Row(
                         children: [
                           DateBubble(
                             month: 'OCT',
                             day: upcomingAppt.date.split('-').last,
-                            color: PawlyColors.terracotta,
+                            color: PawlyColors.black,
                           ),
-                          const SizedBox(width: 16),
+                          const SizedBox(width: 14),
                           Expanded(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -674,23 +609,14 @@ class HomeScreen extends StatelessWidget {
                                 Text(
                                   upcomingAppt.purpose,
                                   style: const TextStyle(
-                                    fontSize: 16,
+                                    fontSize: 14,
                                     fontWeight: FontWeight.w800,
-                                    color: PawlyColors.espresso,
+                                    color: PawlyColors.black,
                                   ),
                                 ),
-                                const SizedBox(height: 3),
+                                const SizedBox(height: 2),
                                 Text(
-                                  '${upcomingAppt.time} • ${upcomingAppt.clinic}',
-                                  style: const TextStyle(
-                                    fontSize: 13,
-                                    fontWeight: FontWeight.w700,
-                                    color: PawlyColors.terracotta,
-                                  ),
-                                ),
-                                const SizedBox(height: 3),
-                                Text(
-                                  'With ${upcomingAppt.vetName} • Tap to view Vet Prep brief',
+                                  '${upcomingAppt.time} · ${upcomingAppt.clinic}',
                                   style: const TextStyle(
                                     fontSize: 12,
                                     color: PawlyColors.warmGrey,
@@ -699,7 +625,7 @@ class HomeScreen extends StatelessWidget {
                               ],
                             ),
                           ),
-                          const Icon(Icons.arrow_forward_ios_rounded, size: 16, color: PawlyColors.terracotta),
+                          const Icon(Icons.arrow_forward_ios_rounded, size: 14, color: PawlyColors.black),
                         ],
                       ),
                     ),
@@ -709,108 +635,89 @@ class HomeScreen extends StatelessWidget {
               ],
 
               // ========================================================
-              // RECENT MOMENTS & GROWTH
+              // RECENT MOMENTS / ACTIVITY (Dividers & Compact Rows)
               // ========================================================
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: SectionHeader(
-                  title: '${activePet.name}’s Highlights',
-                  subtitle: 'Latest moments and tracking',
-                  actionText: 'Pet Space',
-                  onAction: () => onOpenPetSpace(activePet.id),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Expanded(
+                      child: Text('RECENT ACTIVITY', style: PawlyTypography.eyebrow),
+                    ),
+                    const SizedBox(width: 8),
+                    GestureDetector(
+                      onTap: () => onOpenPetSpace(activePet.id),
+                      child: const Text(
+                        'Pet Space',
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w700,
+                          color: PawlyColors.black,
+                          decoration: TextDecoration.underline,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
-              const SizedBox(height: 10),
+              const SizedBox(height: 8),
 
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Column(
-                  children: [
-                    if (recentWeight != null)
-                      Container(
-                        margin: const EdgeInsets.only(bottom: 10),
-                        child: PawlyBubble(
-                          backgroundColor: Colors.white,
-                          padding: const EdgeInsets.all(16),
-                          child: Row(
-                            children: [
-                              Container(
-                                width: 40,
-                                height: 40,
-                                decoration: BoxDecoration(
-                                  color: PawlyColors.butterYellow,
-                                  borderRadius: BorderRadius.circular(14),
-                                ),
-                                child: const Icon(Icons.monitor_weight_outlined, color: PawlyColors.espresso, size: 20),
-                              ),
-                              const SizedBox(width: 14),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      'Current Weight: ${recentWeight.weightKg} kg',
-                                      style: const TextStyle(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w800,
-                                        color: PawlyColors.espresso,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 2),
-                                    Text(
-                                      '${recentWeight.date} • ${recentWeight.note}',
-                                      style: const TextStyle(fontSize: 12, color: PawlyColors.warmGrey),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              const PawlyBadge(label: 'Growth', variant: PawlyBadgeVariant.honey),
-                            ],
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: AppRadius.rMd,
+                    border: Border.all(color: PawlyColors.border),
+                  ),
+                  child: Column(
+                    children: [
+                      if (recentWeight != null)
+                        ListTile(
+                          contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 2),
+                          leading: Container(
+                            padding: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color: PawlyColors.softGrey,
+                              borderRadius: AppRadius.rSm,
+                            ),
+                            child: const Icon(Icons.monitor_weight_outlined, size: 18, color: PawlyColors.black),
                           ),
+                          title: Text('Weight Check: ${recentWeight.weightKg} kg', style: PawlyTypography.titleSmall),
+                          subtitle: Text('${recentWeight.date} · ${recentWeight.note}', style: PawlyTypography.caption),
+                          trailing: const Icon(Icons.chevron_right, size: 18, color: PawlyColors.midGrey),
+                          onTap: onOpenWeight,
                         ),
-                      ),
 
-                    if (recentMemory != null)
-                      PawlyBubble(
-                        backgroundColor: Colors.white,
-                        padding: const EdgeInsets.all(16),
-                        child: Row(
-                          children: [
-                            Container(
-                              width: 40,
-                              height: 40,
-                              decoration: BoxDecoration(
-                                color: PawlyColors.powderBlue,
-                                borderRadius: BorderRadius.circular(14),
-                              ),
-                              child: const Icon(Icons.photo_library_outlined, color: PawlyColors.espresso, size: 20),
-                            ),
-                            const SizedBox(width: 14),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    recentMemory.title,
-                                    style: const TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w800,
-                                      color: PawlyColors.espresso,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 2),
-                                  Text(
-                                    '${recentMemory.date} • ${recentMemory.caption}',
-                                    style: const TextStyle(fontSize: 12, color: PawlyColors.warmGrey),
-                                  ),
-                                ],
+                      if (recentWeight != null && recentMemory != null)
+                        const Divider(height: 1, indent: 56),
+
+                      if (recentMemory != null)
+                        ListTile(
+                          contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 2),
+                          leading: ClipRRect(
+                            borderRadius: AppRadius.rSm,
+                            child: Image.network(
+                              recentMemory.imageUrl,
+                              width: 34,
+                              height: 34,
+                              fit: BoxFit.cover,
+                              errorBuilder: (_, __, ___) => Container(
+                                width: 34,
+                                height: 34,
+                                color: PawlyColors.softGrey,
+                                child: const Icon(Icons.photo_outlined, size: 16),
                               ),
                             ),
-                            PawlyBadge(label: recentMemory.milestoneType, variant: PawlyBadgeVariant.slate),
-                          ],
+                          ),
+                          title: Text(recentMemory.title, style: PawlyTypography.titleSmall),
+                          subtitle: Text('${recentMemory.date} · ${recentMemory.caption}', style: PawlyTypography.caption),
+                          trailing: const Icon(Icons.chevron_right, size: 18, color: PawlyColors.midGrey),
+                          onTap: () => onOpenPetSpace(activePet.id),
                         ),
-                      ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ],
@@ -821,13 +728,13 @@ class HomeScreen extends StatelessWidget {
   }
 }
 
-class _QuickActionPill extends StatelessWidget {
+class _ActionChip extends StatelessWidget {
   final IconData icon;
   final String label;
   final VoidCallback onTap;
   final bool isPrimary;
 
-  const _QuickActionPill({
+  const _ActionChip({
     required this.icon,
     required this.label,
     required this.onTap,
@@ -839,13 +746,13 @@ class _QuickActionPill extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         decoration: BoxDecoration(
-          color: isPrimary ? PawlyColors.forest : Colors.white,
-          borderRadius: BorderRadius.circular(20),
+          color: isPrimary ? PawlyColors.black : Colors.white,
+          borderRadius: AppRadius.rSm,
           border: Border.all(
-            color: isPrimary ? PawlyColors.forest : PawlyColors.border,
-            width: 1,
+            color: isPrimary ? PawlyColors.black : PawlyColors.border,
+            width: 1.0,
           ),
         ),
         child: Row(
@@ -853,8 +760,8 @@ class _QuickActionPill extends StatelessWidget {
           children: [
             Icon(
               icon,
-              size: 16,
-              color: isPrimary ? Colors.white : PawlyColors.espresso,
+              size: 15,
+              color: isPrimary ? Colors.white : PawlyColors.black,
             ),
             const SizedBox(width: 6),
             Text(
@@ -862,7 +769,7 @@ class _QuickActionPill extends StatelessWidget {
               style: TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.w700,
-                color: isPrimary ? Colors.white : PawlyColors.espresso,
+                color: isPrimary ? Colors.white : PawlyColors.black,
               ),
             ),
           ],

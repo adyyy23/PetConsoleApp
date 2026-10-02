@@ -3,6 +3,7 @@ import '../../models/models.dart';
 import '../../repositories/pawly_repository.dart';
 import '../../theme/pawly_colors.dart';
 import '../../theme/pawly_typography.dart';
+import '../../theme/app_tokens.dart';
 import '../../widgets/widgets.dart';
 
 class MemoriesScreen extends StatelessWidget {
@@ -32,46 +33,16 @@ class MemoriesScreen extends StatelessWidget {
 
         return Scaffold(
           backgroundColor: PawlyColors.background,
+          appBar: PawlyAppBar(
+            title: 'Memories & Milestones',
+            trailing: IconButton(
+              icon: const Icon(Icons.add_photo_alternate_rounded, color: PawlyColors.black, size: 20),
+              onPressed: () => _showAddMemoryModal(context),
+            ),
+          ),
           body: CustomScrollView(
             physics: const BouncingScrollPhysics(),
             slivers: [
-              SliverAppBar(
-                backgroundColor: PawlyColors.surface,
-                elevation: 0,
-                pinned: true,
-                expandedHeight: 120,
-                leading: Navigator.canPop(context)
-                    ? IconButton(
-                        icon: const Icon(Icons.arrow_back_ios_new_rounded, color: PawlyColors.textPrimary, size: 20),
-                        onPressed: () => Navigator.pop(context),
-                      )
-                    : null,
-                actions: [
-                  IconButton(
-                    icon: Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: PawlyColors.forest.withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: const Icon(Icons.add_photo_alternate_rounded, color: PawlyColors.forest, size: 20),
-                    ),
-                    onPressed: () => _showAddMemoryModal(context),
-                  ),
-                  const SizedBox(width: 12),
-                ],
-                flexibleSpace: FlexibleSpaceBar(
-                  titlePadding: const EdgeInsets.only(left: 20, bottom: 16),
-                  title: Text(
-                    'Memories & Milestones',
-                    style: PawlyTypography.titleMedium.copyWith(
-                      color: PawlyColors.textPrimary,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                ),
-              ),
-
               // Pet Switcher
               SliverToBoxAdapter(
                 child: Padding(
@@ -103,7 +74,7 @@ class MemoriesScreen extends StatelessWidget {
                       (context, index) {
                         final memory = memories[index];
                         return Padding(
-                          padding: const EdgeInsets.only(bottom: 24),
+                          padding: const EdgeInsets.only(bottom: 16),
                           child: _MemoryCard(memory: memory),
                         );
                       },
@@ -129,15 +100,8 @@ class _MemoryCard extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: PawlyColors.surface,
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: AppRadius.rMd,
         border: Border.all(color: PawlyColors.border),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.04),
-            blurRadius: 16,
-            offset: const Offset(0, 4),
-          ),
-        ],
       ),
       clipBehavior: Clip.antiAlias,
       child: Column(

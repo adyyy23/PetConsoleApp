@@ -3,6 +3,7 @@ import '../../models/models.dart';
 import '../../repositories/pawly_repository.dart';
 import '../../theme/pawly_colors.dart';
 import '../../theme/pawly_typography.dart';
+import '../../theme/app_tokens.dart';
 import '../../widgets/widgets.dart';
 import 'lost_pet_mode_screen.dart';
 
@@ -33,29 +34,12 @@ class EmergencyCardScreen extends StatelessWidget {
 
         return Scaffold(
           backgroundColor: PawlyColors.background,
-          appBar: AppBar(
-            backgroundColor: PawlyColors.surface,
-            elevation: 0,
-            leading: Navigator.canPop(context)
-                ? IconButton(
-                    icon: const Icon(Icons.arrow_back_ios_new_rounded, color: PawlyColors.textPrimary, size: 20),
-                    onPressed: () => Navigator.pop(context),
-                  )
-                : null,
-            title: Text(
-              'Emergency Pet Card',
-              style: PawlyTypography.titleMedium.copyWith(
-                fontWeight: FontWeight.w700,
-                color: PawlyColors.textPrimary,
-              ),
+          appBar: PawlyAppBar(
+            title: 'Emergency Pet Card',
+            trailing: IconButton(
+              icon: const Icon(Icons.edit_outlined, color: PawlyColors.black, size: 20),
+              onPressed: () => _showEditSheet(context),
             ),
-            actions: [
-              IconButton(
-                icon: const Icon(Icons.edit_outlined, color: PawlyColors.textPrimary, size: 20),
-                onPressed: () => _showEditSheet(context),
-              ),
-              const SizedBox(width: 8),
-            ],
           ),
           body: SingleChildScrollView(
             padding: const EdgeInsets.fromLTRB(20, 16, 20, 40),
@@ -73,26 +57,26 @@ class EmergencyCardScreen extends StatelessWidget {
                     );
                   },
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                     decoration: BoxDecoration(
                       color: repository.isLostPetModeEnabled
-                          ? PawlyColors.alertRose
-                          : PawlyColors.warmHoney.withOpacity(0.12),
-                      borderRadius: BorderRadius.circular(18),
+                          ? PawlyColors.alert
+                          : PawlyColors.softGrey,
+                      borderRadius: AppRadius.rMd,
                       border: Border.all(
                         color: repository.isLostPetModeEnabled
-                            ? PawlyColors.alertRose
-                            : PawlyColors.warmHoney.withOpacity(0.4),
+                            ? PawlyColors.alert
+                            : PawlyColors.border,
                       ),
                     ),
                     child: Row(
                       children: [
                         Icon(
                           Icons.warning_amber_rounded,
-                          color: repository.isLostPetModeEnabled ? Colors.white : PawlyColors.warmHoney,
-                          size: 24,
+                          color: repository.isLostPetModeEnabled ? Colors.white : PawlyColors.alert,
+                          size: 20,
                         ),
-                        const SizedBox(width: 14),
+                        const SizedBox(width: 12),
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -100,7 +84,7 @@ class EmergencyCardScreen extends StatelessWidget {
                               Text(
                                 repository.isLostPetModeEnabled ? 'LOST PET MODE IS ACTIVE' : 'Lost Pet Mode',
                                 style: PawlyTypography.titleSmall.copyWith(
-                                  color: repository.isLostPetModeEnabled ? Colors.white : PawlyColors.deepEspresso,
+                                  color: repository.isLostPetModeEnabled ? Colors.white : PawlyColors.black,
                                   fontWeight: FontWeight.w700,
                                 ),
                               ),
@@ -108,8 +92,8 @@ class EmergencyCardScreen extends StatelessWidget {
                                 repository.isLostPetModeEnabled
                                     ? 'Tap to view or share rescue poster'
                                     : 'Generate shareable rescue poster & alert',
-                                style: PawlyTypography.bodySmall.copyWith(
-                                  color: repository.isLostPetModeEnabled ? Colors.white70 : PawlyColors.textSecondary,
+                                style: PawlyTypography.caption.copyWith(
+                                  color: repository.isLostPetModeEnabled ? Colors.white70 : PawlyColors.textMuted,
                                 ),
                               ),
                             ],
@@ -117,27 +101,21 @@ class EmergencyCardScreen extends StatelessWidget {
                         ),
                         Icon(
                           Icons.arrow_forward_ios_rounded,
-                          color: repository.isLostPetModeEnabled ? Colors.white : PawlyColors.textSecondary,
-                          size: 16,
+                          color: repository.isLostPetModeEnabled ? Colors.white : PawlyColors.textMuted,
+                          size: 14,
                         ),
                       ],
                     ),
                   ),
                 ),
-                const SizedBox(height: 20),
+                const SizedBox(height: 16),
 
                 // Digital Passport Card
                 Container(
                   decoration: BoxDecoration(
-                    color: PawlyColors.deepEspresso,
-                    borderRadius: BorderRadius.circular(26),
-                    boxShadow: [
-                      BoxShadow(
-                        color: PawlyColors.deepEspresso.withOpacity(0.2),
-                        blurRadius: 20,
-                        offset: const Offset(0, 10),
-                      ),
-                    ],
+                    color: PawlyColors.black,
+                    borderRadius: AppRadius.rMd,
+                    border: Border.all(color: PawlyColors.charcoal),
                   ),
                   clipBehavior: Clip.antiAlias,
                   child: Column(

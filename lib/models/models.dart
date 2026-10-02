@@ -1,3 +1,6 @@
+export 'pet.dart';
+export 'care_routine.dart';
+
 class HealthEvent {
   final String id;
   final String petId;

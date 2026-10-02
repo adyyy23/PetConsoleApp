@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../theme/pawly_colors.dart';
 import '../../theme/pawly_typography.dart';
+import '../../theme/app_tokens.dart';
 import '../../widgets/widgets.dart';
 
 class SignupScreen extends StatefulWidget {
@@ -25,12 +26,11 @@ class _SignupScreenState extends State<SignupScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: PawlyColors.creamBg,
-      appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_rounded),
-          onPressed: widget.onNavigateToLogin,
-        ),
+      backgroundColor: PawlyColors.background,
+      appBar: PawlyAppBar(
+        title: '',
+        onBack: widget.onNavigateToLogin,
+        showBottomBorder: false,
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -45,75 +45,90 @@ class _SignupScreenState extends State<SignupScreen> {
                 style: PawlyTypography.bodyLarge,
               ),
 
-              const SizedBox(height: 32),
+              const SizedBox(height: 28),
 
-              const Text('Your name', style: PawlyTypography.labelLarge),
-              const SizedBox(height: 8),
+              const Text('YOUR NAME', style: PawlyTypography.eyebrow),
+              const SizedBox(height: 6),
               TextField(
                 controller: _nameController,
+                style: PawlyTypography.bodyLarge,
                 decoration: InputDecoration(
                   hintText: 'e.g. Lady Liberty',
                   filled: true,
-                  fillColor: PawlyColors.surface,
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: const BorderSide(color: PawlyColors.border)),
-                  enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: const BorderSide(color: PawlyColors.border)),
+                  fillColor: Colors.white,
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                  border: OutlineInputBorder(borderRadius: AppRadius.rMd, borderSide: const BorderSide(color: PawlyColors.border)),
+                  enabledBorder: OutlineInputBorder(borderRadius: AppRadius.rMd, borderSide: const BorderSide(color: PawlyColors.border)),
+                  focusedBorder: OutlineInputBorder(borderRadius: AppRadius.rMd, borderSide: const BorderSide(color: PawlyColors.black, width: 1.5)),
                 ),
               ),
 
-              const SizedBox(height: 20),
+              const SizedBox(height: 18),
 
-              const Text('Email address', style: PawlyTypography.labelLarge),
-              const SizedBox(height: 8),
+              const Text('EMAIL ADDRESS', style: PawlyTypography.eyebrow),
+              const SizedBox(height: 6),
               TextField(
                 controller: _emailController,
                 keyboardType: TextInputType.emailAddress,
+                style: PawlyTypography.bodyLarge,
                 decoration: InputDecoration(
                   hintText: 'you@example.com',
                   filled: true,
-                  fillColor: PawlyColors.surface,
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: const BorderSide(color: PawlyColors.border)),
-                  enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: const BorderSide(color: PawlyColors.border)),
+                  fillColor: Colors.white,
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                  border: OutlineInputBorder(borderRadius: AppRadius.rMd, borderSide: const BorderSide(color: PawlyColors.border)),
+                  enabledBorder: OutlineInputBorder(borderRadius: AppRadius.rMd, borderSide: const BorderSide(color: PawlyColors.border)),
+                  focusedBorder: OutlineInputBorder(borderRadius: AppRadius.rMd, borderSide: const BorderSide(color: PawlyColors.black, width: 1.5)),
                 ),
               ),
 
-              const SizedBox(height: 20),
+              const SizedBox(height: 18),
 
-              const Text('Password', style: PawlyTypography.labelLarge),
-              const SizedBox(height: 8),
+              const Text('PASSWORD', style: PawlyTypography.eyebrow),
+              const SizedBox(height: 6),
               TextField(
                 controller: _passwordController,
                 obscureText: true,
+                style: PawlyTypography.bodyLarge,
                 decoration: InputDecoration(
                   hintText: 'Create a password',
                   filled: true,
-                  fillColor: PawlyColors.surface,
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: const BorderSide(color: PawlyColors.border)),
-                  enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: const BorderSide(color: PawlyColors.border)),
+                  fillColor: Colors.white,
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                  border: OutlineInputBorder(borderRadius: AppRadius.rMd, borderSide: const BorderSide(color: PawlyColors.border)),
+                  enabledBorder: OutlineInputBorder(borderRadius: AppRadius.rMd, borderSide: const BorderSide(color: PawlyColors.border)),
+                  focusedBorder: OutlineInputBorder(borderRadius: AppRadius.rMd, borderSide: const BorderSide(color: PawlyColors.black, width: 1.5)),
                 ),
               ),
 
-              const SizedBox(height: 32),
+              const SizedBox(height: 28),
 
               PawlyButton(
-                label: 'Continue to Pet Setup',
+                label: 'Create Account',
                 isFullWidth: true,
-                variant: PawlyButtonVariant.primary,
                 onPressed: widget.onSignupSuccess,
+                variant: PawlyButtonVariant.primary,
               ),
 
               const SizedBox(height: 24),
 
               Center(
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
+                child: Wrap(
+                  alignment: WrapAlignment.center,
+                  crossAxisAlignment: WrapCrossAlignment.center,
                   children: [
-                    const Text('Already have an account? ', style: TextStyle(color: PawlyColors.warmGrey, fontSize: 14)),
+                    const Text('Already have an account? ', style: PawlyTypography.bodyMedium),
                     GestureDetector(
                       onTap: widget.onNavigateToLogin,
-                      child: const Text('Sign in', style: TextStyle(color: PawlyColors.forest, fontWeight: FontWeight.w700, fontSize: 14)),
+                      child: const Text(
+                        'Sign in',
+                        style: TextStyle(
+                          color: PawlyColors.black,
+                          fontWeight: FontWeight.w700,
+                          fontSize: 13,
+                          decoration: TextDecoration.underline,
+                        ),
+                      ),
                     ),
                   ],
                 ),

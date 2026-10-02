@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import '../../theme/pawly_colors.dart';
 import '../../theme/pawly_typography.dart';
+import '../../theme/app_tokens.dart';
 import '../../widgets/widgets.dart';
 import '../../repositories/pawly_repository.dart';
-import '../../models/care_routine.dart';
+import '../../models/models.dart';
 
 class CareScreen extends StatefulWidget {
   final PawlyRepository repository;
@@ -46,7 +47,7 @@ class _CareScreenState extends State<CareScreen> {
     final completed = filtered.where((r) => r.isCompleted).toList();
 
     return Scaffold(
-      backgroundColor: PawlyColors.creamBg,
+      backgroundColor: PawlyColors.background,
       body: SafeArea(
         bottom: false,
         child: CustomScrollView(
@@ -61,7 +62,7 @@ class _CareScreenState extends State<CareScreen> {
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('EVERYDAY ROUTINES • ${activePet.name.toUpperCase()}', style: PawlyTypography.labelSmall),
+                        Text('EVERYDAY ROUTINES • ${activePet.name.toUpperCase()}', style: PawlyTypography.eyebrow),
                         const SizedBox(height: 2),
                         const Text('Care Agenda', style: PawlyTypography.displayMedium),
                       ],
@@ -77,13 +78,12 @@ class _CareScreenState extends State<CareScreen> {
               ),
             ),
 
-            // Horizontal Week Selector
+            // Horizontal Week Selector (Clean 8px card, 6px day buttons)
             SliverToBoxAdapter(
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-                child: PawlyBubble(
-                  backgroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 6),
+                child: PawlyCard(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: List.generate(_weekDays.length, (idx) {
@@ -92,11 +92,11 @@ class _CareScreenState extends State<CareScreen> {
                       return GestureDetector(
                         onTap: () => setState(() => _selectedDayIndex = idx),
                         child: AnimatedContainer(
-                          duration: const Duration(milliseconds: 150),
+                          duration: const Duration(milliseconds: 120),
                           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                           decoration: BoxDecoration(
-                            color: isSelected ? PawlyColors.forest : Colors.transparent,
-                            borderRadius: BorderRadius.circular(16),
+                            color: isSelected ? PawlyColors.black : Colors.transparent,
+                            borderRadius: AppRadius.rSm,
                           ),
                           child: Column(
                             mainAxisSize: MainAxisSize.min,
@@ -104,9 +104,9 @@ class _CareScreenState extends State<CareScreen> {
                               Text(
                                 item['day']!,
                                 style: TextStyle(
-                                  fontSize: 11,
+                                  fontSize: 10,
                                   fontWeight: FontWeight.w700,
-                                  color: isSelected ? Colors.white70 : PawlyColors.warmGrey,
+                                  color: isSelected ? Colors.white70 : PawlyColors.textMuted,
                                 ),
                               ),
                               const SizedBox(height: 2),
@@ -115,7 +115,7 @@ class _CareScreenState extends State<CareScreen> {
                                 style: TextStyle(
                                   fontSize: 14,
                                   fontWeight: FontWeight.w800,
-                                  color: isSelected ? Colors.white : PawlyColors.espresso,
+                                  color: isSelected ? Colors.white : PawlyColors.black,
                                 ),
                               ),
                             ],
@@ -128,21 +128,20 @@ class _CareScreenState extends State<CareScreen> {
               ),
             ),
 
-            // Gentle Care Consistency Streak Banner
+            // Gentle Care Consistency Streak Banner (8px Card)
             SliverToBoxAdapter(
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-                child: PawlyBubble(
-                  backgroundColor: PawlyColors.sageLight,
-                  borderColor: PawlyColors.softSage,
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 6),
+                child: PawlyCard(
+                  backgroundColor: PawlyColors.surfaceWarm,
                   padding: const EdgeInsets.all(14),
                   child: Row(
                     children: [
                       Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: const BoxDecoration(
-                          color: PawlyColors.forest,
-                          shape: BoxShape.circle,
+                        padding: const EdgeInsets.all(7),
+                        decoration: BoxDecoration(
+                          color: PawlyColors.black,
+                          borderRadius: AppRadius.rSm,
                         ),
                         child: const Icon(Icons.star_rounded, color: Colors.white, size: 16),
                       ),
@@ -156,16 +155,13 @@ class _CareScreenState extends State<CareScreen> {
                               style: TextStyle(
                                 fontSize: 13,
                                 fontWeight: FontWeight.w800,
-                                color: PawlyColors.forest,
+                                color: PawlyColors.black,
                               ),
                             ),
-                            const SizedBox(height: 1),
+                            const SizedBox(height: 2),
                             Text(
                               '${activePet.name} is on track with scheduled wellness care.',
-                              style: const TextStyle(
-                                fontSize: 11,
-                                color: PawlyColors.forest,
-                              ),
+                              style: PawlyTypography.bodySmall,
                             ),
                           ],
                         ),
@@ -176,55 +172,29 @@ class _CareScreenState extends State<CareScreen> {
               ),
             ),
 
-            // Category Filter Pills
+            // Category Filter Pills (Clean 6px tags)
             SliverToBoxAdapter(
               child: Container(
-                height: 44,
-                margin: const EdgeInsets.only(top: 6, bottom: 12),
+                height: 38,
+                margin: const EdgeInsets.only(top: 8, bottom: 12),
                 child: ListView(
                   scrollDirection: Axis.horizontal,
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   children: [
-                    ChoiceChip(
-                      label: const Text('All Routines'),
-                      selected: _selectedCategory == null,
-                      onSelected: (_) => setState(() => _selectedCategory = null),
-                      backgroundColor: Colors.white,
-                      selectedColor: PawlyColors.forest,
-                      labelStyle: TextStyle(
-                        fontSize: 12,
-                        fontWeight: _selectedCategory == null ? FontWeight.w800 : FontWeight.w600,
-                        color: _selectedCategory == null ? Colors.white : PawlyColors.espresso,
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(18),
-                        side: BorderSide(
-                          color: _selectedCategory == null ? PawlyColors.forest : PawlyColors.border,
-                        ),
-                      ),
+                    _FilterChip(
+                      label: 'All Routines',
+                      isSelected: _selectedCategory == null,
+                      onTap: () => setState(() => _selectedCategory = null),
                     ),
                     const SizedBox(width: 8),
                     ...CareCategory.values.map((cat) {
                       final isSelected = _selectedCategory == cat;
                       return Padding(
                         padding: const EdgeInsets.only(right: 8),
-                        child: ChoiceChip(
-                          label: Text(cat.displayName),
-                          selected: isSelected,
-                          onSelected: (_) => setState(() => _selectedCategory = cat),
-                          backgroundColor: Colors.white,
-                          selectedColor: PawlyColors.forest,
-                          labelStyle: TextStyle(
-                            fontSize: 12,
-                            fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
-                            color: isSelected ? Colors.white : PawlyColors.espresso,
-                          ),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(18),
-                            side: BorderSide(
-                              color: isSelected ? PawlyColors.forest : PawlyColors.border,
-                            ),
-                          ),
+                        child: _FilterChip(
+                          label: cat.displayName,
+                          isSelected: isSelected,
+                          onTap: () => setState(() => _selectedCategory = cat),
                         ),
                       );
                     }),
@@ -251,8 +221,8 @@ class _CareScreenState extends State<CareScreen> {
                   delegate: SliverChildListDelegate([
                     if (pending.isNotEmpty) ...[
                       const Padding(
-                        padding: EdgeInsets.only(bottom: 12, top: 4),
-                        child: Text('SCHEDULED TODAY', style: PawlyTypography.labelSmall),
+                        padding: EdgeInsets.only(bottom: 8, top: 4),
+                        child: Text('SCHEDULED TODAY', style: PawlyTypography.eyebrow),
                       ),
                       ...List.generate(pending.length, (idx) {
                         final r = pending[idx];
@@ -272,8 +242,8 @@ class _CareScreenState extends State<CareScreen> {
 
                     if (completed.isNotEmpty) ...[
                       const Padding(
-                        padding: EdgeInsets.only(bottom: 12),
-                        child: Text('COMPLETED TODAY', style: PawlyTypography.labelSmall),
+                        padding: EdgeInsets.only(bottom: 8),
+                        child: Text('COMPLETED TODAY', style: PawlyTypography.eyebrow),
                       ),
                       ...List.generate(completed.length, (idx) {
                         final r = completed[idx];
@@ -295,6 +265,45 @@ class _CareScreenState extends State<CareScreen> {
                 ),
               ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class _FilterChip extends StatelessWidget {
+  final String label;
+  final bool isSelected;
+  final VoidCallback onTap;
+
+  const _FilterChip({
+    required this.label,
+    required this.isSelected,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+        decoration: BoxDecoration(
+          color: isSelected ? PawlyColors.black : Colors.white,
+          borderRadius: AppRadius.rSm,
+          border: Border.all(
+            color: isSelected ? PawlyColors.black : PawlyColors.border,
+            width: 1.0,
+          ),
+        ),
+        alignment: Alignment.center,
+        child: Text(
+          label,
+          style: TextStyle(
+            fontSize: 12,
+            fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
+            color: isSelected ? Colors.white : PawlyColors.black,
+          ),
         ),
       ),
     );

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../theme/pawly_colors.dart';
 import '../../theme/pawly_typography.dart';
+import '../../theme/app_tokens.dart';
 import '../../widgets/widgets.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -29,7 +30,7 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: PawlyColors.creamBg,
+      backgroundColor: PawlyColors.background,
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
@@ -37,15 +38,15 @@ class _LoginScreenState extends State<LoginScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 16),
-              // App Brand Mark
+              // App Brand Mark (8px)
               Container(
-                width: 48,
-                height: 48,
+                width: 44,
+                height: 44,
                 decoration: BoxDecoration(
-                  color: PawlyColors.forest,
-                  borderRadius: BorderRadius.circular(16),
+                  color: PawlyColors.black,
+                  borderRadius: AppRadius.rMd,
                 ),
-                child: const Icon(Icons.pets, color: Colors.white, size: 24),
+                child: const Icon(Icons.pets, color: Colors.white, size: 22),
               ),
               const SizedBox(height: 24),
               const Text('Welcome\nback to Pawly.', style: PawlyTypography.displayMedium),
@@ -55,16 +56,12 @@ class _LoginScreenState extends State<LoginScreen> {
                 style: PawlyTypography.bodyLarge,
               ),
 
-              const SizedBox(height: 32),
+              const SizedBox(height: 28),
 
-              // 1-Click Demo Login Box (for fast portfolio test)
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: PawlyColors.forestLight,
-                  borderRadius: BorderRadius.circular(18),
-                  border: Border.all(color: PawlyColors.forestBorder),
-                ),
+              // 1-Click Demo Login Box (8px Card)
+              PawlyCard(
+                backgroundColor: PawlyColors.surfaceWarm,
+                padding: const EdgeInsets.all(14),
                 child: Row(
                   children: [
                     const Expanded(
@@ -74,18 +71,15 @@ class _LoginScreenState extends State<LoginScreen> {
                           Text(
                             'Quick Portfolio Demo',
                             style: TextStyle(
-                              fontSize: 13,
-                              fontWeight: FontWeight.w700,
-                              color: PawlyColors.forest,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w800,
+                              color: PawlyColors.black,
                             ),
                           ),
                           SizedBox(height: 2),
                           Text(
                             'Jump straight into Lady’s household with preloaded pets & routines.',
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: PawlyColors.charcoal,
-                            ),
+                            style: PawlyTypography.caption,
                           ),
                         ],
                       ),
@@ -101,87 +95,95 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
               ),
 
-              const SizedBox(height: 28),
+              const SizedBox(height: 24),
 
               // Email Input
-              const Text('Email address', style: PawlyTypography.labelLarge),
-              const SizedBox(height: 8),
+              const Text('EMAIL ADDRESS', style: PawlyTypography.eyebrow),
+              const SizedBox(height: 6),
               TextField(
                 controller: _emailController,
                 keyboardType: TextInputType.emailAddress,
+                style: PawlyTypography.bodyLarge,
                 decoration: InputDecoration(
                   hintText: 'you@example.com',
+                  hintStyle: PawlyTypography.bodyMedium,
                   filled: true,
-                  fillColor: PawlyColors.surface,
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
+                  fillColor: Colors.white,
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
                   border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(16),
+                    borderRadius: AppRadius.rMd,
                     borderSide: const BorderSide(color: PawlyColors.border),
                   ),
                   enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(16),
+                    borderRadius: AppRadius.rMd,
                     borderSide: const BorderSide(color: PawlyColors.border),
                   ),
                   focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(16),
-                    borderSide: const BorderSide(color: PawlyColors.forest, width: 1.5),
+                    borderRadius: AppRadius.rMd,
+                    borderSide: const BorderSide(color: PawlyColors.black, width: 1.5),
                   ),
                 ),
               ),
 
-              const SizedBox(height: 20),
+              const SizedBox(height: 18),
 
               // Password Input
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text('Password', style: PawlyTypography.labelLarge),
-                  GestureDetector(
-                    onTap: widget.onNavigateToForgotPassword,
-                    child: const Text(
-                      'Forgot password?',
-                      style: TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w600,
-                        color: PawlyColors.forest,
+                  const Text('PASSWORD', style: PawlyTypography.eyebrow),
+                  Flexible(
+                    child: GestureDetector(
+                      onTap: widget.onNavigateToForgotPassword,
+                      child: const Text(
+                        'Forgot password?',
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          color: PawlyColors.black,
+                          decoration: TextDecoration.underline,
+                        ),
                       ),
                     ),
                   ),
                 ],
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: 6),
               TextField(
                 controller: _passwordController,
                 obscureText: _obscurePassword,
+                style: PawlyTypography.bodyLarge,
                 decoration: InputDecoration(
                   hintText: '••••••••',
+                  hintStyle: PawlyTypography.bodyMedium,
                   filled: true,
-                  fillColor: PawlyColors.surface,
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
+                  fillColor: Colors.white,
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
                   suffixIcon: IconButton(
                     icon: Icon(
                       _obscurePassword ? Icons.visibility_off : Icons.visibility,
-                      color: PawlyColors.mutedGrey,
-                      size: 20,
+                      color: PawlyColors.textMuted,
+                      size: 18,
                     ),
                     onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
                   ),
                   border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(16),
+                    borderRadius: AppRadius.rMd,
                     borderSide: const BorderSide(color: PawlyColors.border),
                   ),
                   enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(16),
+                    borderRadius: AppRadius.rMd,
                     borderSide: const BorderSide(color: PawlyColors.border),
                   ),
                   focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(16),
-                    borderSide: const BorderSide(color: PawlyColors.forest, width: 1.5),
+                    borderRadius: AppRadius.rMd,
+                    borderSide: const BorderSide(color: PawlyColors.black, width: 1.5),
                   ),
                 ),
               ),
 
-              const SizedBox(height: 28),
+              const SizedBox(height: 24),
 
               PawlyButton(
                 label: 'Sign in to Pawly',
@@ -190,24 +192,26 @@ class _LoginScreenState extends State<LoginScreen> {
                 variant: PawlyButtonVariant.primary,
               ),
 
-              const SizedBox(height: 28),
+              const SizedBox(height: 24),
 
               Center(
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
+                child: Wrap(
+                  alignment: WrapAlignment.center,
+                  crossAxisAlignment: WrapCrossAlignment.center,
                   children: [
                     const Text(
                       'New to Pawly? ',
-                      style: TextStyle(color: PawlyColors.warmGrey, fontSize: 14),
+                      style: PawlyTypography.bodyMedium,
                     ),
                     GestureDetector(
                       onTap: widget.onNavigateToSignup,
                       child: const Text(
                         'Create an account',
                         style: TextStyle(
-                          color: PawlyColors.forest,
+                          color: PawlyColors.black,
                           fontWeight: FontWeight.w700,
-                          fontSize: 14,
+                          fontSize: 13,
+                          decoration: TextDecoration.underline,
                         ),
                       ),
                     ),

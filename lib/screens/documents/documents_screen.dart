@@ -3,6 +3,7 @@ import '../../models/models.dart';
 import '../../repositories/pawly_repository.dart';
 import '../../theme/pawly_colors.dart';
 import '../../theme/pawly_typography.dart';
+import '../../theme/app_tokens.dart';
 import '../../widgets/widgets.dart';
 
 class DocumentsScreen extends StatefulWidget {
@@ -51,46 +52,16 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
 
         return Scaffold(
           backgroundColor: PawlyColors.background,
+          appBar: PawlyAppBar(
+            title: 'Document Wallet',
+            trailing: IconButton(
+              icon: const Icon(Icons.upload_file_rounded, color: PawlyColors.black, size: 20),
+              onPressed: _showAddDocumentModal,
+            ),
+          ),
           body: CustomScrollView(
             physics: const BouncingScrollPhysics(),
             slivers: [
-              SliverAppBar(
-                backgroundColor: PawlyColors.surface,
-                elevation: 0,
-                pinned: true,
-                expandedHeight: 120,
-                leading: Navigator.canPop(context)
-                    ? IconButton(
-                        icon: const Icon(Icons.arrow_back_ios_new_rounded, color: PawlyColors.textPrimary, size: 20),
-                        onPressed: () => Navigator.pop(context),
-                      )
-                    : null,
-                actions: [
-                  IconButton(
-                    icon: Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: PawlyColors.forest.withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: const Icon(Icons.upload_file_rounded, color: PawlyColors.forest, size: 20),
-                    ),
-                    onPressed: _showAddDocumentModal,
-                  ),
-                  const SizedBox(width: 12),
-                ],
-                flexibleSpace: FlexibleSpaceBar(
-                  titlePadding: const EdgeInsets.only(left: 20, bottom: 16),
-                  title: Text(
-                    'Document Wallet',
-                    style: PawlyTypography.titleMedium.copyWith(
-                      color: PawlyColors.textPrimary,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                ),
-              ),
-
               // Pet Switcher
               SliverToBoxAdapter(
                 child: Padding(
@@ -178,25 +149,20 @@ class _DocumentCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: PawlyColors.surface,
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: PawlyColors.border),
-      ),
+    return PawlyCard(
+      padding: const EdgeInsets.all(14),
       child: Row(
         children: [
           Container(
-            padding: const EdgeInsets.all(12),
+            padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: PawlyColors.forest.withOpacity(0.08),
-              borderRadius: BorderRadius.circular(14),
+              color: PawlyColors.softGrey,
+              borderRadius: AppRadius.rSm,
             ),
             child: const Icon(
               Icons.description_rounded,
-              color: PawlyColors.forest,
-              size: 24,
+              color: PawlyColors.black,
+              size: 20,
             ),
           ),
           const SizedBox(width: 14),

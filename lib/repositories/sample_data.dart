@@ -1,5 +1,3 @@
-import '../models/pet.dart';
-import '../models/care_routine.dart';
 import '../models/models.dart';
 
 class SampleData {

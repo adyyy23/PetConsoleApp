@@ -1,145 +1,195 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
 import '../theme/pawly_colors.dart';
 import '../theme/pawly_typography.dart';
+import '../theme/app_tokens.dart';
 import '../models/pet.dart';
 
 // ============================================================================
-// 1. FROSTED & TRANSLUCENT BUBBLES (Selective Layering over Photography / Sheets)
+// 1. GLOBAL NAVIGATION APP BAR
 // ============================================================================
 
-/// Reusable frosted translucent bubble with subtle backdrop blur and high text contrast.
-class FrostedBubble extends StatelessWidget {
-  final Widget child;
-  final EdgeInsetsGeometry padding;
-  final BorderRadius? borderRadius;
-  final Color backgroundColor;
-  final Color borderColor;
-  final double blurSigma;
-  final VoidCallback? onTap;
+/// Consistent editorial app bar for detail / secondary screens.
+class PawlyAppBar extends StatelessWidget implements PreferredSizeWidget {
+  final String title;
+  final VoidCallback? onBack;
+  final List<Widget>? actions;
+  final Widget? trailing;
+  final bool showBottomBorder;
 
-  const FrostedBubble({
+  const PawlyAppBar({
     super.key,
-    required this.child,
-    this.padding = const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-    this.borderRadius,
-    this.backgroundColor = PawlyColors.frostedWhite,
-    this.borderColor = PawlyColors.frostedBorder,
-    this.blurSigma = 12.0,
-    this.onTap,
+    required this.title,
+    this.onBack,
+    this.actions,
+    this.trailing,
+    this.showBottomBorder = true,
   });
 
   @override
+  Size get preferredSize => const Size.fromHeight(kToolbarHeight);
+
+  @override
   Widget build(BuildContext context) {
-    final radius = borderRadius ?? BorderRadius.circular(20);
-
-    Widget bubble = ClipRRect(
-      borderRadius: radius,
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: blurSigma, sigmaY: blurSigma),
-        child: Container(
-          padding: padding,
-          decoration: BoxDecoration(
-            color: backgroundColor,
-            borderRadius: radius,
-            border: Border.all(color: borderColor, width: 1.0),
-            boxShadow: [
-              BoxShadow(
-                color: PawlyColors.deepEspresso.withOpacity(0.06),
-                blurRadius: 16,
-                offset: const Offset(0, 4),
-              ),
-            ],
-          ),
-          child: child,
-        ),
+    return AppBar(
+      backgroundColor: PawlyColors.background,
+      elevation: 0,
+      scrolledUnderElevation: 0,
+      centerTitle: true,
+      leading: IconButton(
+        icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 18, color: PawlyColors.black),
+        onPressed: onBack ?? () => Navigator.maybePop(context),
+        splashRadius: 20,
       ),
+      title: Text(
+        title,
+        style: PawlyTypography.titleMedium.copyWith(fontWeight: FontWeight.w700),
+      ),
+      actions: actions ??
+          (trailing != null
+              ? [
+                  Padding(
+                    padding: const EdgeInsets.only(right: 12),
+                    child: Center(child: trailing!),
+                  ),
+                ]
+              : null),
+      bottom: showBottomBorder
+          ? const PreferredSize(
+              preferredSize: Size.fromHeight(1.0),
+              child: Divider(height: 1.0, color: PawlyColors.border),
+            )
+          : null,
     );
+  }
+}
 
-    if (onTap != null) {
-      bubble = GestureDetector(onTap: onTap, child: bubble);
+// ============================================================================
+// 2. BUTTONS (Normalized 6-8px radius, NO giant capsules)
+// ============================================================================
+
+enum PawlyButtonVariant { primary, secondary, subtle, danger, clay }
+
+class PawlyButton extends StatelessWidget {
+  final String label;
+  final VoidCallback? onPressed;
+  final IconData? icon;
+  final PawlyButtonVariant variant;
+  final bool isFullWidth;
+  final bool isSmall;
+  final bool isLoading;
+
+  const PawlyButton({
+    super.key,
+    String? label,
+    String? text,
+    required this.onPressed,
+    this.icon,
+    PawlyButtonVariant? variant,
+    bool? isSecondary,
+    this.isFullWidth = false,
+    this.isSmall = false,
+    this.isLoading = false,
+  })  : label = label ?? text ?? '',
+        variant = variant ?? (isSecondary == true ? PawlyButtonVariant.secondary : PawlyButtonVariant.primary);
+
+  @override
+  Widget build(BuildContext context) {
+    Color bg;
+    Color fg;
+    BorderSide border = BorderSide.none;
+
+    switch (variant) {
+      case PawlyButtonVariant.primary:
+      case PawlyButtonVariant.clay:
+        bg = PawlyColors.black;
+        fg = Colors.white;
+        break;
+      case PawlyButtonVariant.secondary:
+        bg = Colors.white;
+        fg = PawlyColors.black;
+        border = const BorderSide(color: PawlyColors.border, width: 1.0);
+        break;
+      case PawlyButtonVariant.subtle:
+        bg = PawlyColors.softGrey;
+        fg = PawlyColors.black;
+        break;
+      case PawlyButtonVariant.danger:
+        bg = PawlyColors.alertLight;
+        fg = PawlyColors.alert;
+        border = const BorderSide(color: PawlyColors.alert, width: 1.0);
+        break;
     }
 
-    return bubble;
-  }
-}
+    final buttonStyle = ElevatedButton.styleFrom(
+      backgroundColor: bg,
+      foregroundColor: fg,
+      disabledBackgroundColor: PawlyColors.lightGrey,
+      disabledForegroundColor: PawlyColors.textMuted,
+      elevation: 0,
+      shadowColor: Colors.transparent,
+      padding: EdgeInsets.symmetric(
+        horizontal: isSmall ? 12 : 20,
+        vertical: isSmall ? 8 : 14,
+      ),
+      shape: RoundedRectangleBorder(
+        borderRadius: isSmall ? AppRadius.rSm : AppRadius.rMd,
+        side: border,
+      ),
+      minimumSize: isSmall ? const Size(0, 36) : const Size(0, 48),
+    );
 
-/// Floating translucent bubble specifically designed to float over Pet Photography.
-class PhotoOverlayBubble extends StatelessWidget {
-  final String? title;
-  final String? subtitle;
-  final Widget? child;
-  final IconData? icon;
-  final Color? iconColor;
-  final VoidCallback? onTap;
-  final bool isDark;
-  final EdgeInsetsGeometry padding;
-
-  const PhotoOverlayBubble({
-    super.key,
-    this.title,
-    this.subtitle,
-    this.child,
-    this.icon,
-    this.iconColor,
-    this.onTap,
-    this.isDark = false,
-    this.padding = const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return FrostedBubble(
-      onTap: onTap,
-      backgroundColor: isDark ? PawlyColors.frostedEspresso : PawlyColors.frostedWhite,
-      borderColor: isDark ? Colors.white.withOpacity(0.18) : PawlyColors.frostedBorder,
-      padding: padding,
-      borderRadius: BorderRadius.circular(18),
-      child: child ??
-          Row(
-            mainAxisSize: MainAxisSize.min,
+    Widget content = isLoading
+        ? SizedBox(
+            width: 18,
+            height: 18,
+            child: CircularProgressIndicator(
+              strokeWidth: 2,
+              valueColor: AlwaysStoppedAnimation<Color>(fg),
+            ),
+          )
+        : Row(
+            mainAxisSize: isFullWidth ? MainAxisSize.max : MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
               if (icon != null) ...[
-                Icon(icon, size: 16, color: iconColor ?? (isDark ? Colors.white : PawlyColors.forest)),
+                Icon(icon, size: isSmall ? 15 : 18, color: fg),
                 const SizedBox(width: 8),
               ],
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  if (title != null)
-                    Text(
-                      title!,
-                      style: PawlyTypography.labelLarge.copyWith(
-                        color: isDark ? Colors.white : PawlyColors.deepEspresso,
-                        fontWeight: FontWeight.w700,
-                        fontSize: 13,
-                      ),
-                    ),
-                  if (subtitle != null) ...[
-                    const SizedBox(height: 1),
-                    Text(
-                      subtitle!,
-                      style: PawlyTypography.bodySmall.copyWith(
-                        color: isDark ? Colors.white.withOpacity(0.75) : PawlyColors.warmGrey,
-                        fontSize: 11,
-                      ),
-                    ),
-                  ],
-                ],
+              Text(
+                label,
+                style: TextStyle(
+                  fontSize: isSmall ? 13 : 14,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: -0.1,
+                  color: fg,
+                ),
               ),
             ],
-          ),
-    );
+          );
+
+    return isFullWidth
+        ? SizedBox(
+            width: double.infinity,
+            child: ElevatedButton(
+              style: buttonStyle,
+              onPressed: isLoading ? null : onPressed,
+              child: content,
+            ),
+          )
+        : ElevatedButton(
+            style: buttonStyle,
+            onPressed: isLoading ? null : onPressed,
+            child: content,
+          );
   }
 }
 
 // ============================================================================
-// 2. SOFT BUBBLE CONTAINER & METRIC BUBBLE
+// 3. EDITORIAL CARDS & CONTAINERS (8px Standard Radius)
 // ============================================================================
 
-/// Organic, tactile soft bubble surface (reducing rigid box cards).
-class PawlyBubble extends StatelessWidget {
+/// Clean, editorial card surface (strictly 8px radius, crisp 1px neutral border).
+class PawlyCard extends StatelessWidget {
   final Widget child;
   final EdgeInsetsGeometry padding;
   final EdgeInsetsGeometry? margin;
@@ -148,7 +198,7 @@ class PawlyBubble extends StatelessWidget {
   final BorderRadius? borderRadius;
   final VoidCallback? onTap;
 
-  const PawlyBubble({
+  const PawlyCard({
     super.key,
     required this.child,
     this.padding = const EdgeInsets.all(16),
@@ -161,7 +211,7 @@ class PawlyBubble extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final effectiveRadius = borderRadius ?? BorderRadius.circular(22);
+    final effectiveRadius = borderRadius ?? AppRadius.rMd;
 
     Widget container = Container(
       margin: margin,
@@ -173,13 +223,6 @@ class PawlyBubble extends StatelessWidget {
           color: borderColor ?? PawlyColors.border,
           width: 1.0,
         ),
-        boxShadow: [
-          BoxShadow(
-            color: PawlyColors.deepEspresso.withOpacity(0.03),
-            blurRadius: 12,
-            offset: const Offset(0, 3),
-          ),
-        ],
       ),
       child: child,
     );
@@ -196,7 +239,13 @@ class PawlyBubble extends StatelessWidget {
   }
 }
 
-/// Compact metric bubble showing large distinct figure and unit label.
+/// Backwards compatibility alias
+typedef PawlyBubble = PawlyCard;
+
+// ============================================================================
+// 4. METRIC & DATE CARDS (8px Radius)
+// ============================================================================
+
 class MetricBubble extends StatelessWidget {
   final String value;
   final String label;
@@ -214,19 +263,19 @@ class MetricBubble extends StatelessWidget {
     this.icon,
     Color? color,
     Color? backgroundColor,
-    this.foregroundColor = PawlyColors.deepEspresso,
+    this.foregroundColor = PawlyColors.black,
     this.onTap,
-  }) : backgroundColor = color ?? backgroundColor ?? PawlyColors.surfaceWarm;
+  }) : backgroundColor = color ?? backgroundColor ?? Colors.white;
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
         decoration: BoxDecoration(
           color: backgroundColor,
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: AppRadius.rMd,
           border: Border.all(color: PawlyColors.border, width: 1.0),
         ),
         child: Column(
@@ -237,30 +286,31 @@ class MetricBubble extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 if (icon != null) ...[
-                  Icon(icon, size: 14, color: foregroundColor.withOpacity(0.7)),
+                  Icon(icon, size: 13, color: foregroundColor.withOpacity(0.6)),
                   const SizedBox(width: 4),
                 ],
                 Text(
                   label.toUpperCase(),
                   style: PawlyTypography.labelSmall.copyWith(
-                    color: foregroundColor.withOpacity(0.65),
-                    fontSize: 10,
+                    color: foregroundColor.withOpacity(0.6),
+                    fontSize: 9,
                     letterSpacing: 0.6,
                   ),
                 ),
               ],
             ),
-            const SizedBox(height: 3),
+            const SizedBox(height: 4),
             Row(
               crossAxisAlignment: CrossAxisAlignment.baseline,
               textBaseline: TextBaseline.alphabetic,
               children: [
                 Text(
                   value,
-                  style: PawlyTypography.titleMedium.copyWith(
+                  style: const TextStyle(
+                    fontSize: 16,
                     fontWeight: FontWeight.w800,
-                    color: foregroundColor,
-                    letterSpacing: -0.3,
+                    color: PawlyColors.black,
+                    letterSpacing: -0.4,
                   ),
                 ),
                 if (unit != null) ...[
@@ -283,7 +333,6 @@ class MetricBubble extends StatelessWidget {
   }
 }
 
-/// Circular or rounded date block with month in small uppercase and day in bold large number.
 class DateBubble extends StatelessWidget {
   final String month;
   final String day;
@@ -298,16 +347,16 @@ class DateBubble extends StatelessWidget {
     Color? backgroundColor,
     Color? textColor,
   })  : backgroundColor = backgroundColor ?? PawlyColors.surfaceWarm,
-        textColor = color ?? textColor ?? PawlyColors.deepEspresso;
+        textColor = color ?? textColor ?? PawlyColors.black;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 50,
-      height: 54,
+      width: 46,
+      height: 48,
       decoration: BoxDecoration(
         color: backgroundColor,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: AppRadius.rSm,
         border: Border.all(color: PawlyColors.border, width: 1.0),
       ),
       child: Column(
@@ -316,8 +365,8 @@ class DateBubble extends StatelessWidget {
           Text(
             month.toUpperCase(),
             style: TextStyle(
-              fontSize: 10,
-              fontWeight: FontWeight.w700,
+              fontSize: 9,
+              fontWeight: FontWeight.w800,
               color: textColor.withOpacity(0.6),
               letterSpacing: 0.5,
             ),
@@ -326,7 +375,7 @@ class DateBubble extends StatelessWidget {
           Text(
             day,
             style: TextStyle(
-              fontSize: 17,
+              fontSize: 16,
               fontWeight: FontWeight.w900,
               color: textColor,
               height: 1.0,
@@ -339,7 +388,7 @@ class DateBubble extends StatelessWidget {
 }
 
 // ============================================================================
-// 3. EDITORIAL SECTION HEADER
+// 5. EDITORIAL SECTION HEADER
 // ============================================================================
 
 class SectionHeader extends StatelessWidget {
@@ -360,7 +409,7 @@ class SectionHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.only(bottom: 10),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         crossAxisAlignment: CrossAxisAlignment.end,
@@ -370,7 +419,7 @@ class SectionHeader extends StatelessWidget {
             children: [
               Text(
                 title,
-                style: PawlyTypography.titleLarge.copyWith(
+                style: PawlyTypography.titleMedium.copyWith(
                   fontWeight: FontWeight.w800,
                   letterSpacing: -0.3,
                 ),
@@ -389,9 +438,11 @@ class SectionHeader extends StatelessWidget {
               onTap: onAction,
               child: Text(
                 actionLabel!,
-                style: PawlyTypography.labelMedium.copyWith(
-                  color: PawlyColors.forest,
+                style: const TextStyle(
+                  fontSize: 12,
+                  color: PawlyColors.black,
                   fontWeight: FontWeight.w700,
+                  decoration: TextDecoration.underline,
                 ),
               ),
             ),
@@ -402,238 +453,54 @@ class SectionHeader extends StatelessWidget {
 }
 
 // ============================================================================
-// 4. BUTTONS & BADGES
-// ============================================================================
-
-enum PawlyButtonVariant { primary, secondary, clay, subtle, danger }
-
-class PawlyButton extends StatelessWidget {
-  final String label;
-  final VoidCallback? onPressed;
-  final IconData? icon;
-  final PawlyButtonVariant variant;
-  final bool isFullWidth;
-  final bool isSmall;
-
-  const PawlyButton({
-    super.key,
-    String? label,
-    String? text,
-    required this.onPressed,
-    this.icon,
-    PawlyButtonVariant? variant,
-    bool? isSecondary,
-    this.isFullWidth = false,
-    this.isSmall = false,
-  })  : label = label ?? text ?? '',
-        variant = variant ?? (isSecondary == true ? PawlyButtonVariant.secondary : PawlyButtonVariant.primary);
-
-  @override
-  Widget build(BuildContext context) {
-    Color bg;
-    Color fg;
-    BorderSide border = BorderSide.none;
-
-    switch (variant) {
-      case PawlyButtonVariant.primary:
-        bg = PawlyColors.forest;
-        fg = Colors.white;
-        break;
-      case PawlyButtonVariant.clay:
-        bg = PawlyColors.clay;
-        fg = Colors.white;
-        break;
-      case PawlyButtonVariant.secondary:
-        bg = PawlyColors.surface;
-        fg = PawlyColors.espresso;
-        border = const BorderSide(color: PawlyColors.border, width: 1.2);
-        break;
-      case PawlyButtonVariant.subtle:
-        bg = PawlyColors.surfaceWarm;
-        fg = PawlyColors.charcoal;
-        break;
-      case PawlyButtonVariant.danger:
-        bg = PawlyColors.roseLight;
-        fg = PawlyColors.rose;
-        border = const BorderSide(color: Color(0xFFF3C4C4), width: 1);
-        break;
-    }
-
-    final content = Row(
-      mainAxisSize: isFullWidth ? MainAxisSize.max : MainAxisSize.min,
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        if (icon != null) ...[
-          Icon(icon, size: isSmall ? 16 : 18, color: fg),
-          const SizedBox(width: 8),
-        ],
-        Text(
-          label,
-          style: TextStyle(
-            fontSize: isSmall ? 13 : 15,
-            fontWeight: FontWeight.w700,
-            color: fg,
-            letterSpacing: -0.2,
-          ),
-        ),
-      ],
-    );
-
-    return SizedBox(
-      width: isFullWidth ? double.infinity : null,
-      child: ElevatedButton(
-        style: ElevatedButton.styleFrom(
-          backgroundColor: bg,
-          foregroundColor: fg,
-          elevation: 0,
-          shadowColor: Colors.transparent,
-          side: border,
-          padding: EdgeInsets.symmetric(
-            horizontal: isSmall ? 14 : 22,
-            vertical: isSmall ? 8 : 14,
-          ),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(isSmall ? 14 : 18),
-          ),
-        ),
-        onPressed: onPressed,
-        child: content,
-      ),
-    );
-  }
-}
-
-enum PawlyBadgeVariant { sage, clay, honey, slate, subtle, alert }
-
-class PawlyBadge extends StatelessWidget {
-  final String label;
-  final IconData? icon;
-  final PawlyBadgeVariant variant;
-  final Color? backgroundColor;
-  final Color? textColor;
-
-  const PawlyBadge({
-    super.key,
-    required this.label,
-    this.icon,
-    this.variant = PawlyBadgeVariant.subtle,
-    this.backgroundColor,
-    this.textColor,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    Color bg;
-    Color fg;
-    Color border;
-
-    switch (variant) {
-      case PawlyBadgeVariant.sage:
-        bg = PawlyColors.forestLight;
-        fg = PawlyColors.forest;
-        border = PawlyColors.forestBorder;
-        break;
-      case PawlyBadgeVariant.clay:
-        bg = PawlyColors.clayLight;
-        fg = PawlyColors.clay;
-        border = PawlyColors.clayBorder;
-        break;
-      case PawlyBadgeVariant.honey:
-        bg = PawlyColors.honeyLight;
-        fg = PawlyColors.honey;
-        border = PawlyColors.honeyBorder;
-        break;
-      case PawlyBadgeVariant.slate:
-        bg = PawlyColors.slateLight;
-        fg = PawlyColors.slate;
-        border = const Color(0xFFC7DBE6);
-        break;
-      case PawlyBadgeVariant.alert:
-        bg = PawlyColors.roseLight;
-        fg = PawlyColors.rose;
-        border = const Color(0xFFF7CECE);
-        break;
-      case PawlyBadgeVariant.subtle:
-        bg = PawlyColors.surfaceWarm;
-        fg = PawlyColors.charcoal;
-        border = PawlyColors.border;
-        break;
-    }
-
-    if (backgroundColor != null) bg = backgroundColor!;
-    if (textColor != null) {
-      fg = textColor!;
-      border = Colors.transparent;
-    }
-
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-      decoration: BoxDecoration(
-        color: bg,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: border, width: 1),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          if (icon != null) ...[
-            Icon(icon, size: 12, color: fg),
-            const SizedBox(width: 4),
-          ],
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: 11,
-              fontWeight: FontWeight.w700,
-              color: fg,
-              letterSpacing: 0.1,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-// ============================================================================
-// 5. PET AVATAR & CIRCULAR PET SWITCHER
+// 6. PET AVATAR & PET SWITCHER
 // ============================================================================
 
 class PawlyPetAvatar extends StatelessWidget {
   final String imageUrl;
+  final String name;
   final double size;
-  final bool hasBorder;
   final bool isSelected;
+  final bool hasBorder;
+  final VoidCallback? onTap;
 
   const PawlyPetAvatar({
     super.key,
     required this.imageUrl,
-    this.size = 48,
-    this.hasBorder = true,
+    this.name = '',
+    this.size = 46.0,
     this.isSelected = false,
+    this.hasBorder = true,
+    this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: size,
-      height: size,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        border: Border.all(
-          color: isSelected
-              ? PawlyColors.forest
-              : (hasBorder ? PawlyColors.border : Colors.transparent),
-          width: isSelected ? 2.5 : 1.2,
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: size,
+        height: size,
+        decoration: BoxDecoration(
+          borderRadius: AppRadius.rMd,
+          border: hasBorder
+              ? Border.all(
+                  color: isSelected ? PawlyColors.black : PawlyColors.border,
+                  width: isSelected ? 2.0 : 1.0,
+                )
+              : null,
         ),
-      ),
-      child: ClipOval(
+        clipBehavior: Clip.antiAlias,
         child: Image.network(
           imageUrl,
           fit: BoxFit.cover,
           errorBuilder: (_, __, ___) => Container(
-            color: PawlyColors.surfaceWarm,
-            child: const Icon(Icons.pets, color: PawlyColors.forest),
+            color: PawlyColors.softGrey,
+            alignment: Alignment.center,
+            child: Text(
+              name.isNotEmpty ? name[0] : 'P',
+              style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: PawlyColors.black),
+            ),
           ),
         ),
       ),
@@ -641,98 +508,111 @@ class PawlyPetAvatar extends StatelessWidget {
   }
 }
 
-/// Circular pet portrait switcher (Mochi) (Luna) (Milo) (+) - editorial bubble design.
 class PetSwitcher extends StatelessWidget {
   final List<Pet> pets;
   final String selectedPetId;
   final ValueChanged<String> onSelectPet;
   final VoidCallback? onAddPet;
 
-  PetSwitcher({
+  const PetSwitcher({
     super.key,
     required this.pets,
     required this.selectedPetId,
     ValueChanged<String>? onSelectPet,
     ValueChanged<String>? onPetSelected,
     this.onAddPet,
-  }) : onSelectPet = onSelectPet ?? onPetSelected ?? ((_) {});
+  }) : onSelectPet = onSelectPet ?? onPetSelected ?? _noopSelect;
+
+  static void _noopSelect(String _) {}
 
   @override
   Widget build(BuildContext context) {
+    final showAdd = onAddPet != null;
     return SizedBox(
-      height: 72,
+      height: 48,
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
-        physics: const BouncingScrollPhysics(),
-        padding: const EdgeInsets.symmetric(horizontal: 4),
-        itemCount: onAddPet != null ? pets.length + 1 : pets.length,
-        separatorBuilder: (_, __) => const SizedBox(width: 14),
-        itemBuilder: (context, index) {
-          if (index == pets.length && onAddPet != null) {
-            // Add pet circular bubble
+        padding: const EdgeInsets.symmetric(horizontal: 20),
+        itemCount: pets.length + (showAdd ? 1 : 0),
+        separatorBuilder: (_, __) => const SizedBox(width: 8),
+        itemBuilder: (context, idx) {
+          if (showAdd && idx == pets.length) {
             return GestureDetector(
               onTap: onAddPet,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Container(
-                    width: 46,
-                    height: 46,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: PawlyColors.surface,
-                      border: Border.all(color: PawlyColors.border, width: 1.5),
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: AppRadius.rSm,
+                  border: Border.all(color: PawlyColors.border, width: 1),
+                ),
+                child: const Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.add, size: 16, color: PawlyColors.black),
+                    SizedBox(width: 4),
+                    Text(
+                      'Add',
+                      style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: PawlyColors.black),
                     ),
-                    child: const Icon(Icons.add_rounded, size: 20, color: PawlyColors.charcoal),
-                  ),
-                  const SizedBox(height: 4),
-                  const Text(
-                    'Add',
-                    style: TextStyle(
-                      fontSize: 11,
-                      fontWeight: FontWeight.w600,
-                      color: PawlyColors.warmGrey,
-                    ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             );
           }
 
-          final pet = pets[index];
+          final pet = pets[idx];
           final isSelected = pet.id == selectedPetId;
 
           return GestureDetector(
             onTap: () => onSelectPet(pet.id),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                AnimatedContainer(
-                  duration: const Duration(milliseconds: 200),
-                  padding: const EdgeInsets.all(2.5),
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    border: Border.all(
-                      color: isSelected ? PawlyColors.forest : Colors.transparent,
-                      width: 2.2,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              decoration: BoxDecoration(
+                color: isSelected ? PawlyColors.black : Colors.white,
+                borderRadius: AppRadius.rSm,
+                border: Border.all(
+                  color: isSelected ? PawlyColors.black : PawlyColors.border,
+                  width: 1,
+                ),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(4),
+                    child: Image.network(
+                      pet.imageUrl,
+                      width: 22,
+                      height: 22,
+                      fit: BoxFit.cover,
+                      errorBuilder: (_, __, ___) => Container(
+                        width: 22,
+                        height: 22,
+                        color: isSelected ? Colors.white24 : PawlyColors.softGrey,
+                        alignment: Alignment.center,
+                        child: Text(
+                          pet.name[0],
+                          style: TextStyle(
+                            fontSize: 10,
+                            fontWeight: FontWeight.w800,
+                            color: isSelected ? Colors.white : PawlyColors.black,
+                          ),
+                        ),
+                      ),
                     ),
                   ),
-                  child: PawlyPetAvatar(
-                    imageUrl: pet.imageUrl,
-                    size: 42,
-                    hasBorder: !isSelected,
+                  const SizedBox(width: 8),
+                  Text(
+                    pet.name,
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w700,
+                      color: isSelected ? Colors.white : PawlyColors.black,
+                    ),
                   ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  pet.name,
-                  style: TextStyle(
-                    fontSize: 11,
-                    fontWeight: isSelected ? FontWeight.w800 : FontWeight.w500,
-                    color: isSelected ? PawlyColors.forest : PawlyColors.charcoal,
-                  ),
-                ),
-              ],
+                ],
+              ),
             ),
           );
         },
@@ -742,10 +622,124 @@ class PetSwitcher extends StatelessWidget {
 }
 
 // ============================================================================
-// 6. VISUAL TIMELINE ITEMS (Tactile, uncontained timeline rows)
+// 7. PHOTO HERO CARD (High-contrast dark scrim, 8-10px radius)
 // ============================================================================
 
-/// Tactile care timeline row (e.g. 8 AM ●──── Apoquel \n Medication).
+class PhotoOverlayBubble extends StatelessWidget {
+  final String? title;
+  final String? subtitle;
+  final Widget? child;
+  final IconData? icon;
+  final Color? iconColor;
+  final VoidCallback? onTap;
+  final bool isDark;
+  final EdgeInsetsGeometry padding;
+
+  const PhotoOverlayBubble({
+    super.key,
+    this.title,
+    this.subtitle,
+    this.child,
+    this.icon,
+    this.iconColor,
+    this.onTap,
+    this.isDark = true,
+    this.padding = const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: padding,
+      decoration: BoxDecoration(
+        color: isDark ? Colors.black.withOpacity(0.75) : Colors.white.withOpacity(0.92),
+        borderRadius: AppRadius.rSm,
+        border: Border.all(
+          color: isDark ? Colors.white.withOpacity(0.18) : PawlyColors.border,
+          width: 1.0,
+        ),
+      ),
+      child: child ??
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (icon != null) ...[
+                Icon(icon, size: 14, color: iconColor ?? (isDark ? Colors.white : PawlyColors.black)),
+                const SizedBox(width: 6),
+              ],
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (title != null)
+                    Text(
+                      title!,
+                      style: TextStyle(
+                        color: isDark ? Colors.white : PawlyColors.black,
+                        fontWeight: FontWeight.w800,
+                        fontSize: 12,
+                      ),
+                    ),
+                  if (subtitle != null) ...[
+                    const SizedBox(height: 1),
+                    Text(
+                      subtitle!,
+                      style: TextStyle(
+                        color: isDark ? Colors.white70 : PawlyColors.warmGrey,
+                        fontSize: 10,
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ],
+          ),
+    );
+  }
+}
+
+/// Backwards compatibility alias
+class FrostedBubble extends StatelessWidget {
+  final Widget child;
+  final EdgeInsetsGeometry padding;
+  final BorderRadius? borderRadius;
+  final Color backgroundColor;
+  final Color borderColor;
+  final double blurSigma;
+  final VoidCallback? onTap;
+
+  const FrostedBubble({
+    super.key,
+    required this.child,
+    this.padding = const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+    this.borderRadius,
+    this.backgroundColor = Colors.white,
+    this.borderColor = PawlyColors.border,
+    this.blurSigma = 0.0,
+    this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: padding,
+        decoration: BoxDecoration(
+          color: backgroundColor,
+          borderRadius: borderRadius ?? AppRadius.rSm,
+          border: Border.all(color: borderColor, width: 1.0),
+        ),
+        child: child,
+      ),
+    );
+  }
+}
+
+// ============================================================================
+// 8. CARE TIMELINE ITEM (Daily Planner Style, 8px radius)
+// ============================================================================
+
 class CareTimelineItem extends StatelessWidget {
   final String time;
   final String title;
@@ -763,7 +757,7 @@ class CareTimelineItem extends StatelessWidget {
     required this.title,
     required this.subtitle,
     required this.isCompleted,
-    this.categoryColor = PawlyColors.forest,
+    this.categoryColor = PawlyColors.black,
     this.categoryIcon = Icons.check_circle_outline,
     this.assignedTo,
     required this.onToggle,
@@ -772,129 +766,89 @@ class CareTimelineItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return IntrinsicHeight(
+    return Container(
+      margin: const EdgeInsets.only(bottom: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      decoration: BoxDecoration(
+        color: isCompleted ? PawlyColors.softGrey : Colors.white,
+        borderRadius: AppRadius.rMd,
+        border: Border.all(
+          color: isCompleted ? Colors.transparent : PawlyColors.border,
+          width: 1.0,
+        ),
+      ),
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Time column
+          // Time badge
           SizedBox(
-            width: 58,
+            width: 60,
             child: Text(
               time,
-              style: PawlyTypography.labelSmall.copyWith(
-                fontWeight: FontWeight.w700,
-                color: isCompleted ? PawlyColors.mutedGrey : PawlyColors.deepEspresso,
+              style: TextStyle(
                 fontSize: 12,
+                fontWeight: FontWeight.w800,
+                color: isCompleted ? PawlyColors.textMuted : PawlyColors.black,
               ),
             ),
           ),
-
-          // Vertical timeline track with check circle
-          Column(
-            children: [
-              GestureDetector(
-                onTap: onToggle,
-                child: AnimatedContainer(
-                  duration: const Duration(milliseconds: 200),
-                  width: 22,
-                  height: 22,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: isCompleted ? PawlyColors.forest : PawlyColors.surface,
-                    border: Border.all(
-                      color: isCompleted ? PawlyColors.forest : PawlyColors.border,
-                      width: 2,
-                    ),
-                  ),
-                  child: isCompleted
-                      ? const Icon(Icons.check_rounded, size: 14, color: Colors.white)
-                      : null,
-                ),
-              ),
-              if (!isLast)
-                Expanded(
-                  child: Container(
-                    width: 2,
-                    color: PawlyColors.borderLight,
-                    margin: const EdgeInsets.symmetric(vertical: 4),
-                  ),
-                ),
-            ],
-          ),
-          const SizedBox(width: 14),
+          const SizedBox(width: 8),
 
           // Content body
           Expanded(
-            child: Padding(
-              padding: const EdgeInsets.only(bottom: 22),
-              child: GestureDetector(
-                onTap: onToggle,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-                  decoration: BoxDecoration(
-                    color: isCompleted ? PawlyColors.surfaceWarm.withOpacity(0.5) : PawlyColors.surface,
-                    borderRadius: BorderRadius.circular(18),
-                    border: Border.all(
-                      color: isCompleted ? Colors.transparent : PawlyColors.border,
-                    ),
-                  ),
-                  child: Row(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          color: categoryColor.withOpacity(0.12),
-                          shape: BoxShape.circle,
-                        ),
-                        child: Icon(categoryIcon, size: 16, color: categoryColor),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              title,
-                              style: PawlyTypography.titleSmall.copyWith(
-                                fontWeight: FontWeight.w700,
-                                decoration: isCompleted ? TextDecoration.lineThrough : null,
-                                color: isCompleted ? PawlyColors.mutedGrey : PawlyColors.deepEspresso,
-                              ),
-                            ),
-                            if (subtitle.isNotEmpty) ...[
-                              const SizedBox(height: 2),
-                              Text(
-                                subtitle,
-                                style: PawlyTypography.bodySmall.copyWith(
-                                  color: PawlyColors.warmGrey,
-                                ),
-                              ),
-                            ],
-                            if (assignedTo != null && assignedTo!.isNotEmpty) ...[
-                              const SizedBox(height: 4),
-                              Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                                decoration: BoxDecoration(
-                                  color: PawlyColors.surfaceWarm,
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                                child: Text(
-                                  'Assigned to: $assignedTo',
-                                  style: const TextStyle(
-                                    fontSize: 10,
-                                    fontWeight: FontWeight.w700,
-                                    color: PawlyColors.forest,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ],
-                        ),
-                      ),
-                    ],
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w700,
+                    decoration: isCompleted ? TextDecoration.lineThrough : null,
+                    color: isCompleted ? PawlyColors.textMuted : PawlyColors.black,
                   ),
                 ),
+                if (subtitle.isNotEmpty) ...[
+                  const SizedBox(height: 2),
+                  Text(
+                    subtitle,
+                    style: const TextStyle(
+                      fontSize: 11,
+                      color: PawlyColors.warmGrey,
+                    ),
+                  ),
+                ],
+                if (assignedTo != null && assignedTo!.isNotEmpty) ...[
+                  const SizedBox(height: 4),
+                  Text(
+                    'Assigned: $assignedTo',
+                    style: const TextStyle(
+                      fontSize: 10,
+                      fontWeight: FontWeight.w600,
+                      color: PawlyColors.midGrey,
+                    ),
+                  ),
+                ],
+              ],
+            ),
+          ),
+
+          // Check circle button
+          GestureDetector(
+            onTap: onToggle,
+            child: Container(
+              width: 24,
+              height: 24,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: isCompleted ? PawlyColors.black : Colors.transparent,
+                border: Border.all(
+                  color: isCompleted ? PawlyColors.black : PawlyColors.border,
+                  width: 1.5,
+                ),
               ),
+              child: isCompleted
+                  ? const Icon(Icons.check, size: 14, color: Colors.white)
+                  : null,
             ),
           ),
         ],
@@ -904,7 +858,60 @@ class CareTimelineItem extends StatelessWidget {
 }
 
 // ============================================================================
-// 7. EMPTY STATE VIEW (Warm, pet-specific copy)
+// 9. STATUS BADGES
+// ============================================================================
+
+enum PawlyBadgeVariant { sage, clay, honey, slate, alert }
+
+class PawlyBadge extends StatelessWidget {
+  final String label;
+  final PawlyBadgeVariant variant;
+  final Color? backgroundColor;
+  final Color? textColor;
+
+  const PawlyBadge({
+    super.key,
+    required this.label,
+    this.variant = PawlyBadgeVariant.slate,
+    this.backgroundColor,
+    this.textColor,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    Color bg = PawlyColors.softGrey;
+    Color fg = PawlyColors.black;
+
+    if (variant == PawlyBadgeVariant.alert) {
+      bg = PawlyColors.alertLight;
+      fg = PawlyColors.alert;
+    }
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+      decoration: BoxDecoration(
+        color: backgroundColor ?? bg,
+        borderRadius: AppRadius.rXs,
+        border: Border.all(
+          color: (backgroundColor ?? bg) == PawlyColors.alertLight ? PawlyColors.alert : PawlyColors.border,
+          width: 0.8,
+        ),
+      ),
+      child: Text(
+        label,
+        style: TextStyle(
+          fontSize: 10,
+          fontWeight: FontWeight.w700,
+          color: textColor ?? fg,
+          letterSpacing: 0.2,
+        ),
+      ),
+    );
+  }
+}
+
+// ============================================================================
+// 10. EMPTY STATE VIEW (Minimal, Actionable)
 // ============================================================================
 
 class EmptyStateView extends StatelessWidget {
@@ -928,41 +935,38 @@ class EmptyStateView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 48),
-      child: Center(
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(32),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             Container(
-              width: 68,
-              height: 68,
+              padding: const EdgeInsets.all(14),
               decoration: BoxDecoration(
-                color: PawlyColors.surfaceWarm,
-                shape: BoxShape.circle,
-                border: Border.all(color: PawlyColors.borderLight, width: 1.5),
+                color: PawlyColors.softGrey,
+                borderRadius: AppRadius.rMd,
               ),
-              child: Icon(icon, size: 30, color: PawlyColors.warmGrey),
+              child: Icon(icon, size: 28, color: PawlyColors.black),
             ),
-            const SizedBox(height: 18),
+            const SizedBox(height: 16),
             Text(
               title,
-              style: PawlyTypography.titleMedium.copyWith(fontWeight: FontWeight.w800),
+              style: PawlyTypography.titleMedium,
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 6),
             Text(
               subtitle,
-              style: PawlyTypography.bodyMedium.copyWith(color: PawlyColors.warmGrey),
+              style: PawlyTypography.bodyMedium,
               textAlign: TextAlign.center,
             ),
             if (buttonLabel != null && onButtonPressed != null) ...[
               const SizedBox(height: 20),
               PawlyButton(
-                label: buttonLabel!,
-                onPressed: onButtonPressed,
+                text: buttonLabel!,
                 isSmall: true,
-                variant: PawlyButtonVariant.primary,
+                onPressed: onButtonPressed!,
               ),
             ],
           ],

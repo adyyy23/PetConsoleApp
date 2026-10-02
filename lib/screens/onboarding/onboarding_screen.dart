@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../theme/pawly_colors.dart';
 import '../../theme/pawly_typography.dart';
+import '../../theme/app_tokens.dart';
 import '../../widgets/widgets.dart';
 
 class OnboardingScreen extends StatefulWidget {
@@ -48,7 +49,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     final isLast = _currentIndex == _pages.length - 1;
 
     return Scaffold(
-      backgroundColor: PawlyColors.creamBg,
+      backgroundColor: PawlyColors.background,
       body: SafeArea(
         child: Column(
           children: [
@@ -61,10 +62,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   Row(
                     children: [
                       Container(
-                        padding: const EdgeInsets.all(6),
+                        padding: const EdgeInsets.all(5),
                         decoration: BoxDecoration(
-                          color: PawlyColors.forest,
-                          borderRadius: BorderRadius.circular(10),
+                          color: PawlyColors.black,
+                          borderRadius: AppRadius.rSm,
                         ),
                         child: const Icon(Icons.pets, size: 16, color: Colors.white),
                       ),
@@ -75,7 +76,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                           fontSize: 18,
                           fontWeight: FontWeight.w800,
                           letterSpacing: -0.5,
-                          color: PawlyColors.espresso,
+                          color: PawlyColors.black,
                         ),
                       ),
                     ],
@@ -111,11 +112,11 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         const SizedBox(height: 12),
-                        // Big Visual Image Card
+                        // Big Visual Image Card (8-10px radius)
                         AspectRatio(
                           aspectRatio: 16 / 11,
                           child: ClipRRect(
-                            borderRadius: BorderRadius.circular(28),
+                            borderRadius: AppRadius.rLg,
                             child: Stack(
                               fit: StackFit.expand,
                               children: [
@@ -123,18 +124,19 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                                   item.imageUrl,
                                   fit: BoxFit.cover,
                                   errorBuilder: (_, __, ___) => Container(
-                                    color: PawlyColors.surfaceWarm,
-                                    child: const Icon(Icons.pets, size: 64, color: PawlyColors.forest),
+                                    color: PawlyColors.softGrey,
+                                    child: const Icon(Icons.pets, size: 54, color: PawlyColors.black),
                                   ),
                                 ),
                                 Positioned(
-                                  top: 16,
-                                  left: 16,
+                                  top: 14,
+                                  left: 14,
                                   child: Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                                     decoration: BoxDecoration(
-                                      color: PawlyColors.espresso.withOpacity(0.85),
-                                      borderRadius: BorderRadius.circular(20),
+                                      color: Colors.black.withOpacity(0.75),
+                                      borderRadius: AppRadius.rSm,
+                                      border: Border.all(color: Colors.white24, width: 0.8),
                                     ),
                                     child: Text(
                                       item.badge,
@@ -175,25 +177,23 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       (i) => AnimatedContainer(
                         duration: const Duration(milliseconds: 200),
                         margin: const EdgeInsets.only(right: 6),
-                        width: i == _currentIndex ? 24 : 8,
-                        height: 8,
+                        width: i == _currentIndex ? 22 : 6,
+                        height: 6,
                         decoration: BoxDecoration(
                           color: i == _currentIndex
-                              ? PawlyColors.forest
+                              ? PawlyColors.black
                               : PawlyColors.border,
-                          borderRadius: BorderRadius.circular(4),
+                          borderRadius: BorderRadius.circular(3),
                         ),
                       ),
                     ),
                   ),
 
-                  // Continue / Get Started Button
+                  // Continue / Get Started Button (6-8px radius)
                   PawlyButton(
                     label: isLast ? 'Get Started' : 'Continue',
                     icon: Icons.arrow_forward_rounded,
-                    variant: isLast
-                        ? PawlyButtonVariant.clay
-                        : PawlyButtonVariant.primary,
+                    variant: PawlyButtonVariant.primary,
                     onPressed: () {
                       if (isLast) {
                         widget.onFinish();

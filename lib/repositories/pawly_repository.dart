@@ -1,8 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../models/pet.dart';
-import '../models/care_routine.dart';
 import '../models/models.dart';
 import 'sample_data.dart';
 
