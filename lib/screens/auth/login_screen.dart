@@ -1,227 +1,143 @@
 import 'package:flutter/material.dart';
-import '../../theme/pawly_colors.dart';
-import '../../theme/pawly_typography.dart';
-import '../../theme/app_tokens.dart';
+import '../../repositories/pawly_repository.dart';
 import '../../widgets/widgets.dart';
 
+/// Pawly currently has local persistence, not a remote authentication service.
 class LoginScreen extends StatefulWidget {
-  final VoidCallback onLoginSuccess;
+  final PawlyRepository repository;
+  final VoidCallback onLoginSuccess,
+      onNavigateToSignup,
+      onNavigateToForgotPassword;
   final VoidCallback? onExploreDemo;
-  final VoidCallback onNavigateToSignup;
-  final VoidCallback onNavigateToForgotPassword;
-
-  const LoginScreen({
-    super.key,
-    required this.onLoginSuccess,
-    this.onExploreDemo,
-    required this.onNavigateToSignup,
-    required this.onNavigateToForgotPassword,
-  });
-
+  const LoginScreen(
+      {super.key,
+      required this.repository,
+      required this.onLoginSuccess,
+      required this.onNavigateToSignup,
+      required this.onNavigateToForgotPassword,
+      this.onExploreDemo});
   @override
   State<LoginScreen> createState() => _LoginScreenState();
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  final TextEditingController _emailController =
-      TextEditingController(text: 'lady@pawly.app');
-  final TextEditingController _passwordController =
-      TextEditingController(text: 'pawly2026');
-  bool _obscurePassword = true;
+  late final TextEditingController _name = TextEditingController(
+      text: widget.repository.user.name == 'Pet parent'
+          ? ''
+          : widget.repository.user.name);
+  bool _busy = false;
+  String? _error;
+  @override
+  void dispose() {
+    _name.dispose();
+    super.dispose();
+  }
+
+  Future<void> _continue() async {
+    if (_busy) return;
+    if (_name.text.trim().isEmpty) {
+      setState(() => _error = 'Tell us what to call you.');
+      return;
+    }
+    setState(() {
+      _busy = true;
+      _error = null;
+    });
+    try {
+      await widget.repository.updateUser(_name.text);
+      if (mounted) widget.onLoginSuccess();
+    } catch (_) {
+      if (mounted) {
+        setState(() => _error = 'Couldn’t save your name. Please try again.');
+      }
+    } finally {
+      if (mounted) setState(() => _busy = false);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
     return Scaffold(
-      backgroundColor: PawlyColors.background,
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: 16),
-              // App Brand Mark (8px)
-              Container(
-                width: 44,
-                height: 44,
-                decoration: BoxDecoration(
-                  color: PawlyColors.black,
-                  borderRadius: AppTokens.rMd,
-                ),
-                child: const Icon(Icons.pets, color: Colors.white, size: 22),
-              ),
-              const SizedBox(height: 24),
-              const Text('Welcome\nback to Pawly.', style: PawlyTypography.displayMedium),
-              const SizedBox(height: 8),
-              const Text(
-                'Sign in to check today’s care agenda, medical history, and appointments.',
-                style: PawlyTypography.bodyLarge,
-              ),
-
-              const SizedBox(height: 28),
-
-              // 1-Click Explore Demo Box (8px Card)
-              PawlyCard(
-                backgroundColor: PawlyColors.surfaceWarm,
-                padding: const EdgeInsets.all(14),
-                child: Row(
+        body: SafeArea(
+            child: SingleChildScrollView(
+                padding: const EdgeInsets.all(24),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Explore Demo',
-                            style: TextStyle(
-                              fontSize: 13,
-                              fontWeight: FontWeight.w800,
-                              color: PawlyColors.black,
-                            ),
-                          ),
-                          SizedBox(height: 2),
-                          Text(
-                            'Tour Pawly with seeded sample pets, care routines & medical records.',
-                            style: PawlyTypography.caption,
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    PawlyButton(
-                      text: 'Demo Enter',
-                      onPressed: widget.onExploreDemo ?? widget.onLoginSuccess,
-                      isSmall: true,
-                    ),
-                  ],
-                ),
-              ),
-
-              const SizedBox(height: 24),
-
-              // Email Input
-              const Text('EMAIL ADDRESS', style: PawlyTypography.eyebrow),
-              const SizedBox(height: 6),
-              TextField(
-                controller: _emailController,
-                keyboardType: TextInputType.emailAddress,
-                style: PawlyTypography.bodyLarge,
-                decoration: InputDecoration(
-                  hintText: 'you@example.com',
-                  hintStyle: PawlyTypography.bodyMedium,
-                  filled: true,
-                  fillColor: Colors.white,
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-                  border: OutlineInputBorder(
-                    borderRadius: AppTokens.rMd,
-                    borderSide: const BorderSide(color: PawlyColors.border),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: AppTokens.rMd,
-                    borderSide: const BorderSide(color: PawlyColors.border),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: AppTokens.rMd,
-                    borderSide: const BorderSide(color: PawlyColors.black, width: 1.5),
-                  ),
-                ),
-              ),
-
-              const SizedBox(height: 18),
-
-              // Password Input
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text('PASSWORD', style: PawlyTypography.eyebrow),
-                  Flexible(
-                    child: GestureDetector(
-                      onTap: widget.onNavigateToForgotPassword,
-                      child: const Text(
-                        'Forgot password?',
-                        overflow: TextOverflow.ellipsis,
+                    const SizedBox(height: 32),
+                    CircleAvatar(
+                        radius: 30,
+                        backgroundColor: scheme.primaryContainer,
+                        child: Icon(Icons.pets,
+                            size: 30, color: scheme.onPrimaryContainer)),
+                    const SizedBox(height: 28),
+                    const Text('Welcome\nback to Pawly.',
                         style: TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
-                          color: PawlyColors.black,
-                          decoration: TextDecoration.underline,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 6),
-              TextField(
-                controller: _passwordController,
-                obscureText: _obscurePassword,
-                style: PawlyTypography.bodyLarge,
-                decoration: InputDecoration(
-                  hintText: '••••••••',
-                  hintStyle: PawlyTypography.bodyMedium,
-                  filled: true,
-                  fillColor: Colors.white,
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-                  suffixIcon: IconButton(
-                    icon: Icon(
-                      _obscurePassword ? Icons.visibility_off : Icons.visibility,
-                      color: PawlyColors.tertiary,
-                      size: 18,
-                    ),
-                    onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
-                  ),
-                  border: OutlineInputBorder(
-                    borderRadius: AppTokens.rMd,
-                    borderSide: const BorderSide(color: PawlyColors.border),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: AppTokens.rMd,
-                    borderSide: const BorderSide(color: PawlyColors.border),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: AppTokens.rMd,
-                    borderSide: const BorderSide(color: PawlyColors.black, width: 1.5),
-                  ),
-                ),
-              ),
-
-              const SizedBox(height: 24),
-
-              PawlyButton(text: 'Sign in to Pawly',
-                
-                onPressed: widget.onLoginSuccess,
-                
-              ),
-
-              const SizedBox(height: 24),
-
-              Center(
-                child: Wrap(
-                  alignment: WrapAlignment.center,
-                  crossAxisAlignment: WrapCrossAlignment.center,
-                  children: [
+                            fontSize: 34,
+                            fontWeight: FontWeight.w800,
+                            height: 1.12)),
+                    const SizedBox(height: 14),
                     const Text(
-                      'New to Pawly? ',
-                      style: PawlyTypography.bodyMedium,
-                    ),
-                    GestureDetector(
-                      onTap: widget.onNavigateToSignup,
-                      child: const Text(
-                        'Create an account',
+                        'A little home for your pet’s routines, health and favourite moments.',
+                        style: TextStyle(fontSize: 17, height: 1.5)),
+                    const SizedBox(height: 32),
+                    TextField(
+                        controller: _name,
+                        textCapitalization: TextCapitalization.words,
+                        autofillHints: const [AutofillHints.givenName],
+                        textInputAction: TextInputAction.done,
+                        onSubmitted: (_) => _continue(),
+                        decoration: InputDecoration(
+                            labelText: 'What should we call you?',
+                            hintText: 'Your name',
+                            errorText: _error)),
+                    const SizedBox(height: 20),
+                    PawlyButton(
+                        text: _busy ? 'Saving…' : 'Open my Pawly',
+                        onPressed: _continue),
+                    const SizedBox(height: 16),
+                    Text(
+                        'Saved privately on this device. No password or online account is required.',
                         style: TextStyle(
-                          color: PawlyColors.black,
-                          fontWeight: FontWeight.w700,
-                          fontSize: 13,
-                          decoration: TextDecoration.underline,
-                        ),
-                      ),
-                    ),
+                            color: scheme.onSurfaceVariant,
+                            fontSize: 13,
+                            height: 1.5)),
+                    const SizedBox(height: 32),
+                    const Divider(),
+                    const SizedBox(height: 24),
+                    const Text('A peek before you begin',
+                        style: TextStyle(
+                            fontSize: 18, fontWeight: FontWeight.w700)),
+                    const SizedBox(height: 8),
+                    Text(
+                        widget.repository.pets.isEmpty
+                            ? 'Explore an example pet family and their care routines.'
+                            : 'Your pets are already here. Continue to see their care.',
+                        style: TextStyle(
+                            color: scheme.onSurfaceVariant, height: 1.5)),
+                    const SizedBox(height: 16),
+                    PawlyButton(
+                        text: widget.repository.pets.isEmpty
+                            ? 'Demo Enter'
+                            : 'Continue with my pets',
+                        isSecondary: true,
+                        onPressed: () async {
+                          if (_busy) return;
+                          setState(() => _busy = true);
+                          try {
+                            await widget.repository.seedDemoData();
+                            if (mounted) widget.onLoginSuccess();
+                          } catch (_) {
+                            if (mounted) {
+                              setState(() => _error =
+                                  'Couldn’t open the preview. Please try again.');
+                            }
+                          } finally {
+                            if (mounted) setState(() => _busy = false);
+                          }
+                        }),
                   ],
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
+                ))));
   }
 }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../models/care_schedule.dart';
 import '../../theme/pawly_colors.dart';
 import '../../theme/pawly_typography.dart';
 import '../../theme/app_tokens.dart';
@@ -16,12 +17,23 @@ class PetCalendarScreen extends StatefulWidget {
 }
 
 class _PetCalendarScreenState extends State<PetCalendarScreen> {
+  void _refresh() {
+    if (mounted) setState(() {});
+  }
+
+  @override
+  void dispose() {
+    widget.repository.removeListener(_refresh);
+    super.dispose();
+  }
+
   late DateTime _selectedMonth;
   late DateTime _selectedDay;
 
   @override
   void initState() {
     super.initState();
+    widget.repository.addListener(_refresh);
     final now = DateTime.now();
     _selectedMonth = DateTime(now.year, now.month, 1);
     _selectedDay = DateTime(now.year, now.month, now.day);
@@ -29,20 +41,32 @@ class _PetCalendarScreenState extends State<PetCalendarScreen> {
 
   void _prevMonth() {
     setState(() {
-      _selectedMonth = DateTime(_selectedMonth.year, _selectedMonth.month - 1, 1);
+      _selectedMonth =
+          DateTime(_selectedMonth.year, _selectedMonth.month - 1, 1);
     });
   }
 
   void _nextMonth() {
     setState(() {
-      _selectedMonth = DateTime(_selectedMonth.year, _selectedMonth.month + 1, 1);
+      _selectedMonth =
+          DateTime(_selectedMonth.year, _selectedMonth.month + 1, 1);
     });
   }
 
   String _formatMonthYear(DateTime date) {
     const months = [
-      'January', 'February', 'March', 'April', 'May', 'June',
-      'July', 'August', 'September', 'October', 'November', 'December'
+      'January',
+      'February',
+      'March',
+      'April',
+      'May',
+      'June',
+      'July',
+      'August',
+      'September',
+      'October',
+      'November',
+      'December'
     ];
     return '${months[date.month - 1]} ${date.year}';
   }
@@ -59,9 +83,8 @@ class _PetCalendarScreenState extends State<PetCalendarScreen> {
     final pet = widget.repository.activePet;
     final selectedDateStr = _formatDateString(_selectedDay);
 
-    final routines = widget.repository.activePetRoutines.where((r) {
-      return r.date == selectedDateStr;
-    }).toList();
+    final routines =
+        widget.repository.routinesForDate(_selectedDay, petId: pet.id);
 
     final appointments = widget.repository.activePetAppointments.where((a) {
       return a.date == selectedDateStr;
@@ -70,7 +93,7 @@ class _PetCalendarScreenState extends State<PetCalendarScreen> {
     final medications = widget.repository.activePetMedications;
 
     return Scaffold(
-      backgroundColor: PawlyColors.background,
+      backgroundColor: PawlyColors.resolve(context, PawlyColors.background),
       appBar: PawlyAppBar(title: '${pet.name}’s Calendar'),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -80,21 +103,28 @@ class _PetCalendarScreenState extends State<PetCalendarScreen> {
             children: [
               // Month Selector Header (8px Card)
               PawlyCard(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     IconButton(
-                      icon:  const Icon(Icons.chevron_left_rounded, color: PawlyColors.black),
+                      icon: Icon(Icons.chevron_left_rounded,
+                          color:
+                              PawlyColors.resolve(context, PawlyColors.black)),
                       onPressed: _prevMonth,
                       visualDensity: VisualDensity.compact,
                     ),
-                    Text(
+                    Flexible(
+                        child: Text(
                       _formatMonthYear(_selectedMonth),
-                      style: PawlyTypography.titleMedium,
-                    ),
+                      style: PawlyTypography.resolve(
+                          context, PawlyTypography.titleMedium),
+                    )),
                     IconButton(
-                      icon:  const Icon(Icons.chevron_right_rounded, color: PawlyColors.black),
+                      icon: Icon(Icons.chevron_right_rounded,
+                          color:
+                              PawlyColors.resolve(context, PawlyColors.black)),
                       onPressed: _nextMonth,
                       visualDensity: VisualDensity.compact,
                     ),
@@ -134,23 +164,29 @@ class _PetCalendarScreenState extends State<PetCalendarScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
+                  Flexible(
+                      child: Text(
                     'Agenda for ${_selectedDay.month}/${_selectedDay.day}/${_selectedDay.year}',
-                    style: PawlyTypography.titleSmall,
-                  ),
+                    style: PawlyTypography.resolve(
+                        context, PawlyTypography.titleSmall),
+                  )),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                     decoration: BoxDecoration(
-                      color: PawlyColors.border,
+                      color: PawlyColors.resolve(context, PawlyColors.border),
                       borderRadius: AppTokens.rSm,
-                      border: Border.all(color: PawlyColors.border, width: 0.8),
+                      border: Border.all(
+                          color:
+                              PawlyColors.resolve(context, PawlyColors.border),
+                          width: 0.8),
                     ),
                     child: Text(
                       '${routines.length + appointments.length} events',
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 11,
                         fontWeight: FontWeight.w700,
-                        color: PawlyColors.black,
+                        color: PawlyColors.resolve(context, PawlyColors.black),
                       ),
                     ),
                   ),
@@ -160,16 +196,20 @@ class _PetCalendarScreenState extends State<PetCalendarScreen> {
               const SizedBox(height: 10),
 
               if (routines.isEmpty && appointments.isEmpty)
-                const PawlyCard(
-                  padding: EdgeInsets.all(16),
+                PawlyCard(
+                  padding: const EdgeInsets.all(16),
                   child: Row(
                     children: [
-                      Icon(Icons.event_available_rounded, color: PawlyColors.black, size: 20),
-                      SizedBox(width: 12),
+                      Icon(Icons.event_available_rounded,
+                          color:
+                              PawlyColors.resolve(context, PawlyColors.black),
+                          size: 20),
+                      const SizedBox(width: 12),
                       Expanded(
                         child: Text(
                           'No scheduled appointments or care routines on this day.',
-                          style: PawlyTypography.bodyMedium,
+                          style: PawlyTypography.resolve(
+                              context, PawlyTypography.bodyMedium),
                         ),
                       ),
                     ],
@@ -188,7 +228,20 @@ class _PetCalendarScreenState extends State<PetCalendarScreen> {
                               final parts = appt.date.split('-');
                               if (parts.length >= 2) {
                                 final m = int.tryParse(parts[1]) ?? 1;
-                                const months = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
+                                const months = [
+                                  'JAN',
+                                  'FEB',
+                                  'MAR',
+                                  'APR',
+                                  'MAY',
+                                  'JUN',
+                                  'JUL',
+                                  'AUG',
+                                  'SEP',
+                                  'OCT',
+                                  'NOV',
+                                  'DEC'
+                                ];
                                 return months[(m - 1).clamp(0, 11)];
                               }
                               return 'APPT';
@@ -202,24 +255,30 @@ class _PetCalendarScreenState extends State<PetCalendarScreen> {
                               children: [
                                 Text(
                                   appt.purpose,
-                                  style: PawlyTypography.titleSmall,
+                                  style: PawlyTypography.resolve(
+                                      context, PawlyTypography.titleSmall),
                                 ),
                                 const SizedBox(height: 2),
                                 Text(
                                   '${appt.time} • ${appt.clinic}',
-                                  style: PawlyTypography.bodyMedium,
+                                  style: PawlyTypography.resolve(
+                                      context, PawlyTypography.bodyMedium),
                                 ),
                                 if (appt.vetName.isNotEmpty) ...[
                                   const SizedBox(height: 2),
                                   Text(
                                     'With ${appt.vetName}',
-                                    style: PawlyTypography.caption,
+                                    style: PawlyTypography.resolve(
+                                        context, PawlyTypography.caption),
                                   ),
                                 ],
                               ],
                             ),
                           ),
-                          const Icon(Icons.medical_services_outlined, color: PawlyColors.black, size: 18),
+                          Icon(Icons.medical_services_outlined,
+                              color: PawlyColors.resolve(
+                                  context, PawlyColors.black),
+                              size: 18),
                         ],
                       ),
                     ),
@@ -231,10 +290,12 @@ class _PetCalendarScreenState extends State<PetCalendarScreen> {
                     child: CareTimelineItem(
                       time: routine.time,
                       title: routine.title,
-                      subtitle: '${routine.category.displayName} • ${routine.recurrence}',
+                      subtitle:
+                          '${routine.category.displayName} • ${routine.recurrence}',
                       isCompleted: routine.isCompleted,
                       assignedTo: routine.assignedTo,
-                      onToggle: () => widget.repository.toggleRoutine(routine.id),
+                      onToggle: () => widget.repository
+                          .toggleRoutine(routine.id, date: _selectedDay),
                     ),
                   )),
 
@@ -242,7 +303,9 @@ class _PetCalendarScreenState extends State<PetCalendarScreen> {
 
               // Active Medications
               if (medications.isNotEmpty) ...[
-                const Text('ONGOING MEDICATIONS', style: PawlyTypography.eyebrow),
+                Text('ONGOING MEDICATIONS',
+                    style: PawlyTypography.resolve(
+                        context, PawlyTypography.eyebrow)),
                 const SizedBox(height: 8),
                 ...medications.map((m) => Container(
                       margin: const EdgeInsets.only(bottom: 8),
@@ -253,10 +316,14 @@ class _PetCalendarScreenState extends State<PetCalendarScreen> {
                             Container(
                               padding: const EdgeInsets.all(6),
                               decoration: BoxDecoration(
-                                color: PawlyColors.border,
+                                color: PawlyColors.resolve(
+                                    context, PawlyColors.border),
                                 borderRadius: AppTokens.rSm,
                               ),
-                              child: const Icon(Icons.medication_outlined, color: PawlyColors.black, size: 16),
+                              child: Icon(Icons.medication_outlined,
+                                  color: PawlyColors.resolve(
+                                      context, PawlyColors.black),
+                                  size: 16),
                             ),
                             const SizedBox(width: 10),
                             Expanded(
@@ -265,11 +332,13 @@ class _PetCalendarScreenState extends State<PetCalendarScreen> {
                                 children: [
                                   Text(
                                     m.name,
-                                    style: PawlyTypography.titleSmall,
+                                    style: PawlyTypography.resolve(
+                                        context, PawlyTypography.titleSmall),
                                   ),
                                   Text(
                                     '${m.dosage} • ${m.frequency}',
-                                    style: PawlyTypography.caption,
+                                    style: PawlyTypography.resolve(
+                                        context, PawlyTypography.caption),
                                   ),
                                 ],
                               ),
@@ -287,8 +356,10 @@ class _PetCalendarScreenState extends State<PetCalendarScreen> {
   }
 
   Widget _buildMonthGrid() {
-    final firstDayOfMonth = DateTime(_selectedMonth.year, _selectedMonth.month, 1);
-    final daysInMonth = DateTime(_selectedMonth.year, _selectedMonth.month + 1, 0).day;
+    final firstDayOfMonth =
+        DateTime(_selectedMonth.year, _selectedMonth.month, 1);
+    final daysInMonth =
+        DateTime(_selectedMonth.year, _selectedMonth.month + 1, 0).day;
     final leadingBlanks = firstDayOfMonth.weekday % 7;
 
     final List<Widget> dayWidgets = [];
@@ -305,8 +376,11 @@ class _PetCalendarScreenState extends State<PetCalendarScreen> {
 
       final dateStr = _formatDateString(date);
 
-      final hasRoutines = widget.repository.activePetRoutines.any((r) => r.date == dateStr);
-      final hasAppts = widget.repository.activePetAppointments.any((a) => a.date == dateStr);
+      final hasRoutines = widget.repository.allRoutines.any((r) =>
+          r.petId == widget.repository.selectedPetId &&
+          CareSchedule.isDue(r, date));
+      final hasAppts =
+          widget.repository.activePetAppointments.any((a) => a.date == dateStr);
 
       dayWidgets.add(
         GestureDetector(
@@ -330,7 +404,9 @@ class _PetCalendarScreenState extends State<PetCalendarScreen> {
                   style: TextStyle(
                     fontSize: 12,
                     fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
-                    color: isSelected ? Colors.white : PawlyColors.black,
+                    color: isSelected
+                        ? Colors.white
+                        : PawlyColors.resolve(context, PawlyColors.black),
                   ),
                 ),
                 if (hasRoutines || hasAppts)
@@ -345,7 +421,10 @@ class _PetCalendarScreenState extends State<PetCalendarScreen> {
                             height: 3,
                             margin: const EdgeInsets.symmetric(horizontal: 1),
                             decoration: BoxDecoration(
-                              color: isSelected ? Colors.white : PawlyColors.charcoal,
+                              color: isSelected
+                                  ? Colors.white
+                                  : PawlyColors.resolve(
+                                      context, PawlyColors.charcoal),
                               shape: BoxShape.circle,
                             ),
                           ),
@@ -355,7 +434,10 @@ class _PetCalendarScreenState extends State<PetCalendarScreen> {
                             height: 3,
                             margin: const EdgeInsets.symmetric(horizontal: 1),
                             decoration: BoxDecoration(
-                              color: isSelected ? Colors.white70 : PawlyColors.black,
+                              color: isSelected
+                                  ? Colors.white70
+                                  : PawlyColors.resolve(
+                                      context, PawlyColors.black),
                               shape: BoxShape.circle,
                             ),
                           ),
@@ -369,12 +451,13 @@ class _PetCalendarScreenState extends State<PetCalendarScreen> {
       );
     }
 
-    return Wrap(
-      spacing: 6,
-      runSpacing: 6,
-      alignment: WrapAlignment.start,
-      children: dayWidgets,
-    );
+    return GridView.count(
+        crossAxisCount: 7,
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        mainAxisSpacing: 4,
+        crossAxisSpacing: 4,
+        children: dayWidgets);
   }
 }
 
@@ -385,12 +468,12 @@ class _WeekDayLabel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      width: 38,
+    return Expanded(
       child: Center(
         child: Text(
           label,
-          style: PawlyTypography.eyebrow.copyWith(fontSize: 10),
+          style: PawlyTypography.resolve(context, PawlyTypography.eyebrow)
+              .copyWith(fontSize: 10),
         ),
       ),
     );

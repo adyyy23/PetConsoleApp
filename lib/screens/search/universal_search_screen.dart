@@ -5,6 +5,12 @@ import '../../theme/app_tokens.dart';
 import '../../widgets/widgets.dart';
 import '../../repositories/pawly_repository.dart';
 import '../../models/models.dart';
+import '../reminders/reminders_screen.dart';
+import '../timeline/pet_timeline_screen.dart';
+import '../vaccination/vaccination_passport_screen.dart';
+import '../medication/medication_screen.dart';
+import '../appointments/appointments_screen.dart';
+import '../documents/documents_screen.dart';
 
 class UniversalSearchScreen extends StatefulWidget {
   final PawlyRepository repository;
@@ -25,6 +31,7 @@ class _UniversalSearchScreenState extends State<UniversalSearchScreen> {
     'Care',
     'Health',
     'Medication',
+    'Vaccination',
     'Appointment',
     'Memory',
     'Document',
@@ -35,10 +42,12 @@ class _UniversalSearchScreenState extends State<UniversalSearchScreen> {
   void initState() {
     super.initState();
     _searchController.addListener(_onSearchChanged);
+    widget.repository.addListener(_onSearchChanged);
   }
 
   @override
   void dispose() {
+    widget.repository.removeListener(_onSearchChanged);
     _searchController.removeListener(_onSearchChanged);
     _searchController.dispose();
     super.dispose();
@@ -48,6 +57,65 @@ class _UniversalSearchScreenState extends State<UniversalSearchScreen> {
     setState(() {
       _results = widget.repository.search(_searchController.text);
     });
+  }
+
+  void _openResult(SearchResultItem item) {
+    final object = item.originalObject;
+    if (object is Pet) {
+      widget.repository.selectPet(object.id);
+      showModalBottomSheet(
+          context: context,
+          isScrollControlled: true,
+          builder: (ctx) => PawlySheet(
+                  child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                    Text(object.name,
+                        style: Theme.of(ctx).textTheme.headlineMedium),
+                    const SizedBox(height: 12),
+                    Text('${object.animalType} · ${object.breed}'),
+                    Text('${object.ageYears} years · ${object.weightKg} kg'),
+                    const SizedBox(height: 12),
+                    Text('Allergies: ${object.allergies}'),
+                    Text(
+                        'Microchip: ${object.microchipId.isEmpty ? "Not recorded" : object.microchipId}'),
+                    if (object.notes.isNotEmpty)
+                      Padding(
+                          padding: const EdgeInsets.only(top: 12),
+                          child: Text(object.notes)),
+                  ])));
+      return;
+    }
+    final String? petId = object is CareRoutine
+        ? object.petId
+        : object is HealthEvent
+            ? object.petId
+            : object is VaccinationRecord
+                ? object.petId
+                : object is Medication
+                    ? object.petId
+                    : object is Appointment
+                        ? object.petId
+                        : object is MemoryEntry
+                            ? object.petId
+                            : object is DocumentItem
+                                ? object.petId
+                                : null;
+    if (petId != null) widget.repository.selectPet(petId);
+    final repo = widget.repository;
+    final Widget screen = object is VaccinationRecord
+        ? VaccinationPassportScreen(repository: repo)
+        : object is Medication
+            ? MedicationScreen(repository: repo)
+            : object is Appointment
+                ? AppointmentsScreen(repository: repo)
+                : object is DocumentItem
+                    ? DocumentsScreen(repository: repo)
+                    : object is CareRoutine
+                        ? RemindersScreen(repository: repo)
+                        : PetTimelineScreen(repository: repo);
+    Navigator.push(context, MaterialPageRoute(builder: (_) => screen));
   }
 
   IconData _getCategoryIcon(String category) {
@@ -78,7 +146,7 @@ class _UniversalSearchScreenState extends State<UniversalSearchScreen> {
         : _results.where((r) => r.category == _selectedCategory).toList();
 
     return Scaffold(
-      backgroundColor: PawlyColors.background,
+      backgroundColor: PawlyColors.resolve(context, PawlyColors.background),
       appBar: const PawlyAppBar(title: 'Universal Search'),
       body: SafeArea(
         child: Column(
@@ -88,26 +156,36 @@ class _UniversalSearchScreenState extends State<UniversalSearchScreen> {
               padding: const EdgeInsets.fromLTRB(20, 12, 20, 10),
               child: Container(
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: PawlyColors.resolve(context, PawlyColors.surface),
                   borderRadius: AppTokens.rMd,
-                  border: Border.all(color: PawlyColors.border, width: 1.0),
+                  border: Border.all(
+                      color: PawlyColors.resolve(context, PawlyColors.border),
+                      width: 1.0),
                 ),
                 child: TextField(
                   controller: _searchController,
                   autofocus: true,
-                  style: PawlyTypography.bodyLarge,
+                  style: PawlyTypography.resolve(
+                      context, PawlyTypography.bodyLarge),
                   decoration: InputDecoration(
                     hintText: 'Search routines, medications, records...',
-                    hintStyle: PawlyTypography.bodyMedium,
-                    prefixIcon: const Icon(Icons.search_rounded, color: PawlyColors.black, size: 20),
+                    hintStyle: PawlyTypography.resolve(
+                        context, PawlyTypography.bodyMedium),
+                    prefixIcon: Icon(Icons.search_rounded,
+                        color: PawlyColors.resolve(context, PawlyColors.black),
+                        size: 20),
                     suffixIcon: _searchController.text.isNotEmpty
                         ? IconButton(
-                            icon:  const Icon(Icons.clear_rounded, size: 18, color: PawlyColors.tertiary),
+                            icon: Icon(Icons.clear_rounded,
+                                size: 18,
+                                color: PawlyColors.resolve(
+                                    context, PawlyColors.tertiary)),
                             onPressed: () => _searchController.clear(),
                           )
                         : null,
                     border: InputBorder.none,
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                    contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 14, vertical: 12),
                   ),
                 ),
               ),
@@ -127,12 +205,16 @@ class _UniversalSearchScreenState extends State<UniversalSearchScreen> {
                   return GestureDetector(
                     onTap: () => setState(() => _selectedCategory = cat),
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 6),
                       decoration: BoxDecoration(
                         color: isSelected ? PawlyColors.black : Colors.white,
                         borderRadius: AppTokens.rSm,
                         border: Border.all(
-                          color: isSelected ? PawlyColors.black : PawlyColors.border,
+                          color: isSelected
+                              ? PawlyColors.black
+                              : PawlyColors.resolve(
+                                  context, PawlyColors.border),
                           width: 1.0,
                         ),
                       ),
@@ -141,8 +223,11 @@ class _UniversalSearchScreenState extends State<UniversalSearchScreen> {
                         cat,
                         style: TextStyle(
                           fontSize: 12,
-                          fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
-                          color: isSelected ? Colors.white : PawlyColors.black,
+                          fontWeight:
+                              isSelected ? FontWeight.w800 : FontWeight.w600,
+                          color: isSelected
+                              ? Colors.white
+                              : PawlyColors.resolve(context, PawlyColors.black),
                         ),
                       ),
                     ),
@@ -165,21 +250,27 @@ class _UniversalSearchScreenState extends State<UniversalSearchScreen> {
                             Container(
                               padding: const EdgeInsets.all(14),
                               decoration: BoxDecoration(
-                                color: PawlyColors.border,
+                                color: PawlyColors.resolve(
+                                    context, PawlyColors.border),
                                 borderRadius: AppTokens.rMd,
                               ),
-                              child: const Icon(Icons.search_rounded, size: 32, color: PawlyColors.black),
+                              child: Icon(Icons.search_rounded,
+                                  size: 32,
+                                  color: PawlyColors.resolve(
+                                      context, PawlyColors.black)),
                             ),
                             const SizedBox(height: 16),
-                            const Text(
+                            Text(
                               'Search Across Everything',
-                              style: PawlyTypography.titleMedium,
+                              style: PawlyTypography.resolve(
+                                  context, PawlyTypography.titleMedium),
                             ),
                             const SizedBox(height: 6),
-                            const Text(
+                            Text(
                               'Search pet profiles, care schedules, vet checkups, medications, memories, and documents.',
                               textAlign: TextAlign.center,
-                              style: PawlyTypography.bodyMedium,
+                              style: PawlyTypography.resolve(
+                                  context, PawlyTypography.bodyMedium),
                             ),
                           ],
                         ),
@@ -192,16 +283,21 @@ class _UniversalSearchScreenState extends State<UniversalSearchScreen> {
                             child: Column(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                const Icon(Icons.search_off_rounded, size: 36, color: PawlyColors.tertiary),
+                                Icon(Icons.search_off_rounded,
+                                    size: 36,
+                                    color: PawlyColors.resolve(
+                                        context, PawlyColors.tertiary)),
                                 const SizedBox(height: 12),
                                 Text(
                                   'No results for "${_searchController.text}"',
-                                  style: PawlyTypography.titleSmall,
+                                  style: PawlyTypography.resolve(
+                                      context, PawlyTypography.titleSmall),
                                 ),
                                 const SizedBox(height: 4),
-                                const Text(
+                                Text(
                                   'Try checking your spelling or choosing another category.',
-                                  style: PawlyTypography.bodyMedium,
+                                  style: PawlyTypography.resolve(
+                                      context, PawlyTypography.bodyMedium),
                                 ),
                               ],
                             ),
@@ -210,12 +306,14 @@ class _UniversalSearchScreenState extends State<UniversalSearchScreen> {
                       : ListView.separated(
                           padding: const EdgeInsets.fromLTRB(20, 4, 20, 24),
                           itemCount: filteredResults.length,
-                          separatorBuilder: (_, __) => const SizedBox(height: 8),
+                          separatorBuilder: (_, __) =>
+                              const SizedBox(height: 8),
                           itemBuilder: (context, idx) {
                             final item = filteredResults[idx];
                             final icon = _getCategoryIcon(item.category);
 
                             return PawlyCard(
+                              onTap: () => _openResult(item),
                               padding: const EdgeInsets.all(14),
                               child: Row(
                                 children: [
@@ -223,25 +321,33 @@ class _UniversalSearchScreenState extends State<UniversalSearchScreen> {
                                     width: 36,
                                     height: 36,
                                     decoration: BoxDecoration(
-                                      color: PawlyColors.border,
+                                      color: PawlyColors.resolve(
+                                          context, PawlyColors.border),
                                       borderRadius: AppTokens.rSm,
                                     ),
-                                    child: Icon(icon, color: PawlyColors.black, size: 18),
+                                    child: Icon(icon,
+                                        color: PawlyColors.resolve(
+                                            context, PawlyColors.black),
+                                        size: 18),
                                   ),
                                   const SizedBox(width: 12),
                                   Expanded(
                                     child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
                                         Row(
-                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
                                           children: [
                                             Expanded(
                                               child: Text(
                                                 item.title,
                                                 maxLines: 1,
                                                 overflow: TextOverflow.ellipsis,
-                                                style: PawlyTypography.titleSmall,
+                                                style: PawlyTypography.resolve(
+                                                    context,
+                                                    PawlyTypography.titleSmall),
                                               ),
                                             ),
                                             StatusBadge(label: item.category),
@@ -252,13 +358,17 @@ class _UniversalSearchScreenState extends State<UniversalSearchScreen> {
                                           item.subtitle,
                                           maxLines: 1,
                                           overflow: TextOverflow.ellipsis,
-                                          style: PawlyTypography.bodyMedium,
+                                          style: PawlyTypography.resolve(
+                                              context,
+                                              PawlyTypography.bodyMedium),
                                         ),
                                         if (item.date.isNotEmpty) ...[
                                           const SizedBox(height: 2),
                                           Text(
                                             item.date,
-                                            style: PawlyTypography.caption,
+                                            style: PawlyTypography.resolve(
+                                                context,
+                                                PawlyTypography.caption),
                                           ),
                                         ],
                                       ],

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import '../../models/models.dart';
 import '../../repositories/pawly_repository.dart';
 import '../../theme/pawly_colors.dart';
@@ -14,7 +15,8 @@ class AdoptionDiscoveryScreen extends StatefulWidget {
   });
 
   @override
-  State<AdoptionDiscoveryScreen> createState() => _AdoptionDiscoveryScreenState();
+  State<AdoptionDiscoveryScreen> createState() =>
+      _AdoptionDiscoveryScreenState();
 }
 
 class _AdoptionDiscoveryScreenState extends State<AdoptionDiscoveryScreen> {
@@ -34,21 +36,26 @@ class _AdoptionDiscoveryScreenState extends State<AdoptionDiscoveryScreen> {
     final allPets = widget.repository.adoptionPets;
     final pets = _filter == 'All'
         ? allPets
-        : allPets.where((p) => p.species.toLowerCase() == _filter.toLowerCase()).toList();
+        : allPets
+            .where((p) => p.species.toLowerCase() == _filter.toLowerCase())
+            .toList();
 
     return Scaffold(
-      backgroundColor: PawlyColors.background,
+      backgroundColor: PawlyColors.resolve(context, PawlyColors.background),
       body: CustomScrollView(
         physics: const BouncingScrollPhysics(),
         slivers: [
           SliverAppBar(
-            backgroundColor: PawlyColors.surface,
+            backgroundColor: PawlyColors.resolve(context, PawlyColors.surface),
             elevation: 0,
             pinned: true,
             expandedHeight: 120,
             leading: Navigator.canPop(context)
                 ? IconButton(
-                    icon:  const Icon(Icons.arrow_back_ios_new_rounded, color: PawlyColors.textPrimary, size: 20),
+                    icon: Icon(Icons.arrow_back_ios_new_rounded,
+                        color: PawlyColors.resolve(
+                            context, PawlyColors.textPrimary),
+                        size: 20),
                     onPressed: () => Navigator.pop(context),
                   )
                 : null,
@@ -56,8 +63,10 @@ class _AdoptionDiscoveryScreenState extends State<AdoptionDiscoveryScreen> {
               titlePadding: const EdgeInsets.only(left: 20, bottom: 16),
               title: Text(
                 'Adopt & Foster',
-                style: PawlyTypography.titleMedium.copyWith(
-                  color: PawlyColors.textPrimary,
+                style: PawlyTypography.resolve(
+                        context, PawlyTypography.titleMedium)
+                    .copyWith(
+                  color: PawlyColors.resolve(context, PawlyColors.textPrimary),
                   fontWeight: FontWeight.w700,
                 ),
               ),
@@ -68,19 +77,29 @@ class _AdoptionDiscoveryScreenState extends State<AdoptionDiscoveryScreen> {
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.fromLTRB(20, 16, 20, 16),
-              child: Row(
+              child: Wrap(
+                spacing: 8,
+                runSpacing: 8,
                 children: ['All', 'Dog', 'Cat'].map((category) {
                   final isSelected = _filter == category;
                   return Padding(
                     padding: const EdgeInsets.only(right: 8),
                     child: ChoiceChip(
-                      label: Text(category == 'All' ? 'All Pets' : '${category}s'),
+                      label:
+                          Text(category == 'All' ? 'All Pets' : '${category}s'),
                       selected: isSelected,
                       selectedColor: PawlyColors.black,
-                      backgroundColor: PawlyColors.surface,
-                      labelStyle: PawlyTypography.eyebrow.copyWith(
-                        color: isSelected ? Colors.white : PawlyColors.textPrimary,
-                        fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                      backgroundColor:
+                          PawlyColors.resolve(context, PawlyColors.surface),
+                      labelStyle: PawlyTypography.resolve(
+                              context, PawlyTypography.eyebrow)
+                          .copyWith(
+                        color: isSelected
+                            ? Colors.white
+                            : PawlyColors.resolve(
+                                context, PawlyColors.textPrimary),
+                        fontWeight:
+                            isSelected ? FontWeight.w700 : FontWeight.w500,
                       ),
                       onSelected: (val) {
                         if (val) setState(() => _filter = category);
@@ -130,9 +149,10 @@ class _AdoptionCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: PawlyColors.surface,
+        color: PawlyColors.resolve(context, PawlyColors.surface),
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: PawlyColors.border),
+        border:
+            Border.all(color: PawlyColors.resolve(context, PawlyColors.border)),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.04),
@@ -149,12 +169,15 @@ class _AdoptionCard extends StatelessWidget {
             children: [
               AspectRatio(
                 aspectRatio: 16 / 10,
-                child: Image.network(
-                  pet.imageUrl,
-                  fit: BoxFit.cover,
+                child: Image(
+                  image: pawlyImageProvider(pet.imageUrl),
+                  fit: BoxFit.contain,
                   errorBuilder: (_, __, ___) => Container(
-                    color: PawlyColors.border,
-                    child: const Icon(Icons.pets_rounded, size: 50, color: PawlyColors.tertiary),
+                    color: PawlyColors.resolve(context, PawlyColors.border),
+                    child: Icon(Icons.pets_rounded,
+                        size: 50,
+                        color:
+                            PawlyColors.resolve(context, PawlyColors.tertiary)),
                   ),
                 ),
               ),
@@ -163,7 +186,8 @@ class _AdoptionCard extends StatelessWidget {
                 right: 14,
                 child: StatusBadge(
                   label: pet.fosterStatus,
-                  backgroundColor: PawlyColors.black,
+                  backgroundColor:
+                      PawlyColors.resolve(context, PawlyColors.black),
                   textColor: Colors.white,
                 ),
               ),
@@ -177,29 +201,41 @@ class _AdoptionCard extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
+                    Flexible(
+                        child: Text(
                       pet.name,
-                      style: PawlyTypography.titleLarge.copyWith(fontWeight: FontWeight.w700),
-                    ),
-                    Text(
+                      style: PawlyTypography.resolve(
+                              context, PawlyTypography.titleLarge)
+                          .copyWith(fontWeight: FontWeight.w700),
+                    )),
+                    Flexible(
+                        child: Text(
                       '${pet.ageYears.toStringAsFixed(1)} yrs old',
-                      style: PawlyTypography.bodyMedium.copyWith(color: PawlyColors.secondary),
-                    ),
+                      style: PawlyTypography.resolve(
+                              context, PawlyTypography.bodyMedium)
+                          .copyWith(
+                              color: PawlyColors.resolve(
+                                  context, PawlyColors.secondary)),
+                    )),
                   ],
                 ),
                 const SizedBox(height: 4),
                 Text(
                   '${pet.breed} • ${pet.species}',
-                  style: PawlyTypography.bodyMedium.copyWith(
-                    color: PawlyColors.secondary,
+                  style: PawlyTypography.resolve(
+                          context, PawlyTypography.bodyMedium)
+                      .copyWith(
+                    color: PawlyColors.resolve(context, PawlyColors.secondary),
                     fontWeight: FontWeight.w500,
                   ),
                 ),
                 const SizedBox(height: 12),
                 Text(
                   pet.bio,
-                  style: PawlyTypography.bodyMedium.copyWith(
-                    color: PawlyColors.secondary,
+                  style: PawlyTypography.resolve(
+                          context, PawlyTypography.bodyMedium)
+                      .copyWith(
+                    color: PawlyColors.resolve(context, PawlyColors.secondary),
                     height: 1.4,
                   ),
                 ),
@@ -209,7 +245,6 @@ class _AdoptionCard extends StatelessWidget {
                     Expanded(
                       child: PawlyButton(
                         text: 'Meet ${pet.name}',
-                        
                         onPressed: onInquire,
                       ),
                     ),
@@ -235,14 +270,15 @@ class _InquiryBottomSheet extends StatefulWidget {
 
 class _InquiryBottomSheetState extends State<_InquiryBottomSheet> {
   late TextEditingController _messageController;
-  final _emailController = TextEditingController(text: 'sarah.miller@example.com');
-  final _phoneController = TextEditingController(text: '+1 (555) 234-5678');
+  final _emailController = TextEditingController();
+  final _phoneController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
     _messageController = TextEditingController(
-      text: 'Hi! I would love to schedule a meet-and-greet with ${widget.pet.name}. I have experience with ${widget.pet.species.toLowerCase()}s and a pet-safe home.',
+      text:
+          'Hi! I would love to schedule a meet-and-greet with ${widget.pet.name}. I have experience with ${widget.pet.species.toLowerCase()}s and a pet-safe home.',
     );
   }
 
@@ -257,11 +293,12 @@ class _InquiryBottomSheetState extends State<_InquiryBottomSheet> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: const BoxDecoration(
-        color: PawlyColors.surface,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+      decoration: BoxDecoration(
+        color: PawlyColors.resolve(context, PawlyColors.surface),
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
       ),
-      padding: EdgeInsets.fromLTRB(20, 20, 20, MediaQuery.of(context).viewInsets.bottom + 24),
+      padding: EdgeInsets.fromLTRB(
+          20, 20, 20, MediaQuery.of(context).viewInsets.bottom + 24),
       child: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -272,7 +309,7 @@ class _InquiryBottomSheetState extends State<_InquiryBottomSheet> {
                 width: 40,
                 height: 4,
                 decoration: BoxDecoration(
-                  color: PawlyColors.border,
+                  color: PawlyColors.resolve(context, PawlyColors.border),
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
@@ -280,18 +317,24 @@ class _InquiryBottomSheetState extends State<_InquiryBottomSheet> {
             const SizedBox(height: 18),
             Text(
               'Inquire about ${widget.pet.name}',
-              style: PawlyTypography.titleMedium.copyWith(fontWeight: FontWeight.w700),
+              style:
+                  PawlyTypography.resolve(context, PawlyTypography.titleMedium)
+                      .copyWith(fontWeight: FontWeight.w700),
             ),
             const SizedBox(height: 6),
             Text(
               'Connect directly with the foster shelter coordinator.',
-              style: PawlyTypography.bodyMedium.copyWith(color: PawlyColors.secondary),
+              style: PawlyTypography.resolve(
+                      context, PawlyTypography.bodyMedium)
+                  .copyWith(
+                      color:
+                          PawlyColors.resolve(context, PawlyColors.secondary)),
             ),
             const SizedBox(height: 18),
-
             TextField(
               controller: _emailController,
-              decoration: const InputDecoration(labelText: 'Your Contact Email'),
+              decoration:
+                  const InputDecoration(labelText: 'Your Contact Email'),
             ),
             const SizedBox(height: 12),
             TextField(
@@ -308,17 +351,21 @@ class _InquiryBottomSheetState extends State<_InquiryBottomSheet> {
               ),
             ),
             const SizedBox(height: 24),
-
             PawlyButton(
-              text: 'Submit Adoption Inquiry',
-              
-              onPressed: () {
+              text: 'Copy Inquiry Draft',
+              onPressed: () async {
+                await Clipboard.setData(ClipboardData(
+                    text:
+                        'Adoption inquiry for ${widget.pet.name}\nFrom: ${_emailController.text}\nPhone: ${_phoneController.text}\n${_messageController.text}'));
+                if (!context.mounted) return;
                 Navigator.pop(context);
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
-                    content: Text('Inquiry sent for ${widget.pet.name}! The coordinator will reach out shortly.'),
+                    content: const Text(
+                        'Inquiry copied. This is an example listing; contact a real shelter to enquire.'),
                     behavior: SnackBarBehavior.floating,
-                    backgroundColor: PawlyColors.black,
+                    backgroundColor:
+                        PawlyColors.resolve(context, PawlyColors.black),
                   ),
                 );
               },

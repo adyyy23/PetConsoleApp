@@ -1,508 +1,313 @@
+import '../../theme/pawly_palette.dart';
 import 'package:flutter/material.dart';
+import '../../models/models.dart';
 import '../../repositories/pawly_repository.dart';
-import '../../theme/pawly_colors.dart';
-import '../../theme/pawly_typography.dart';
-import '../../theme/app_tokens.dart';
 import '../../widgets/widgets.dart';
 import '../adoption/adoption_discovery_screen.dart';
 import '../emergency/emergency_card_screen.dart';
 import '../emergency/lost_pet_mode_screen.dart';
 import '../calendar/pet_calendar_screen.dart';
 import '../search/universal_search_screen.dart';
+import '../timeline/pet_timeline_screen.dart';
+import '../reminders/reminders_screen.dart';
 
 class ProfileSettingsScreen extends StatefulWidget {
   final PawlyRepository repository;
   final VoidCallback onLogout;
-
-  const ProfileSettingsScreen({
-    super.key,
-    required this.repository,
-    required this.onLogout,
-  });
-
+  const ProfileSettingsScreen(
+      {super.key, required this.repository, required this.onLogout});
   @override
   State<ProfileSettingsScreen> createState() => _ProfileSettingsScreenState();
 }
 
 class _ProfileSettingsScreenState extends State<ProfileSettingsScreen> {
-  bool _careNotifications = true;
-  bool _vetReminders = true;
+  void _open(Widget screen) => Navigator.push(
+      context,
+      MaterialPageRoute(
+          builder: (_) => ListenableBuilder(
+              listenable: widget.repository, builder: (_, __) => screen)));
+  Future<void> _editName() async {
+    final name = TextEditingController(text: widget.repository.user.name);
+    final key = GlobalKey<FormState>();
+    await showModalBottomSheet(
+        context: context,
+        isScrollControlled: true,
+        builder: (ctx) => PawlySheet(
+            child: Form(
+                key: key,
+                child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text('Make yourself at home',
+                          style: TextStyle(
+                              fontSize: 24, fontWeight: FontWeight.w700)),
+                      const SizedBox(height: 16),
+                      TextFormField(
+                          controller: name,
+                          autofocus: true,
+                          decoration:
+                              const InputDecoration(labelText: 'Your name'),
+                          validator: (value) => value!.trim().isEmpty
+                              ? 'Enter your name.'
+                              : null),
+                      const SizedBox(height: 20),
+                      PawlyButton(
+                          text: 'Save my name',
+                          onPressed: () async {
+                            if (!key.currentState!.validate()) return;
+                            await widget.repository.updateUser(name.text);
+                            if (ctx.mounted) Navigator.pop(ctx);
+                          }),
+                    ]))));
+    name.dispose();
+  }
 
-  void _showInviteCaregiverSheet() {
-    final nameCtrl = TextEditingController();
-    final emailCtrl = TextEditingController();
-    String role = 'Family Co-owner';
-
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (ctx) => StatefulBuilder(
-        builder: (ctx, setModalState) => Container(
-          decoration: const BoxDecoration(
-            color: PawlyColors.surface,
-            borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-          ),
-          padding: EdgeInsets.fromLTRB(20, 16, 20, MediaQuery.of(ctx).viewInsets.bottom + 24),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Center(
-                child: Container(
-                  width: 36,
-                  height: 4,
-                  decoration: BoxDecoration(
-                    color: PawlyColors.border,
-                    borderRadius: BorderRadius.circular(2),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 16),
-              const Text('Invite to Care Circle', style: PawlyTypography.titleLarge),
-              const SizedBox(height: 4),
-              const Text(
-                'Share care agendas, medication schedules, and digital health records with a co-owner or pet sitter.',
-                style: PawlyTypography.bodyMedium,
-              ),
-              const SizedBox(height: 16),
-              const Text('CAREGIVER NAME', style: PawlyTypography.eyebrow),
-              const SizedBox(height: 6),
-              TextField(
-                controller: nameCtrl,
-                style: PawlyTypography.bodyLarge,
-                decoration: InputDecoration(
-                  hintText: 'e.g. Alex Rivera',
-                  filled: true,
-                  fillColor: PawlyColors.surfaceWarm,
-                  border: OutlineInputBorder(
-                    borderRadius: AppTokens.rMd,
-                    borderSide: const BorderSide(color: PawlyColors.border),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: AppTokens.rMd,
-                    borderSide: const BorderSide(color: PawlyColors.border),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: AppTokens.rMd,
-                    borderSide: const BorderSide(color: PawlyColors.black, width: 1.5),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 12),
-              const Text('EMAIL ADDRESS', style: PawlyTypography.eyebrow),
-              const SizedBox(height: 6),
-              TextField(
-                controller: emailCtrl,
-                style: PawlyTypography.bodyLarge,
-                decoration: InputDecoration(
-                  hintText: 'e.g. alex@example.com',
-                  filled: true,
-                  fillColor: PawlyColors.surfaceWarm,
-                  border: OutlineInputBorder(
-                    borderRadius: AppTokens.rMd,
-                    borderSide: const BorderSide(color: PawlyColors.border),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: AppTokens.rMd,
-                    borderSide: const BorderSide(color: PawlyColors.border),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: AppTokens.rMd,
-                    borderSide: const BorderSide(color: PawlyColors.black, width: 1.5),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 14),
-              const Text('ROLE', style: PawlyTypography.eyebrow),
-              const SizedBox(height: 6),
-              Wrap(
-                spacing: 8,
-                children: ['Family Co-owner', 'Pet Sitter', 'Walker'].map((r) {
-                  final isSelected = role == r;
-                  return GestureDetector(
-                    onTap: () => setModalState(() => role = r),
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                      decoration: BoxDecoration(
-                        color: isSelected ? PawlyColors.black : Colors.white,
-                        borderRadius: AppTokens.rSm,
-                        border: Border.all(
-                          color: isSelected ? PawlyColors.black : PawlyColors.border,
-                          width: 1.0,
-                        ),
-                      ),
-                      child: Text(
-                        r,
-                        style: TextStyle(
-                          color: isSelected ? Colors.white : PawlyColors.black,
-                          fontWeight: FontWeight.w700,
-                          fontSize: 12,
-                        ),
-                      ),
-                    ),
-                  );
-                }).toList(),
-              ),
-              const SizedBox(height: 20),
-              SizedBox(
-                width: double.infinity,
-                child: PawlyButton(
-                  text: 'Send Care Circle Invite',
-                  onPressed: () {
-                    Navigator.pop(ctx);
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Care invitation sent! They can now access your pet’s routines.'),
-                        behavior: SnackBarBehavior.floating,
-                      ),
-                    );
-                  },
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
+  Future<void> _addCaregiver() async {
+    final name = TextEditingController();
+    final phone = TextEditingController();
+    final key = GlobalKey<FormState>();
+    await showModalBottomSheet(
+        context: context,
+        isScrollControlled: true,
+        builder: (ctx) => PawlySheet(
+            child: Form(
+                key: key,
+                child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text('Someone they can count on',
+                          style: TextStyle(
+                              fontSize: 24, fontWeight: FontWeight.w700)),
+                      const SizedBox(height: 8),
+                      const Text(
+                          'Save a caregiver contact here. This does not send an invitation or give them access to your records.'),
+                      const SizedBox(height: 20),
+                      TextFormField(
+                          controller: name,
+                          decoration: const InputDecoration(
+                              labelText: 'Caregiver name'),
+                          validator: (value) =>
+                              value!.trim().isEmpty ? 'Enter a name.' : null),
+                      const SizedBox(height: 12),
+                      TextFormField(
+                          controller: phone,
+                          keyboardType: TextInputType.phone,
+                          decoration:
+                              const InputDecoration(labelText: 'Phone number'),
+                          validator: (value) => value!.trim().isEmpty
+                              ? 'Enter a phone number.'
+                              : null),
+                      const SizedBox(height: 20),
+                      PawlyButton(
+                          text: 'Save caregiver contact',
+                          onPressed: () async {
+                            if (!key.currentState!.validate()) return;
+                            await widget.repository.addCaregiver(CareCircleMember(
+                                id: 'contact_${DateTime.now().microsecondsSinceEpoch}',
+                                name: name.text.trim(),
+                                role: 'Caregiver',
+                                email: '',
+                                phone: phone.text.trim()));
+                            if (ctx.mounted) Navigator.pop(ctx);
+                          }),
+                    ]))));
+    name.dispose();
+    phone.dispose();
   }
 
   @override
-  Widget build(BuildContext context) {
-    return ListenableBuilder(
+  Widget build(BuildContext context) => ListenableBuilder(
       listenable: widget.repository,
       builder: (context, _) {
-        final user = widget.repository.user;
-        final careCircle = widget.repository.careCircle;
-
+        final repo = widget.repository;
+        final scheme = Theme.of(context).colorScheme;
         return Scaffold(
-          backgroundColor: PawlyColors.background,
-          appBar: AppBar(
-            backgroundColor: PawlyColors.background,
-            elevation: 0,
-            scrolledUnderElevation: 0,
-            title: const Text('Settings & More', style: PawlyTypography.displayMedium),
-            centerTitle: false,
-            bottom: const PreferredSize(
-              preferredSize: Size.fromHeight(1.0),
-              child: Divider(height: 1.0, color: PawlyColors.border),
-            ),
-          ),
-          body: SingleChildScrollView(
-            padding: const EdgeInsets.fromLTRB(20, 16, 20, 100),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+            appBar: AppBar(title: const Text('Settings & More')),
+            body: ListView(
+              padding: const EdgeInsets.fromLTRB(20, 12, 20, 32),
               children: [
-                // Account Section
                 PawlyCard(
-                  padding: const EdgeInsets.all(16),
-                  child: Row(
-                    children: [
-                      Container(
-                        width: 44,
-                        height: 44,
-                        decoration: BoxDecoration(
-                          color: PawlyColors.border,
-                          borderRadius: AppTokens.rSm,
-                          border: Border.all(color: PawlyColors.border),
-                        ),
-                        child: const Icon(Icons.person_rounded, color: PawlyColors.black, size: 24),
-                      ),
+                    onTap: _editName,
+                    child: Row(children: [
+                      CircleAvatar(
+                          backgroundColor: scheme.primaryContainer,
+                          child: Icon(Icons.person_outline,
+                              color: scheme.onPrimaryContainer)),
                       const SizedBox(width: 14),
                       Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(user.name, style: PawlyTypography.titleMedium),
-                            const SizedBox(height: 2),
-                            Text(user.email, style: PawlyTypography.caption),
-                          ],
-                        ),
-                      ),
-                      const StatusBadge(label: 'Owner'),
+                          child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                            Text(repo.user.name,
+                                style: const TextStyle(
+                                    fontSize: 20, fontWeight: FontWeight.w700)),
+                            const SizedBox(height: 4),
+                            Text('Local profile · saved on this device',
+                                style: TextStyle(
+                                    fontSize: 12,
+                                    color: scheme.onSurfaceVariant)),
+                          ])),
+                      const Icon(Icons.edit_outlined, size: 20),
+                    ])),
+                const SizedBox(height: 28),
+                const Text('Make it feel like you',
+                    style:
+                        TextStyle(fontSize: 20, fontWeight: FontWeight.w700)),
+                const SizedBox(height: 6),
+                const Text('Choose your colors. Black & white is the default.'),
+                const SizedBox(height: 14),
+                Wrap(
+                    spacing: 10,
+                    runSpacing: 10,
+                    children: PawlyPalette.values
+                        .map((palette) => ChoiceChip(
+                              label: Text(palette.label),
+                              avatar: Container(
+                                  width: 18,
+                                  height: 18,
+                                  decoration: BoxDecoration(
+                                      color: palette.lightAccent,
+                                      shape: BoxShape.circle)),
+                              selected: repo.palette == palette,
+                              onSelected: (_) => repo.setPalette(palette),
+                            ))
+                        .toList()),
+                const SizedBox(height: 18),
+                const Text('Appearance',
+                    style: TextStyle(fontWeight: FontWeight.w600)),
+                const SizedBox(height: 10),
+                SegmentedButton<ThemeMode>(
+                    segments: const [
+                      ButtonSegment(
+                          value: ThemeMode.system, label: Text('Auto')),
+                      ButtonSegment(
+                          value: ThemeMode.light, label: Text('Light')),
+                      ButtonSegment(value: ThemeMode.dark, label: Text('Dark')),
                     ],
-                  ),
-                ),
-
-                const SizedBox(height: 20),
-
-                // Tools & Discovery
-                const Text('TOOLS & DISCOVERY', style: PawlyTypography.eyebrow),
-                const SizedBox(height: 8),
+                    selected: {
+                      repo.themeMode
+                    },
+                    onSelectionChanged: (selection) =>
+                        repo.setThemeMode(selection.first)),
+                const SizedBox(height: 28),
+                const Text('Their everyday essentials',
+                    style:
+                        TextStyle(fontSize: 20, fontWeight: FontWeight.w700)),
+                const SizedBox(height: 12),
                 PawlyCard(
-                  padding: EdgeInsets.zero,
-                  child: Column(
-                    children: [
-                      _SettingsRow(
-                        icon: Icons.search_rounded,
-                        title: 'Universal Search',
-                        subtitle: 'Search across routines, health, meds & docs',
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => UniversalSearchScreen(repository: widget.repository),
-                            ),
-                          );
-                        },
-                      ),
-                      const Divider(height: 1, indent: 52, color: PawlyColors.border),
-                      _SettingsRow(
-                        icon: Icons.calendar_month_outlined,
-                        title: 'Unified Pet Calendar',
-                        subtitle: 'Monthly schedule for appointments and routines',
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => PetCalendarScreen(repository: widget.repository),
-                            ),
-                          );
-                        },
-                      ),
-                    ],
-                  ),
-                ),
-
-                const SizedBox(height: 20),
-
-                // Care Circle Section
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const Text('CARE CIRCLE & FAMILY PACK', style: PawlyTypography.eyebrow),
-                    GestureDetector(
-                      onTap: _showInviteCaregiverSheet,
-                      child: const Text(
-                        '+ Invite',
-                        style: TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w800,
-                          color: PawlyColors.black,
-                          decoration: TextDecoration.underline,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 8),
-
+                    padding: EdgeInsets.zero,
+                    child: Column(children: [
+                      _tool(
+                          Icons.notifications_none,
+                          'Care reminders',
+                          'Today, upcoming and completed for all pets',
+                          () => _open(RemindersScreen(repository: repo))),
+                      _tool(
+                          Icons.search,
+                          'Universal Search',
+                          'Find care, health records and memories',
+                          () => _open(UniversalSearchScreen(repository: repo))),
+                      _tool(
+                          Icons.calendar_month_outlined,
+                          'Unified Pet Calendar',
+                          'Plan care for your selected companion',
+                          () => _open(PetCalendarScreen(repository: repo))),
+                      _tool(
+                          Icons.history,
+                          'Their story',
+                          'Health milestones and everyday memories',
+                          () => _open(PetTimelineScreen(repository: repo))),
+                    ])),
+                const SizedBox(height: 28),
+                Row(children: [
+                  const Expanded(
+                      child: Text('Caregiver contacts',
+                          style: TextStyle(
+                              fontSize: 20, fontWeight: FontWeight.w700))),
+                  IconButton(
+                      tooltip: 'Add caregiver contact',
+                      onPressed: _addCaregiver,
+                      icon: const Icon(Icons.person_add_outlined))
+                ]),
                 PawlyCard(
-                  padding: const EdgeInsets.all(14),
-                  child: Column(
-                    children: careCircle.map((member) {
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 6),
-                        child: Row(
-                          children: [
-                            Container(
-                              width: 36,
-                              height: 36,
-                              decoration: BoxDecoration(
-                                color: PawlyColors.border,
-                                borderRadius: AppTokens.rSm,
-                                border: Border.all(color: PawlyColors.border, width: 0.8),
-                              ),
-                              clipBehavior: Clip.antiAlias,
-                              child: member.avatarUrl.isNotEmpty
-                                  ? Image.network(
-                                      member.avatarUrl,
-                                      fit: BoxFit.cover,
-                                      errorBuilder: (_, __, ___) => Center(
-                                        child: Text(
-                                          member.name.isNotEmpty ? member.name[0] : 'C',
-                                          style: const TextStyle(fontWeight: FontWeight.w800, color: PawlyColors.black),
-                                        ),
-                                      ),
-                                    )
-                                  : Center(
-                                      child: Text(
-                                        member.name.isNotEmpty ? member.name[0] : 'C',
-                                        style: const TextStyle(fontWeight: FontWeight.w800, color: PawlyColors.black),
-                                      ),
-                                    ),
-                            ),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    member.name,
-                                    style: PawlyTypography.titleSmall,
-                                  ),
-                                  Text(
-                                    '${member.role} • ${member.phone}',
-                                    style: PawlyTypography.caption,
-                                  ),
-                                ],
-                              ),
-                            ),
-                            StatusBadge(
-                              label: member.role == 'Owner' ? 'Owner' : 'Co-care',
-                            ),
-                          ],
-                        ),
-                      );
-                    }).toList(),
-                  ),
-                ),
-
-                const SizedBox(height: 20),
-
-                // Safety & Emergency
-                const Text('SAFETY & EMERGENCY', style: PawlyTypography.eyebrow),
-                const SizedBox(height: 8),
+                    child: repo.careCircle.isEmpty
+                        ? Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                                const Text('A helping hand, close by.',
+                                    style:
+                                        TextStyle(fontWeight: FontWeight.w700)),
+                                const SizedBox(height: 6),
+                                const Text(
+                                    'Keep a sitter or family member’s contact on hand.'),
+                                const SizedBox(height: 12),
+                                PawlyButton(
+                                    text: 'Add a caregiver',
+                                    isSmall: true,
+                                    isSecondary: true,
+                                    onPressed: _addCaregiver),
+                              ])
+                        : Column(
+                            children: repo.careCircle
+                                .map((member) => ListTile(
+                                    contentPadding: EdgeInsets.zero,
+                                    leading: const Icon(Icons.person_outline),
+                                    title: Text(member.name),
+                                    subtitle: Text(member.phone)))
+                                .toList())),
+                const SizedBox(height: 28),
+                const Text('For peace of mind',
+                    style:
+                        TextStyle(fontSize: 20, fontWeight: FontWeight.w700)),
+                const SizedBox(height: 12),
                 PawlyCard(
-                  padding: EdgeInsets.zero,
-                  child: Column(
-                    children: [
-                      _SettingsRow(
-                        icon: Icons.shield_outlined,
-                        title: 'Digital Emergency Pet Card',
-                        subtitle: 'Vet contacts, microchip, and critical notes',
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => EmergencyCardScreen(repository: widget.repository),
-                            ),
-                          );
-                        },
-                      ),
-                      const Divider(height: 1, indent: 52, color: PawlyColors.border),
-                      _SettingsRow(
-                        icon: Icons.warning_amber_rounded,
-                        title: 'Lost Pet Mode',
-                        subtitle: 'Generate poster & activate emergency alert banner',
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => LostPetModeScreen(repository: widget.repository),
-                            ),
-                          );
-                        },
-                      ),
-                      const Divider(height: 1, indent: 52, color: PawlyColors.border),
-                      _SettingsRow(
-                        icon: Icons.favorite_border_rounded,
-                        title: 'Adopt & Foster Discovery',
-                        subtitle: 'Browse rescues and foster animals seeking homes',
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => AdoptionDiscoveryScreen(repository: widget.repository),
-                            ),
-                          );
-                        },
-                      ),
-                    ],
-                  ),
-                ),
-
-                const SizedBox(height: 20),
-
-                // Notifications
-                const Text('NOTIFICATIONS', style: PawlyTypography.eyebrow),
-                const SizedBox(height: 8),
-                PawlyCard(
-                  padding: EdgeInsets.zero,
-                  child: Column(
-                    children: [
-                      SwitchListTile(
-                        secondary: Container(
-                          padding: const EdgeInsets.all(6),
-                          decoration: BoxDecoration(
-                            color: PawlyColors.border,
-                            borderRadius: AppTokens.rSm,
-                          ),
-                          child: const Icon(Icons.notifications_active_outlined, color: PawlyColors.black, size: 18),
-                        ),
-                        title: const Text('Daily Routine Reminders', style: PawlyTypography.titleSmall),
-                        subtitle: const Text('Feeding, walks, medication reminders', style: PawlyTypography.caption),
-                        activeColor: PawlyColors.black,
-                        value: _careNotifications,
-                        onChanged: (val) => setState(() => _careNotifications = val),
-                      ),
-                      const Divider(height: 1, indent: 52, color: PawlyColors.border),
-                      SwitchListTile(
-                        secondary: Container(
-                          padding: const EdgeInsets.all(6),
-                          decoration: BoxDecoration(
-                            color: PawlyColors.border,
-                            borderRadius: AppTokens.rSm,
-                          ),
-                          child: const Icon(Icons.event_available_outlined, color: PawlyColors.black, size: 18),
-                        ),
-                        title: const Text('Veterinary Notifications', style: PawlyTypography.titleSmall),
-                        subtitle: const Text('Upcoming visit alerts and prep prompts', style: PawlyTypography.caption),
-                        activeColor: PawlyColors.black,
-                        value: _vetReminders,
-                        onChanged: (val) => setState(() => _vetReminders = val),
-                      ),
-                    ],
-                  ),
-                ),
-
+                    padding: EdgeInsets.zero,
+                    child: Column(children: [
+                      _tool(
+                          Icons.shield_outlined,
+                          'Digital Emergency Pet Card',
+                          'Contact details and essential pet information',
+                          () => _open(EmergencyCardScreen(repository: repo))),
+                      _tool(
+                          Icons.warning_amber,
+                          'Lost Pet Mode',
+                          'Prepare details you can copy and share',
+                          () => _open(LostPetModeScreen(repository: repo))),
+                      _tool(
+                          Icons.favorite_border,
+                          'Adopt & Foster Discovery',
+                          'Example rescue listings and inquiry drafts',
+                          () =>
+                              _open(AdoptionDiscoveryScreen(repository: repo))),
+                    ])),
                 const SizedBox(height: 24),
-
-                // Logout button
+                Text(
+                    'Pawly keeps records on this device. Care reminders appear in the app; phone notifications, file uploads, shelter submissions and shared online accounts are not connected.',
+                    style: TextStyle(
+                        color: scheme.onSurfaceVariant,
+                        height: 1.5,
+                        fontSize: 13)),
+                const SizedBox(height: 24),
                 PawlyButton(
-                  text: 'Log Out of Pawly',
-                  
-                  isSecondary: true,
-                  
-                  onPressed: widget.onLogout,
-                ),
-
+                    text: 'Close my local profile',
+                    isSecondary: true,
+                    onPressed: widget.onLogout),
                 const SizedBox(height: 24),
-
-                const Center(
-                  child: Text(
-                    'Pawly Mobile • Version 2.0.0\nDesigned with care for pets and their companions',
-                    textAlign: TextAlign.center,
-                    style: PawlyTypography.caption,
-                  ),
-                ),
+                Center(
+                    child: Text('Pawly · A little care. Every day.',
+                        style: TextStyle(
+                            color: scheme.onSurfaceVariant, fontSize: 12))),
               ],
-            ),
-          ),
-        );
-      },
-    );
-  }
-}
-
-class _SettingsRow extends StatelessWidget {
-  final IconData icon;
-  final String title;
-  final String subtitle;
-  final VoidCallback onTap;
-
-  const _SettingsRow({
-    required this.icon,
-    required this.title,
-    required this.subtitle,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return ListTile(
-      leading: Container(
-        padding: const EdgeInsets.all(6),
-        decoration: BoxDecoration(
-          color: PawlyColors.border,
-          borderRadius: AppTokens.rSm,
-        ),
-        child: Icon(icon, color: PawlyColors.black, size: 18),
-      ),
-      title: Text(title, style: PawlyTypography.titleSmall),
-      subtitle: Text(subtitle, style: PawlyTypography.caption),
-      trailing: const Icon(Icons.chevron_right_rounded, color: PawlyColors.tertiary, size: 18),
-      onTap: onTap,
-    );
-  }
+            ));
+      });
+  Widget _tool(
+          IconData icon, String title, String subtitle, VoidCallback action) =>
+      ListTile(
+          leading: Icon(icon, color: Theme.of(context).colorScheme.primary),
+          title: Text(title),
+          subtitle: Text(subtitle, style: const TextStyle(fontSize: 12)),
+          trailing: const Icon(Icons.chevron_right, size: 20),
+          onTap: action);
 }

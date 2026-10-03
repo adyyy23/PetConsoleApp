@@ -36,7 +36,8 @@ class AppDatabase {
         );
         _useSqlite = true;
       } catch (e) {
-        debugPrint('[AppDatabase] SQLite unavailable, using persistent key-value store: $e');
+        debugPrint(
+            '[AppDatabase] SQLite unavailable, using persistent key-value store: $e');
         _useSqlite = false;
       }
     } else {
@@ -201,7 +202,8 @@ class AppDatabase {
     ''');
   }
 
-  Future<void> _onUpgrade(sql.Database db, int oldVersion, int newVersion) async {
+  Future<void> _onUpgrade(
+      sql.Database db, int oldVersion, int newVersion) async {
     // Versioned migration logic placeholder for future schema bumps
   }
 
@@ -212,29 +214,35 @@ class AppDatabase {
   Future<List<Pet>> getAllPets() async {
     if (_useSqlite && _sqliteDb != null) {
       final rows = await _sqliteDb!.query('pets', orderBy: 'name ASC');
-      return rows.map((r) => Pet(
-        id: r['id'] as String,
-        name: r['name'] as String,
-        animalType: r['animalType'] as String? ?? 'Dog',
-        breed: r['breed'] as String? ?? '',
-        ageYears: (r['ageYears'] as num?)?.toDouble() ?? 1.0,
-        weightKg: (r['weightKg'] as num?)?.toDouble() ?? 5.0,
-        gender: r['gender'] as String? ?? 'Male',
-        imageUrl: r['imageUrl'] as String? ?? '',
-        notes: r['notes'] as String? ?? '',
-        allergies: r['allergies'] as String? ?? 'None reported',
-        microchipNumber: r['microchipNumber'] as String? ?? '',
-        birthday: r['birthday'] as String? ?? '',
-        category: r['category'] as String? ?? 'Companion',
-        nickname: r['nickname'] as String? ?? '',
-        favoriteFood: r['favoriteFood'] as String? ?? '',
-        favoriteToy: r['favoriteToy'] as String? ?? '',
-        favoriteActivity: r['favoriteActivity'] as String? ?? '',
-        temperament: r['temperament'] as String? ?? 'Gentle & curious',
-        likes: (r['likes'] as String?)?.isNotEmpty == true ? (r['likes'] as String).split(';') : const [],
-        dislikes: (r['dislikes'] as String?)?.isNotEmpty == true ? (r['dislikes'] as String).split(';') : const [],
-        funFact: r['funFact'] as String? ?? '',
-      )).toList();
+      return rows
+          .map((r) => Pet(
+                id: r['id'] as String,
+                name: r['name'] as String,
+                animalType: r['animalType'] as String? ?? 'Dog',
+                breed: r['breed'] as String? ?? '',
+                ageYears: (r['ageYears'] as num?)?.toDouble() ?? 1.0,
+                weightKg: (r['weightKg'] as num?)?.toDouble() ?? 5.0,
+                gender: r['gender'] as String? ?? 'Male',
+                imageUrl: r['imageUrl'] as String? ?? '',
+                notes: r['notes'] as String? ?? '',
+                allergies: r['allergies'] as String? ?? 'None reported',
+                microchipNumber: r['microchipNumber'] as String? ?? '',
+                birthday: r['birthday'] as String? ?? '',
+                category: r['category'] as String? ?? 'Companion',
+                nickname: r['nickname'] as String? ?? '',
+                favoriteFood: r['favoriteFood'] as String? ?? '',
+                favoriteToy: r['favoriteToy'] as String? ?? '',
+                favoriteActivity: r['favoriteActivity'] as String? ?? '',
+                temperament: r['temperament'] as String? ?? 'Gentle & curious',
+                likes: (r['likes'] as String?)?.isNotEmpty == true
+                    ? (r['likes'] as String).split(';')
+                    : const [],
+                dislikes: (r['dislikes'] as String?)?.isNotEmpty == true
+                    ? (r['dislikes'] as String).split(';')
+                    : const [],
+                funFact: r['funFact'] as String? ?? '',
+              ))
+          .toList();
     } else {
       final raw = _prefs?.getString('db_pets');
       if (raw == null) return [];
@@ -293,43 +301,67 @@ class AppDatabase {
   Future<void> deletePet(String petId) async {
     if (_useSqlite && _sqliteDb != null) {
       await _sqliteDb!.delete('pets', where: 'id = ?', whereArgs: [petId]);
-      await _sqliteDb!.delete('care_routines', where: 'petId = ?', whereArgs: [petId]);
-      await _sqliteDb!.delete('health_records', where: 'petId = ?', whereArgs: [petId]);
-      await _sqliteDb!.delete('weight_entries', where: 'petId = ?', whereArgs: [petId]);
-      await _sqliteDb!.delete('vaccinations', where: 'petId = ?', whereArgs: [petId]);
-      await _sqliteDb!.delete('medications', where: 'petId = ?', whereArgs: [petId]);
-      await _sqliteDb!.delete('appointments', where: 'petId = ?', whereArgs: [petId]);
-      await _sqliteDb!.delete('memories', where: 'petId = ?', whereArgs: [petId]);
-      await _sqliteDb!.delete('daily_notes', where: 'petId = ?', whereArgs: [petId]);
+      await _sqliteDb!
+          .delete('care_routines', where: 'petId = ?', whereArgs: [petId]);
+      await _sqliteDb!
+          .delete('health_records', where: 'petId = ?', whereArgs: [petId]);
+      await _sqliteDb!
+          .delete('weight_entries', where: 'petId = ?', whereArgs: [petId]);
+      await _sqliteDb!
+          .delete('vaccinations', where: 'petId = ?', whereArgs: [petId]);
+      await _sqliteDb!
+          .delete('medications', where: 'petId = ?', whereArgs: [petId]);
+      await _sqliteDb!
+          .delete('appointments', where: 'petId = ?', whereArgs: [petId]);
+      await _sqliteDb!
+          .delete('memories', where: 'petId = ?', whereArgs: [petId]);
+      await _sqliteDb!
+          .delete('daily_notes', where: 'petId = ?', whereArgs: [petId]);
     } else {
       final pets = await getAllPets();
       pets.removeWhere((p) => p.id == petId);
       await _saveJsonList('db_pets', pets.map((p) => p.toJson()).toList());
 
       // Cascade delete child entities
-      final routines = (await getAllRoutines())..removeWhere((r) => r.petId == petId);
-      await _saveJsonList('db_care_routines', routines.map((r) => r.toJson()).toList());
+      final routines = (await getAllRoutines())
+        ..removeWhere((r) => r.petId == petId);
+      await _saveJsonList(
+          'db_care_routines', routines.map((r) => r.toJson()).toList());
 
-      final health = (await getAllHealthRecords())..removeWhere((h) => h.petId == petId);
-      await _saveJsonList('db_health_records', health.map((h) => h.toJson()).toList());
+      final health = (await getAllHealthRecords())
+        ..removeWhere((h) => h.petId == petId);
+      await _saveJsonList(
+          'db_health_records', health.map((h) => h.toJson()).toList());
 
-      final weights = (await getAllWeightEntries())..removeWhere((w) => w.petId == petId);
-      await _saveJsonList('db_weight_entries', weights.map((w) => w.toJson()).toList());
+      final weights = (await getAllWeightEntries())
+        ..removeWhere((w) => w.petId == petId);
+      await _saveJsonList(
+          'db_weight_entries', weights.map((w) => w.toJson()).toList());
 
-      final appts = (await getAllAppointments())..removeWhere((a) => a.petId == petId);
-      await _saveJsonList('db_appointments', appts.map((a) => a.toJson()).toList());
+      final appts = (await getAllAppointments())
+        ..removeWhere((a) => a.petId == petId);
+      await _saveJsonList(
+          'db_appointments', appts.map((a) => a.toJson()).toList());
 
-      final memories = (await getAllMemories())..removeWhere((m) => m.petId == petId);
-      await _saveJsonList('db_memories', memories.map((m) => m.toJson()).toList());
+      final memories = (await getAllMemories())
+        ..removeWhere((m) => m.petId == petId);
+      await _saveJsonList(
+          'db_memories', memories.map((m) => m.toJson()).toList());
 
-      final meds = (await getAllMedications())..removeWhere((m) => m.petId == petId);
-      await _saveJsonList('db_medications', meds.map((m) => m.toJson()).toList());
+      final meds = (await getAllMedications())
+        ..removeWhere((m) => m.petId == petId);
+      await _saveJsonList(
+          'db_medications', meds.map((m) => m.toJson()).toList());
 
-      final vaccs = (await getAllVaccinations())..removeWhere((v) => v.petId == petId);
-      await _saveJsonList('db_vaccinations', vaccs.map((v) => v.toJson()).toList());
+      final vaccs = (await getAllVaccinations())
+        ..removeWhere((v) => v.petId == petId);
+      await _saveJsonList(
+          'db_vaccinations', vaccs.map((v) => v.toJson()).toList());
 
-      final notes = (await getAllDailyNotes())..removeWhere((n) => n.petId == petId);
-      await _saveJsonList('db_daily_notes', notes.map((n) => n.toJson()).toList());
+      final notes = (await getAllDailyNotes())
+        ..removeWhere((n) => n.petId == petId);
+      await _saveJsonList(
+          'db_daily_notes', notes.map((n) => n.toJson()).toList());
     }
   }
 
@@ -340,23 +372,25 @@ class AppDatabase {
   Future<List<CareRoutine>> getAllRoutines() async {
     if (_useSqlite && _sqliteDb != null) {
       final rows = await _sqliteDb!.query('care_routines', orderBy: 'time ASC');
-      return rows.map((r) => CareRoutine(
-        id: r['id'] as String,
-        petId: r['petId'] as String,
-        title: r['title'] as String,
-        time: r['time'] as String,
-        date: r['date'] as String,
-        category: CareCategory.values.firstWhere(
-          (c) => c.name == r['category'],
-          orElse: () => CareCategory.other,
-        ),
-        priority: r['priority'] as String? ?? 'Medium',
-        isCompleted: (r['isCompleted'] as int) == 1,
-        notes: r['notes'] as String? ?? '',
-        recurrence: r['recurrence'] as String? ?? 'Daily',
-        assignedTo: r['assignedTo'] as String? ?? 'Me',
-        completedAt: r['completedAt'] as String? ?? '',
-      )).toList();
+      return rows
+          .map((r) => CareRoutine(
+                id: r['id'] as String,
+                petId: r['petId'] as String,
+                title: r['title'] as String,
+                time: r['time'] as String,
+                date: r['date'] as String,
+                category: CareCategory.values.firstWhere(
+                  (c) => c.name == r['category'],
+                  orElse: () => CareCategory.other,
+                ),
+                priority: r['priority'] as String? ?? 'Medium',
+                isCompleted: (r['isCompleted'] as int) == 1,
+                notes: r['notes'] as String? ?? '',
+                recurrence: r['recurrence'] as String? ?? 'Daily',
+                assignedTo: r['assignedTo'] as String? ?? 'Me',
+                completedAt: r['completedAt'] as String? ?? '',
+              ))
+          .toList();
     } else {
       final raw = _prefs?.getString('db_care_routines');
       if (raw == null) return [];
@@ -393,17 +427,20 @@ class AppDatabase {
       final list = await getAllRoutines();
       list.removeWhere((r) => r.id == routine.id);
       list.add(routine);
-      await _saveJsonList('db_care_routines', list.map((r) => r.toJson()).toList());
+      await _saveJsonList(
+          'db_care_routines', list.map((r) => r.toJson()).toList());
     }
   }
 
   Future<void> deleteRoutine(String routineId) async {
     if (_useSqlite && _sqliteDb != null) {
-      await _sqliteDb!.delete('care_routines', where: 'id = ?', whereArgs: [routineId]);
+      await _sqliteDb!
+          .delete('care_routines', where: 'id = ?', whereArgs: [routineId]);
     } else {
       final list = await getAllRoutines();
       list.removeWhere((r) => r.id == routineId);
-      await _saveJsonList('db_care_routines', list.map((r) => r.toJson()).toList());
+      await _saveJsonList(
+          'db_care_routines', list.map((r) => r.toJson()).toList());
     }
   }
 
@@ -413,17 +450,20 @@ class AppDatabase {
 
   Future<List<HealthEvent>> getAllHealthRecords() async {
     if (_useSqlite && _sqliteDb != null) {
-      final rows = await _sqliteDb!.query('health_records', orderBy: 'date DESC');
-      return rows.map((r) => HealthEvent(
-        id: r['id'] as String,
-        petId: r['petId'] as String,
-        date: r['date'] as String,
-        title: r['title'] as String,
-        type: r['type'] as String,
-        notes: r['notes'] as String? ?? '',
-        veterinarian: r['veterinarian'] as String? ?? '',
-        clinic: r['clinic'] as String? ?? '',
-      )).toList();
+      final rows =
+          await _sqliteDb!.query('health_records', orderBy: 'date DESC');
+      return rows
+          .map((r) => HealthEvent(
+                id: r['id'] as String,
+                petId: r['petId'] as String,
+                date: r['date'] as String,
+                title: r['title'] as String,
+                type: r['type'] as String,
+                notes: r['notes'] as String? ?? '',
+                veterinarian: r['veterinarian'] as String? ?? '',
+                clinic: r['clinic'] as String? ?? '',
+              ))
+          .toList();
     } else {
       final raw = _prefs?.getString('db_health_records');
       if (raw == null) return [];
@@ -456,17 +496,20 @@ class AppDatabase {
       final list = await getAllHealthRecords();
       list.removeWhere((h) => h.id == event.id);
       list.insert(0, event);
-      await _saveJsonList('db_health_records', list.map((h) => h.toJson()).toList());
+      await _saveJsonList(
+          'db_health_records', list.map((h) => h.toJson()).toList());
     }
   }
 
   Future<void> deleteHealthRecord(String eventId) async {
     if (_useSqlite && _sqliteDb != null) {
-      await _sqliteDb!.delete('health_records', where: 'id = ?', whereArgs: [eventId]);
+      await _sqliteDb!
+          .delete('health_records', where: 'id = ?', whereArgs: [eventId]);
     } else {
       final list = await getAllHealthRecords();
       list.removeWhere((h) => h.id == eventId);
-      await _saveJsonList('db_health_records', list.map((h) => h.toJson()).toList());
+      await _saveJsonList(
+          'db_health_records', list.map((h) => h.toJson()).toList());
     }
   }
 
@@ -476,14 +519,17 @@ class AppDatabase {
 
   Future<List<WeightEntry>> getAllWeightEntries() async {
     if (_useSqlite && _sqliteDb != null) {
-      final rows = await _sqliteDb!.query('weight_entries', orderBy: 'date DESC');
-      return rows.map((r) => WeightEntry(
-        id: r['id'] as String,
-        petId: r['petId'] as String,
-        date: r['date'] as String,
-        weightKg: (r['weightKg'] as num).toDouble(),
-        note: r['note'] as String? ?? '',
-      )).toList();
+      final rows =
+          await _sqliteDb!.query('weight_entries', orderBy: 'date DESC');
+      return rows
+          .map((r) => WeightEntry(
+                id: r['id'] as String,
+                petId: r['petId'] as String,
+                date: r['date'] as String,
+                weightKg: (r['weightKg'] as num).toDouble(),
+                note: r['note'] as String? ?? '',
+              ))
+          .toList();
     } else {
       final raw = _prefs?.getString('db_weight_entries');
       if (raw == null) return [];
@@ -513,7 +559,8 @@ class AppDatabase {
       final list = await getAllWeightEntries();
       list.removeWhere((w) => w.id == entry.id);
       list.insert(0, entry);
-      await _saveJsonList('db_weight_entries', list.map((w) => w.toJson()).toList());
+      await _saveJsonList(
+          'db_weight_entries', list.map((w) => w.toJson()).toList());
     }
   }
 
@@ -523,21 +570,24 @@ class AppDatabase {
 
   Future<List<VaccinationRecord>> getAllVaccinations() async {
     if (_useSqlite && _sqliteDb != null) {
-      final rows = await _sqliteDb!.query('vaccinations', orderBy: 'dateAdministered DESC');
-      return rows.map((r) => VaccinationRecord(
-        id: r['id'] as String,
-        petId: r['petId'] as String,
-        vaccineName: r['vaccineName'] as String,
-        dateAdministered: r['dateAdministered'] as String,
-        nextDueDate: r['nextDueDate'] as String,
-        veterinarian: r['veterinarian'] as String? ?? '',
-        clinic: r['clinic'] as String? ?? '',
-        notes: r['notes'] as String? ?? '',
-        status: VaccineStatus.values.firstWhere(
-          (s) => s.name == r['status'],
-          orElse: () => VaccineStatus.current,
-        ),
-      )).toList();
+      final rows = await _sqliteDb!
+          .query('vaccinations', orderBy: 'dateAdministered DESC');
+      return rows
+          .map((r) => VaccinationRecord(
+                id: r['id'] as String,
+                petId: r['petId'] as String,
+                vaccineName: r['vaccineName'] as String,
+                dateAdministered: r['dateAdministered'] as String,
+                nextDueDate: r['nextDueDate'] as String,
+                veterinarian: r['veterinarian'] as String? ?? '',
+                clinic: r['clinic'] as String? ?? '',
+                notes: r['notes'] as String? ?? '',
+                status: VaccineStatus.values.firstWhere(
+                  (s) => s.name == r['status'],
+                  orElse: () => VaccineStatus.current,
+                ),
+              ))
+          .toList();
     } else {
       final raw = _prefs?.getString('db_vaccinations');
       if (raw == null) return [];
@@ -571,7 +621,8 @@ class AppDatabase {
       final list = await getAllVaccinations();
       list.removeWhere((v) => v.id == vac.id);
       list.insert(0, vac);
-      await _saveJsonList('db_vaccinations', list.map((v) => v.toJson()).toList());
+      await _saveJsonList(
+          'db_vaccinations', list.map((v) => v.toJson()).toList());
     }
   }
 
@@ -582,17 +633,19 @@ class AppDatabase {
   Future<List<Medication>> getAllMedications() async {
     if (_useSqlite && _sqliteDb != null) {
       final rows = await _sqliteDb!.query('medications', orderBy: 'name ASC');
-      return rows.map((r) => Medication(
-        id: r['id'] as String,
-        petId: r['petId'] as String,
-        name: r['name'] as String,
-        dosage: r['dosage'] as String,
-        frequency: r['frequency'] as String,
-        instructions: r['instructions'] as String? ?? '',
-        startDate: r['startDate'] as String,
-        endDate: r['endDate'] as String? ?? 'Ongoing',
-        isActive: (r['isActive'] as int) == 1,
-      )).toList();
+      return rows
+          .map((r) => Medication(
+                id: r['id'] as String,
+                petId: r['petId'] as String,
+                name: r['name'] as String,
+                dosage: r['dosage'] as String,
+                frequency: r['frequency'] as String,
+                instructions: r['instructions'] as String? ?? '',
+                startDate: r['startDate'] as String,
+                endDate: r['endDate'] as String? ?? 'Ongoing',
+                isActive: (r['isActive'] as int) == 1,
+              ))
+          .toList();
     } else {
       final raw = _prefs?.getString('db_medications');
       if (raw == null) return [];
@@ -626,7 +679,8 @@ class AppDatabase {
       final list = await getAllMedications();
       list.removeWhere((m) => m.id == med.id);
       list.insert(0, med);
-      await _saveJsonList('db_medications', list.map((m) => m.toJson()).toList());
+      await _saveJsonList(
+          'db_medications', list.map((m) => m.toJson()).toList());
     }
   }
 
@@ -637,17 +691,19 @@ class AppDatabase {
   Future<List<Appointment>> getAllAppointments() async {
     if (_useSqlite && _sqliteDb != null) {
       final rows = await _sqliteDb!.query('appointments', orderBy: 'date ASC');
-      return rows.map((r) => Appointment(
-        id: r['id'] as String,
-        petId: r['petId'] as String,
-        date: r['date'] as String,
-        time: r['time'] as String,
-        purpose: r['purpose'] as String,
-        clinic: r['clinic'] as String,
-        vetName: r['vetName'] as String,
-        notes: r['notes'] as String? ?? '',
-        isCompleted: (r['isCompleted'] as int) == 1,
-      )).toList();
+      return rows
+          .map((r) => Appointment(
+                id: r['id'] as String,
+                petId: r['petId'] as String,
+                date: r['date'] as String,
+                time: r['time'] as String,
+                purpose: r['purpose'] as String,
+                clinic: r['clinic'] as String,
+                vetName: r['vetName'] as String,
+                notes: r['notes'] as String? ?? '',
+                isCompleted: (r['isCompleted'] as int) == 1,
+              ))
+          .toList();
     } else {
       final raw = _prefs?.getString('db_appointments');
       if (raw == null) return [];
@@ -681,17 +737,20 @@ class AppDatabase {
       final list = await getAllAppointments();
       list.removeWhere((a) => a.id == appt.id);
       list.add(appt);
-      await _saveJsonList('db_appointments', list.map((a) => a.toJson()).toList());
+      await _saveJsonList(
+          'db_appointments', list.map((a) => a.toJson()).toList());
     }
   }
 
   Future<void> deleteAppointment(String apptId) async {
     if (_useSqlite && _sqliteDb != null) {
-      await _sqliteDb!.delete('appointments', where: 'id = ?', whereArgs: [apptId]);
+      await _sqliteDb!
+          .delete('appointments', where: 'id = ?', whereArgs: [apptId]);
     } else {
       final list = await getAllAppointments();
       list.removeWhere((a) => a.id == apptId);
-      await _saveJsonList('db_appointments', list.map((a) => a.toJson()).toList());
+      await _saveJsonList(
+          'db_appointments', list.map((a) => a.toJson()).toList());
     }
   }
 
@@ -702,15 +761,17 @@ class AppDatabase {
   Future<List<MemoryEntry>> getAllMemories() async {
     if (_useSqlite && _sqliteDb != null) {
       final rows = await _sqliteDb!.query('memories', orderBy: 'date DESC');
-      return rows.map((r) => MemoryEntry(
-        id: r['id'] as String,
-        petId: r['petId'] as String,
-        date: r['date'] as String,
-        title: r['title'] as String,
-        caption: r['caption'] as String? ?? '',
-        imageUrl: r['imageUrl'] as String,
-        milestoneType: r['milestoneType'] as String? ?? 'Milestone',
-      )).toList();
+      return rows
+          .map((r) => MemoryEntry(
+                id: r['id'] as String,
+                petId: r['petId'] as String,
+                date: r['date'] as String,
+                title: r['title'] as String,
+                caption: r['caption'] as String? ?? '',
+                imageUrl: r['imageUrl'] as String,
+                milestoneType: r['milestoneType'] as String? ?? 'Milestone',
+              ))
+          .toList();
     } else {
       final raw = _prefs?.getString('db_memories');
       if (raw == null) return [];
@@ -753,16 +814,18 @@ class AppDatabase {
   Future<List<SymptomNote>> getAllDailyNotes() async {
     if (_useSqlite && _sqliteDb != null) {
       final rows = await _sqliteDb!.query('daily_notes', orderBy: 'date DESC');
-      return rows.map((r) => SymptomNote(
-        id: r['id'] as String,
-        petId: r['petId'] as String,
-        date: r['date'] as String,
-        appetite: r['appetite'] as String? ?? 'Good',
-        energy: r['energy'] as String? ?? 'Normal',
-        stool: r['stool'] as String? ?? 'Normal',
-        skin: r['skin'] as String? ?? 'Clear',
-        notes: r['notes'] as String? ?? '',
-      )).toList();
+      return rows
+          .map((r) => SymptomNote(
+                id: r['id'] as String,
+                petId: r['petId'] as String,
+                date: r['date'] as String,
+                appetite: r['appetite'] as String? ?? 'Good',
+                energy: r['energy'] as String? ?? 'Normal',
+                stool: r['stool'] as String? ?? 'Normal',
+                skin: r['skin'] as String? ?? 'Clear',
+                notes: r['notes'] as String? ?? '',
+              ))
+          .toList();
     } else {
       final raw = _prefs?.getString('db_daily_notes');
       if (raw == null) return [];
@@ -795,7 +858,8 @@ class AppDatabase {
       final list = await getAllDailyNotes();
       list.removeWhere((n) => n.id == note.id);
       list.insert(0, note);
-      await _saveJsonList('db_daily_notes', list.map((n) => n.toJson()).toList());
+      await _saveJsonList(
+          'db_daily_notes', list.map((n) => n.toJson()).toList());
     }
   }
 

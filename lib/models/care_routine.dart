@@ -42,7 +42,8 @@ class CareRoutine {
   final String priority; // High, Medium, Low
   final bool isCompleted;
   final String notes;
-  final String recurrence; // Daily, Weekdays, Every 2 weeks, Every 30 days, Monthly, Once
+  final String
+      recurrence; // Daily, Weekdays, Every 2 weeks, Every 30 days, Monthly, Once
   final String assignedTo; // e.g. "Me", "David (Family)", "Sarah (Sitter)"
   final String completedAt; // e.g. "08:14 AM"
 
@@ -92,35 +93,35 @@ class CareRoutine {
   }
 
   Map<String, dynamic> toJson() => {
-    'id': id,
-    'petId': petId,
-    'title': title,
-    'time': time,
-    'date': date,
-    'category': category.name,
-    'priority': priority,
-    'isCompleted': isCompleted,
-    'notes': notes,
-    'recurrence': recurrence,
-    'assignedTo': assignedTo,
-    'completedAt': completedAt,
-  };
+        'id': id,
+        'petId': petId,
+        'title': title,
+        'time': time,
+        'date': date,
+        'category': category.name,
+        'priority': priority,
+        'isCompleted': isCompleted,
+        'notes': notes,
+        'recurrence': recurrence,
+        'assignedTo': assignedTo,
+        'completedAt': completedAt,
+      };
 
   factory CareRoutine.fromJson(Map<String, dynamic> json) => CareRoutine(
-    id: json['id'] as String,
-    petId: json['petId'] as String,
-    title: json['title'] as String,
-    time: json['time'] as String,
-    date: json['date'] as String,
-    category: CareCategory.values.firstWhere(
-      (e) => e.name == json['category'],
-      orElse: () => CareCategory.other,
-    ),
-    priority: json['priority'] as String? ?? 'Medium',
-    isCompleted: json['isCompleted'] as bool? ?? false,
-    notes: json['notes'] as String? ?? '',
-    recurrence: json['recurrence'] as String? ?? 'Daily',
-    assignedTo: json['assignedTo'] as String? ?? 'Me',
-    completedAt: json['completedAt'] as String? ?? '',
-  );
+        id: json['id'] as String,
+        petId: json['petId'] as String,
+        title: json['title'] as String,
+        time: json['time'] as String,
+        date: json['date'] as String,
+        category: CareCategory.values.firstWhere(
+          (e) => e.name == json['category'],
+          orElse: () => CareCategory.other,
+        ),
+        priority: json['priority'] as String? ?? 'Medium',
+        isCompleted: json['isCompleted'] as bool? ?? false,
+        notes: json['notes'] as String? ?? '',
+        recurrence: json['recurrence'] as String? ?? 'Daily',
+        assignedTo: json['assignedTo'] as String? ?? 'Me',
+        completedAt: json['completedAt'] as String? ?? '',
+      );
 }

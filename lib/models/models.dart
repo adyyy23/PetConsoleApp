@@ -1,3 +1,4 @@
+import 'care_schedule.dart';
 export 'pet.dart';
 export 'care_routine.dart';
 
@@ -6,7 +7,8 @@ class HealthEvent {
   final String petId;
   final String date;
   final String title;
-  final String type; // Vet Visit, Vaccination, Checkup, Medication, Surgery, Note
+  final String
+      type; // Vet Visit, Vaccination, Checkup, Medication, Surgery, Note
   final String notes;
   final String veterinarian;
   final String clinic;
@@ -24,26 +26,26 @@ class HealthEvent {
   }) : type = type ?? eventType ?? 'Checkup';
 
   Map<String, dynamic> toJson() => {
-    'id': id,
-    'petId': petId,
-    'date': date,
-    'title': title,
-    'type': type,
-    'notes': notes,
-    'veterinarian': veterinarian,
-    'clinic': clinic,
-  };
+        'id': id,
+        'petId': petId,
+        'date': date,
+        'title': title,
+        'type': type,
+        'notes': notes,
+        'veterinarian': veterinarian,
+        'clinic': clinic,
+      };
 
   factory HealthEvent.fromJson(Map<String, dynamic> json) => HealthEvent(
-    id: json['id'] as String,
-    petId: json['petId'] as String,
-    date: json['date'] as String,
-    title: json['title'] as String,
-    type: json['type'] as String? ?? 'Checkup',
-    notes: json['notes'] as String? ?? '',
-    veterinarian: json['veterinarian'] as String? ?? 'Attending Vet',
-    clinic: json['clinic'] as String? ?? '',
-  );
+        id: json['id'] as String,
+        petId: json['petId'] as String,
+        date: json['date'] as String,
+        title: json['title'] as String,
+        type: json['type'] as String? ?? 'Checkup',
+        notes: json['notes'] as String? ?? '',
+        veterinarian: json['veterinarian'] as String? ?? 'Attending Vet',
+        clinic: json['clinic'] as String? ?? '',
+      );
 }
 
 class WeightEntry {
@@ -63,20 +65,20 @@ class WeightEntry {
   }) : note = note ?? notes ?? '';
 
   Map<String, dynamic> toJson() => {
-    'id': id,
-    'petId': petId,
-    'date': date,
-    'weightKg': weightKg,
-    'note': note,
-  };
+        'id': id,
+        'petId': petId,
+        'date': date,
+        'weightKg': weightKg,
+        'note': note,
+      };
 
   factory WeightEntry.fromJson(Map<String, dynamic> json) => WeightEntry(
-    id: json['id'] as String,
-    petId: json['petId'] as String,
-    date: json['date'] as String,
-    weightKg: (json['weightKg'] as num).toDouble(),
-    note: json['note'] as String? ?? '',
-  );
+        id: json['id'] as String,
+        petId: json['petId'] as String,
+        date: json['date'] as String,
+        weightKg: (json['weightKg'] as num).toDouble(),
+        note: json['note'] as String? ?? '',
+      );
 }
 
 enum VaccineStatus { current, dueSoon, overdue }
@@ -104,32 +106,45 @@ class VaccinationRecord {
     this.status = VaccineStatus.current,
   });
 
-  Map<String, dynamic> toJson() => {
-    'id': id,
-    'petId': petId,
-    'vaccineName': vaccineName,
-    'dateAdministered': dateAdministered,
-    'nextDueDate': nextDueDate,
-    'veterinarian': veterinarian,
-    'clinic': clinic,
-    'notes': notes,
-    'status': status.name,
-  };
+  VaccineStatus statusOn(DateTime now) {
+    final due = CareSchedule.parseDate(nextDueDate);
+    if (due == null) return status;
+    final today = CareSchedule.day(now);
+    if (due.isBefore(today)) return VaccineStatus.overdue;
+    return due.difference(today).inDays <= 30
+        ? VaccineStatus.dueSoon
+        : VaccineStatus.current;
+  }
 
-  factory VaccinationRecord.fromJson(Map<String, dynamic> json) => VaccinationRecord(
-    id: json['id'] as String,
-    petId: json['petId'] as String,
-    vaccineName: json['vaccineName'] as String,
-    dateAdministered: json['dateAdministered'] as String,
-    nextDueDate: json['nextDueDate'] as String,
-    veterinarian: json['veterinarian'] as String? ?? '',
-    clinic: json['clinic'] as String? ?? '',
-    notes: json['notes'] as String? ?? '',
-    status: VaccineStatus.values.firstWhere(
-      (e) => e.name == json['status'],
-      orElse: () => VaccineStatus.current,
-    ),
-  );
+  VaccineStatus get effectiveStatus => statusOn(DateTime.now());
+
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'petId': petId,
+        'vaccineName': vaccineName,
+        'dateAdministered': dateAdministered,
+        'nextDueDate': nextDueDate,
+        'veterinarian': veterinarian,
+        'clinic': clinic,
+        'notes': notes,
+        'status': status.name,
+      };
+
+  factory VaccinationRecord.fromJson(Map<String, dynamic> json) =>
+      VaccinationRecord(
+        id: json['id'] as String,
+        petId: json['petId'] as String,
+        vaccineName: json['vaccineName'] as String,
+        dateAdministered: json['dateAdministered'] as String,
+        nextDueDate: json['nextDueDate'] as String,
+        veterinarian: json['veterinarian'] as String? ?? '',
+        clinic: json['clinic'] as String? ?? '',
+        notes: json['notes'] as String? ?? '',
+        status: VaccineStatus.values.firstWhere(
+          (e) => e.name == json['status'],
+          orElse: () => VaccineStatus.current,
+        ),
+      );
 }
 
 class Medication {
@@ -156,28 +171,28 @@ class Medication {
   });
 
   Map<String, dynamic> toJson() => {
-    'id': id,
-    'petId': petId,
-    'name': name,
-    'dosage': dosage,
-    'frequency': frequency,
-    'instructions': instructions,
-    'startDate': startDate,
-    'endDate': endDate,
-    'isActive': isActive,
-  };
+        'id': id,
+        'petId': petId,
+        'name': name,
+        'dosage': dosage,
+        'frequency': frequency,
+        'instructions': instructions,
+        'startDate': startDate,
+        'endDate': endDate,
+        'isActive': isActive,
+      };
 
   factory Medication.fromJson(Map<String, dynamic> json) => Medication(
-    id: json['id'] as String,
-    petId: json['petId'] as String,
-    name: json['name'] as String,
-    dosage: json['dosage'] as String,
-    frequency: json['frequency'] as String,
-    instructions: json['instructions'] as String? ?? '',
-    startDate: json['startDate'] as String,
-    endDate: json['endDate'] as String? ?? 'Ongoing',
-    isActive: json['isActive'] as bool? ?? true,
-  );
+        id: json['id'] as String,
+        petId: json['petId'] as String,
+        name: json['name'] as String,
+        dosage: json['dosage'] as String,
+        frequency: json['frequency'] as String,
+        instructions: json['instructions'] as String? ?? '',
+        startDate: json['startDate'] as String,
+        endDate: json['endDate'] as String? ?? 'Ongoing',
+        isActive: json['isActive'] as bool? ?? true,
+      );
 }
 
 class Appointment {
@@ -228,28 +243,28 @@ class Appointment {
   }
 
   Map<String, dynamic> toJson() => {
-    'id': id,
-    'petId': petId,
-    'date': date,
-    'time': time,
-    'purpose': purpose,
-    'clinic': clinic,
-    'vetName': vetName,
-    'notes': notes,
-    'isCompleted': isCompleted,
-  };
+        'id': id,
+        'petId': petId,
+        'date': date,
+        'time': time,
+        'purpose': purpose,
+        'clinic': clinic,
+        'vetName': vetName,
+        'notes': notes,
+        'isCompleted': isCompleted,
+      };
 
   factory Appointment.fromJson(Map<String, dynamic> json) => Appointment(
-    id: json['id'] as String,
-    petId: json['petId'] as String,
-    date: json['date'] as String,
-    time: json['time'] as String,
-    purpose: json['purpose'] as String,
-    clinic: json['clinic'] as String,
-    vetName: json['vetName'] as String,
-    notes: json['notes'] as String? ?? '',
-    isCompleted: json['isCompleted'] as bool? ?? false,
-  );
+        id: json['id'] as String,
+        petId: json['petId'] as String,
+        date: json['date'] as String,
+        time: json['time'] as String,
+        purpose: json['purpose'] as String,
+        clinic: json['clinic'] as String,
+        vetName: json['vetName'] as String,
+        notes: json['notes'] as String? ?? '',
+        isCompleted: json['isCompleted'] as bool? ?? false,
+      );
 }
 
 class MemoryEntry {
@@ -272,31 +287,32 @@ class MemoryEntry {
   });
 
   Map<String, dynamic> toJson() => {
-    'id': id,
-    'petId': petId,
-    'date': date,
-    'title': title,
-    'caption': caption,
-    'imageUrl': imageUrl,
-    'milestoneType': milestoneType,
-  };
+        'id': id,
+        'petId': petId,
+        'date': date,
+        'title': title,
+        'caption': caption,
+        'imageUrl': imageUrl,
+        'milestoneType': milestoneType,
+      };
 
   factory MemoryEntry.fromJson(Map<String, dynamic> json) => MemoryEntry(
-    id: json['id'] as String,
-    petId: json['petId'] as String,
-    date: json['date'] as String,
-    title: json['title'] as String,
-    caption: json['caption'] as String? ?? '',
-    imageUrl: json['imageUrl'] as String,
-    milestoneType: json['milestoneType'] as String? ?? 'Milestone',
-  );
+        id: json['id'] as String,
+        petId: json['petId'] as String,
+        date: json['date'] as String,
+        title: json['title'] as String,
+        caption: json['caption'] as String? ?? '',
+        imageUrl: json['imageUrl'] as String,
+        milestoneType: json['milestoneType'] as String? ?? 'Milestone',
+      );
 }
 
 class DocumentItem {
   final String id;
   final String petId;
   final String title;
-  final String category; // Vaccination, Lab Result, Prescription, Insurance, Registration
+  final String
+      category; // Vaccination, Lab Result, Prescription, Insurance, Registration
   final String dateAdded;
   final String fileType;
 
@@ -310,22 +326,22 @@ class DocumentItem {
   });
 
   Map<String, dynamic> toJson() => {
-    'id': id,
-    'petId': petId,
-    'title': title,
-    'category': category,
-    'dateAdded': dateAdded,
-    'fileType': fileType,
-  };
+        'id': id,
+        'petId': petId,
+        'title': title,
+        'category': category,
+        'dateAdded': dateAdded,
+        'fileType': fileType,
+      };
 
   factory DocumentItem.fromJson(Map<String, dynamic> json) => DocumentItem(
-    id: json['id'] as String,
-    petId: json['petId'] as String,
-    title: json['title'] as String,
-    category: json['category'] as String,
-    dateAdded: json['dateAdded'] as String,
-    fileType: json['fileType'] as String? ?? 'PDF',
-  );
+        id: json['id'] as String,
+        petId: json['petId'] as String,
+        title: json['title'] as String,
+        category: json['category'] as String,
+        dateAdded: json['dateAdded'] as String,
+        fileType: json['fileType'] as String? ?? 'PDF',
+      );
 }
 
 class EmergencyCardData {
@@ -348,24 +364,25 @@ class EmergencyCardData {
   });
 
   Map<String, dynamic> toJson() => {
-    'petId': petId,
-    'emergencyContactName': emergencyContactName,
-    'emergencyPhone': emergencyPhone,
-    'preferredVetName': preferredVetName,
-    'preferredVetPhone': preferredVetPhone,
-    'preferredClinic': preferredClinic,
-    'criticalNotes': criticalNotes,
-  };
+        'petId': petId,
+        'emergencyContactName': emergencyContactName,
+        'emergencyPhone': emergencyPhone,
+        'preferredVetName': preferredVetName,
+        'preferredVetPhone': preferredVetPhone,
+        'preferredClinic': preferredClinic,
+        'criticalNotes': criticalNotes,
+      };
 
-  factory EmergencyCardData.fromJson(Map<String, dynamic> json) => EmergencyCardData(
-    petId: json['petId'] as String,
-    emergencyContactName: json['emergencyContactName'] as String,
-    emergencyPhone: json['emergencyPhone'] as String,
-    preferredVetName: json['preferredVetName'] as String,
-    preferredVetPhone: json['preferredVetPhone'] as String,
-    preferredClinic: json['preferredClinic'] as String,
-    criticalNotes: json['criticalNotes'] as String? ?? '',
-  );
+  factory EmergencyCardData.fromJson(Map<String, dynamic> json) =>
+      EmergencyCardData(
+        petId: json['petId'] as String,
+        emergencyContactName: json['emergencyContactName'] as String,
+        emergencyPhone: json['emergencyPhone'] as String,
+        preferredVetName: json['preferredVetName'] as String,
+        preferredVetPhone: json['preferredVetPhone'] as String,
+        preferredClinic: json['preferredClinic'] as String,
+        criticalNotes: json['criticalNotes'] as String? ?? '',
+      );
 }
 
 class VetPrepItem {
@@ -391,18 +408,18 @@ class VetPrepItem {
   }
 
   Map<String, dynamic> toJson() => {
-    'id': id,
-    'appointmentId': appointmentId,
-    'text': text,
-    'isChecked': isChecked,
-  };
+        'id': id,
+        'appointmentId': appointmentId,
+        'text': text,
+        'isChecked': isChecked,
+      };
 
   factory VetPrepItem.fromJson(Map<String, dynamic> json) => VetPrepItem(
-    id: json['id'] as String,
-    appointmentId: json['appointmentId'] as String,
-    text: json['text'] as String,
-    isChecked: json['isChecked'] as bool? ?? false,
-  );
+        id: json['id'] as String,
+        appointmentId: json['appointmentId'] as String,
+        text: json['text'] as String,
+        isChecked: json['isChecked'] as bool? ?? false,
+      );
 }
 
 class AdoptionPet {
@@ -445,20 +462,20 @@ class UserProfile {
   });
 
   Map<String, dynamic> toJson() => {
-    'id': id,
-    'name': name,
-    'email': email,
-    'avatarUrl': avatarUrl,
-    'weightUnit': weightUnit,
-  };
+        'id': id,
+        'name': name,
+        'email': email,
+        'avatarUrl': avatarUrl,
+        'weightUnit': weightUnit,
+      };
 
   factory UserProfile.fromJson(Map<String, dynamic> json) => UserProfile(
-    id: json['id'] as String,
-    name: json['name'] as String,
-    email: json['email'] as String,
-    avatarUrl: json['avatarUrl'] as String? ?? '',
-    weightUnit: json['weightUnit'] as String? ?? 'kg',
-  );
+        id: json['id'] as String,
+        name: json['name'] as String,
+        email: json['email'] as String,
+        avatarUrl: json['avatarUrl'] as String? ?? '',
+        weightUnit: json['weightUnit'] as String? ?? 'kg',
+      );
 }
 
 class CareCircleMember {
@@ -468,7 +485,8 @@ class CareCircleMember {
   final String email;
   final String phone;
   final String avatarUrl;
-  final List<String> permissions; // View pet, Complete routines, Add notes, View health, Emergency access
+  final List<String>
+      permissions; // View pet, Complete routines, Add notes, View health, Emergency access
 
   const CareCircleMember({
     required this.id,
@@ -481,25 +499,27 @@ class CareCircleMember {
   });
 
   Map<String, dynamic> toJson() => {
-    'id': id,
-    'name': name,
-    'role': role,
-    'email': email,
-    'phone': phone,
-    'avatarUrl': avatarUrl,
-    'permissions': permissions,
-  };
+        'id': id,
+        'name': name,
+        'role': role,
+        'email': email,
+        'phone': phone,
+        'avatarUrl': avatarUrl,
+        'permissions': permissions,
+      };
 
-  factory CareCircleMember.fromJson(Map<String, dynamic> json) => CareCircleMember(
-    id: json['id'] as String,
-    name: json['name'] as String,
-    role: json['role'] as String,
-    email: json['email'] as String,
-    phone: json['phone'] as String? ?? '',
-    avatarUrl: json['avatarUrl'] as String? ?? '',
-    permissions: (json['permissions'] as List?)?.map((e) => e.toString()).toList() ??
-        const ['View pet', 'Complete routines', 'Add notes'],
-  );
+  factory CareCircleMember.fromJson(Map<String, dynamic> json) =>
+      CareCircleMember(
+        id: json['id'] as String,
+        name: json['name'] as String,
+        role: json['role'] as String,
+        email: json['email'] as String,
+        phone: json['phone'] as String? ?? '',
+        avatarUrl: json['avatarUrl'] as String? ?? '',
+        permissions:
+            (json['permissions'] as List?)?.map((e) => e.toString()).toList() ??
+                const ['View pet', 'Complete routines', 'Add notes'],
+      );
 }
 
 class PetMilestone {
@@ -522,24 +542,24 @@ class PetMilestone {
   });
 
   Map<String, dynamic> toJson() => {
-    'id': id,
-    'petId': petId,
-    'year': year,
-    'title': title,
-    'subtitle': subtitle,
-    'date': date,
-    'isAutomated': isAutomated,
-  };
+        'id': id,
+        'petId': petId,
+        'year': year,
+        'title': title,
+        'subtitle': subtitle,
+        'date': date,
+        'isAutomated': isAutomated,
+      };
 
   factory PetMilestone.fromJson(Map<String, dynamic> json) => PetMilestone(
-    id: json['id'] as String,
-    petId: json['petId'] as String,
-    year: json['year'] as String,
-    title: json['title'] as String,
-    subtitle: json['subtitle'] as String? ?? '',
-    date: json['date'] as String? ?? '',
-    isAutomated: json['isAutomated'] as bool? ?? false,
-  );
+        id: json['id'] as String,
+        petId: json['petId'] as String,
+        year: json['year'] as String,
+        title: json['title'] as String,
+        subtitle: json['subtitle'] as String? ?? '',
+        date: json['date'] as String? ?? '',
+        isAutomated: json['isAutomated'] as bool? ?? false,
+      );
 }
 
 class WellnessSnapshot {
@@ -584,32 +604,33 @@ class SymptomNote {
   });
 
   Map<String, dynamic> toJson() => {
-    'id': id,
-    'petId': petId,
-    'date': date,
-    'appetite': appetite,
-    'energy': energy,
-    'stool': stool,
-    'skin': skin,
-    'notes': notes,
-  };
+        'id': id,
+        'petId': petId,
+        'date': date,
+        'appetite': appetite,
+        'energy': energy,
+        'stool': stool,
+        'skin': skin,
+        'notes': notes,
+      };
 
   factory SymptomNote.fromJson(Map<String, dynamic> json) => SymptomNote(
-    id: json['id'] as String,
-    petId: json['petId'] as String,
-    date: json['date'] as String,
-    appetite: json['appetite'] as String? ?? 'Good',
-    energy: json['energy'] as String? ?? 'Normal',
-    stool: json['stool'] as String? ?? 'Normal',
-    skin: json['skin'] as String? ?? 'Clear',
-    notes: json['notes'] as String? ?? '',
-  );
+        id: json['id'] as String,
+        petId: json['petId'] as String,
+        date: json['date'] as String,
+        appetite: json['appetite'] as String? ?? 'Good',
+        energy: json['energy'] as String? ?? 'Normal',
+        stool: json['stool'] as String? ?? 'Normal',
+        skin: json['skin'] as String? ?? 'Clear',
+        notes: json['notes'] as String? ?? '',
+      );
 }
 
 class SearchResultItem {
   final String title;
   final String subtitle;
-  final String category; // 'Care', 'Health', 'Medication', 'Appointment', 'Memory', 'Document', 'Pet'
+  final String
+      category; // 'Care', 'Health', 'Medication', 'Appointment', 'Memory', 'Document', 'Pet'
   final String date;
   final String petName;
   final dynamic originalObject;

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import '../../models/models.dart';
 import '../../repositories/pawly_repository.dart';
 import '../../theme/pawly_colors.dart';
@@ -20,7 +21,8 @@ class EmergencyCardScreen extends StatelessWidget {
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (_) => _EditEmergencySheet(repository: repository),
+      builder: (_) => SingleChildScrollView(
+          child: _EditEmergencySheet(repository: repository)),
     );
   }
 
@@ -33,11 +35,13 @@ class EmergencyCardScreen extends StatelessWidget {
         final card = repository.emergencyCard;
 
         return Scaffold(
-          backgroundColor: PawlyColors.background,
+          backgroundColor: PawlyColors.resolve(context, PawlyColors.background),
           appBar: PawlyAppBar(
             title: 'Emergency Pet Card',
             trailing: IconButton(
-              icon:  const Icon(Icons.edit_outlined, color: PawlyColors.black, size: 20),
+              icon: Icon(Icons.edit_outlined,
+                  color: PawlyColors.resolve(context, PawlyColors.black),
+                  size: 20),
               onPressed: () => _showEditSheet(context),
             ),
           ),
@@ -52,28 +56,32 @@ class EmergencyCardScreen extends StatelessWidget {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (_) => LostPetModeScreen(repository: repository),
+                        builder: (_) =>
+                            LostPetModeScreen(repository: repository),
                       ),
                     );
                   },
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 16, vertical: 12),
                     decoration: BoxDecoration(
                       color: repository.isLostPetModeEnabled
-                          ? PawlyColors.error
-                          : PawlyColors.border,
+                          ? PawlyColors.resolve(context, PawlyColors.error)
+                          : PawlyColors.resolve(context, PawlyColors.border),
                       borderRadius: AppTokens.rMd,
                       border: Border.all(
                         color: repository.isLostPetModeEnabled
-                            ? PawlyColors.error
-                            : PawlyColors.border,
+                            ? PawlyColors.resolve(context, PawlyColors.error)
+                            : PawlyColors.resolve(context, PawlyColors.border),
                       ),
                     ),
                     child: Row(
                       children: [
                         Icon(
                           Icons.warning_amber_rounded,
-                          color: repository.isLostPetModeEnabled ? Colors.white : PawlyColors.error,
+                          color: repository.isLostPetModeEnabled
+                              ? Colors.white
+                              : PawlyColors.resolve(context, PawlyColors.error),
                           size: 20,
                         ),
                         const SizedBox(width: 12),
@@ -82,9 +90,16 @@ class EmergencyCardScreen extends StatelessWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                repository.isLostPetModeEnabled ? 'LOST PET MODE IS ACTIVE' : 'Lost Pet Mode',
-                                style: PawlyTypography.titleSmall.copyWith(
-                                  color: repository.isLostPetModeEnabled ? Colors.white : PawlyColors.black,
+                                repository.isLostPetModeEnabled
+                                    ? 'LOST PET MODE IS ACTIVE'
+                                    : 'Lost Pet Mode',
+                                style: PawlyTypography.resolve(
+                                        context, PawlyTypography.titleSmall)
+                                    .copyWith(
+                                  color: repository.isLostPetModeEnabled
+                                      ? Colors.white
+                                      : PawlyColors.resolve(
+                                          context, PawlyColors.black),
                                   fontWeight: FontWeight.w700,
                                 ),
                               ),
@@ -92,8 +107,13 @@ class EmergencyCardScreen extends StatelessWidget {
                                 repository.isLostPetModeEnabled
                                     ? 'Tap to view or share rescue poster'
                                     : 'Generate shareable rescue poster & alert',
-                                style: PawlyTypography.caption.copyWith(
-                                  color: repository.isLostPetModeEnabled ? Colors.white70 : PawlyColors.tertiary,
+                                style: PawlyTypography.resolve(
+                                        context, PawlyTypography.caption)
+                                    .copyWith(
+                                  color: repository.isLostPetModeEnabled
+                                      ? Colors.white70
+                                      : PawlyColors.resolve(
+                                          context, PawlyColors.tertiary),
                                 ),
                               ),
                             ],
@@ -101,7 +121,10 @@ class EmergencyCardScreen extends StatelessWidget {
                         ),
                         Icon(
                           Icons.arrow_forward_ios_rounded,
-                          color: repository.isLostPetModeEnabled ? Colors.white : PawlyColors.tertiary,
+                          color: repository.isLostPetModeEnabled
+                              ? Colors.white
+                              : PawlyColors.resolve(
+                                  context, PawlyColors.tertiary),
                           size: 14,
                         ),
                       ],
@@ -115,7 +138,9 @@ class EmergencyCardScreen extends StatelessWidget {
                   decoration: BoxDecoration(
                     color: PawlyColors.black,
                     borderRadius: AppTokens.rMd,
-                    border: Border.all(color: PawlyColors.charcoal),
+                    border: Border.all(
+                        color:
+                            PawlyColors.resolve(context, PawlyColors.charcoal)),
                   ),
                   clipBehavior: Clip.antiAlias,
                   child: Column(
@@ -137,17 +162,22 @@ class EmergencyCardScreen extends StatelessWidget {
                                 children: [
                                   Row(
                                     children: [
-                                      Text(
+                                      Flexible(
+                                          child: Text(
                                         pet?.name ?? 'Pet',
-                                        style: PawlyTypography.headlineSmall.copyWith(
+                                        style: PawlyTypography.resolve(context,
+                                                PawlyTypography.headlineSmall)
+                                            .copyWith(
                                           color: Colors.white,
                                           fontWeight: FontWeight.w800,
                                         ),
-                                      ),
+                                      )),
                                       const SizedBox(width: 8),
                                       StatusBadge(
                                         label: pet?.gender ?? '',
-                                        backgroundColor: Colors.white.withOpacity(0.15),
+                                        backgroundColor: PawlyColors.resolve(
+                                                context, PawlyColors.surface)
+                                            .withOpacity(0.15),
                                         textColor: Colors.white,
                                       ),
                                     ],
@@ -155,14 +185,18 @@ class EmergencyCardScreen extends StatelessWidget {
                                   const SizedBox(height: 4),
                                   Text(
                                     '${pet?.breed} • ${pet?.ageYears.toStringAsFixed(1)} yrs',
-                                    style: PawlyTypography.bodyMedium.copyWith(
+                                    style: PawlyTypography.resolve(
+                                            context, PawlyTypography.bodyMedium)
+                                        .copyWith(
                                       color: Colors.white.withOpacity(0.7),
                                     ),
                                   ),
                                   const SizedBox(height: 4),
                                   Text(
                                     'Weight: ${pet?.weightKg.toStringAsFixed(1)} kg',
-                                    style: PawlyTypography.bodyMedium.copyWith(
+                                    style: PawlyTypography.resolve(
+                                            context, PawlyTypography.bodyMedium)
+                                        .copyWith(
                                       color: Colors.white.withOpacity(0.7),
                                     ),
                                   ),
@@ -176,27 +210,37 @@ class EmergencyCardScreen extends StatelessWidget {
                       // Microchip ribbon
                       Container(
                         width: double.infinity,
-                        padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 12),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 22, vertical: 12),
                         color: Colors.white.withOpacity(0.08),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Text(
+                            Flexible(
+                                child: Text(
                               'MICROCHIP ID',
-                              style: PawlyTypography.eyebrow.copyWith(
+                              style: PawlyTypography.resolve(
+                                      context, PawlyTypography.eyebrow)
+                                  .copyWith(
                                 color: Colors.white70,
                                 fontWeight: FontWeight.w700,
                                 letterSpacing: 1.1,
                               ),
-                            ),
-                            Text(
-                              pet?.microchipId.isNotEmpty == true ? pet!.microchipId : 'Not Recorded',
-                              style: PawlyTypography.labelMedium.copyWith(
-                                color: PawlyColors.warmHoney,
+                            )),
+                            Flexible(
+                                child: Text(
+                              pet?.microchipId.isNotEmpty == true
+                                  ? pet!.microchipId
+                                  : 'Not Recorded',
+                              style: PawlyTypography.resolve(
+                                      context, PawlyTypography.labelMedium)
+                                  .copyWith(
+                                color: PawlyColors.resolve(
+                                    context, PawlyColors.warmHoney),
                                 fontWeight: FontWeight.w700,
                                 letterSpacing: 1.2,
                               ),
-                            ),
+                            )),
                           ],
                         ),
                       ),
@@ -217,7 +261,8 @@ class EmergencyCardScreen extends StatelessWidget {
                               icon: Icons.local_hospital_outlined,
                               label: 'Primary Clinic',
                               value: card.preferredClinic,
-                              subValue: '${card.preferredVetName} • ${card.preferredVetPhone}',
+                              subValue:
+                                  '${card.preferredVetName} • ${card.preferredVetPhone}',
                             ),
                             const Divider(color: Colors.white12, height: 24),
                             _EmergencyRow(
@@ -226,7 +271,9 @@ class EmergencyCardScreen extends StatelessWidget {
                               value: pet?.allergies.isNotEmpty == true
                                   ? pet!.allergies
                                   : 'None known',
-                              subValue: card.criticalNotes.isNotEmpty ? card.criticalNotes : null,
+                              subValue: card.criticalNotes.isNotEmpty
+                                  ? card.criticalNotes
+                                  : null,
                             ),
                           ],
                         ),
@@ -238,14 +285,19 @@ class EmergencyCardScreen extends StatelessWidget {
 
                 // Share / Save buttons
                 PawlyButton(
-                  text: 'Share Emergency Card',
-                  
-                  onPressed: () {
+                  text: 'Copy Emergency Card',
+                  onPressed: () async {
+                    await Clipboard.setData(ClipboardData(
+                        text:
+                            'Pawly emergency card: ${pet?.name}\nBreed: ${pet?.breed}\nMicrochip: ${pet?.microchipId}\nAllergies: ${pet?.allergies}\nContact: ${card.emergencyContactName} ${card.emergencyPhone}\nVet: ${card.preferredClinic} ${card.preferredVetPhone}\nCritical notes: ${card.criticalNotes}'));
+                    if (!context.mounted) return;
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
-                        content: Text('Emergency card for ${pet?.name} copied to clipboard!'),
+                        content: Text(
+                            'Emergency details for ${pet?.name} copied. Paste them into a message.'),
                         behavior: SnackBarBehavior.floating,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10)),
                       ),
                     );
                   },
@@ -285,7 +337,8 @@ class _EmergencyRow extends StatelessWidget {
             children: [
               Text(
                 label.toUpperCase(),
-                style: PawlyTypography.eyebrow.copyWith(
+                style: PawlyTypography.resolve(context, PawlyTypography.eyebrow)
+                    .copyWith(
                   color: Colors.white54,
                   fontWeight: FontWeight.w700,
                   letterSpacing: 1.0,
@@ -294,7 +347,9 @@ class _EmergencyRow extends StatelessWidget {
               const SizedBox(height: 4),
               Text(
                 value,
-                style: PawlyTypography.titleSmall.copyWith(
+                style:
+                    PawlyTypography.resolve(context, PawlyTypography.titleSmall)
+                        .copyWith(
                   color: Colors.white,
                   fontWeight: FontWeight.w600,
                 ),
@@ -303,7 +358,9 @@ class _EmergencyRow extends StatelessWidget {
                 const SizedBox(height: 2),
                 Text(
                   subValue!,
-                  style: PawlyTypography.bodyMedium.copyWith(
+                  style: PawlyTypography.resolve(
+                          context, PawlyTypography.bodyMedium)
+                      .copyWith(
                     color: Colors.white70,
                   ),
                 ),
@@ -356,7 +413,7 @@ class _EditEmergencySheetState extends State<_EditEmergencySheet> {
     super.dispose();
   }
 
-  void _save() {
+  Future<void> _save() async {
     final updated = EmergencyCardData(
       petId: widget.repository.selectedPetId,
       emergencyContactName: _contactNameCtrl.text.trim(),
@@ -366,18 +423,19 @@ class _EditEmergencySheetState extends State<_EditEmergencySheet> {
       preferredVetPhone: _vetPhoneCtrl.text.trim(),
       criticalNotes: _notesCtrl.text.trim(),
     );
-    widget.repository.updateEmergencyCard(updated);
-    Navigator.pop(context);
+    await widget.repository.updateEmergencyCard(updated);
+    if (mounted) Navigator.pop(context);
   }
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: const BoxDecoration(
-        color: PawlyColors.surface,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+      decoration: BoxDecoration(
+        color: PawlyColors.resolve(context, PawlyColors.surface),
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
       ),
-      padding: EdgeInsets.fromLTRB(20, 20, 20, MediaQuery.of(context).viewInsets.bottom + 24),
+      padding: EdgeInsets.fromLTRB(
+          20, 20, 20, MediaQuery.of(context).viewInsets.bottom + 24),
       child: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -388,7 +446,7 @@ class _EditEmergencySheetState extends State<_EditEmergencySheet> {
                 width: 40,
                 height: 4,
                 decoration: BoxDecoration(
-                  color: PawlyColors.border,
+                  color: PawlyColors.resolve(context, PawlyColors.border),
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
@@ -396,18 +454,21 @@ class _EditEmergencySheetState extends State<_EditEmergencySheet> {
             const SizedBox(height: 18),
             Text(
               'Edit Emergency Contacts',
-              style: PawlyTypography.titleMedium.copyWith(fontWeight: FontWeight.w700),
+              style:
+                  PawlyTypography.resolve(context, PawlyTypography.titleMedium)
+                      .copyWith(fontWeight: FontWeight.w700),
             ),
             const SizedBox(height: 16),
-
             TextField(
               controller: _contactNameCtrl,
-              decoration: const InputDecoration(labelText: 'Emergency Contact Name'),
+              decoration:
+                  const InputDecoration(labelText: 'Emergency Contact Name'),
             ),
             const SizedBox(height: 12),
             TextField(
               controller: _contactPhoneCtrl,
-              decoration: const InputDecoration(labelText: 'Emergency Contact Phone'),
+              decoration:
+                  const InputDecoration(labelText: 'Emergency Contact Phone'),
               keyboardType: TextInputType.phone,
             ),
             const SizedBox(height: 12),
@@ -423,19 +484,19 @@ class _EditEmergencySheetState extends State<_EditEmergencySheet> {
             const SizedBox(height: 12),
             TextField(
               controller: _vetPhoneCtrl,
-              decoration: const InputDecoration(labelText: 'Veterinarian Phone'),
+              decoration:
+                  const InputDecoration(labelText: 'Veterinarian Phone'),
               keyboardType: TextInputType.phone,
             ),
             const SizedBox(height: 12),
             TextField(
               controller: _notesCtrl,
-              decoration: const InputDecoration(labelText: 'Special Alerts / Instructions'),
+              decoration: const InputDecoration(
+                  labelText: 'Special Alerts / Instructions'),
             ),
             const SizedBox(height: 24),
-
             PawlyButton(
               text: 'Save Details',
-              
               onPressed: _save,
             ),
           ],

@@ -42,12 +42,72 @@ void main() async {
   );
 
   final repository = PawlyRepository();
-  await repository.init();
-
-  runApp(PawlyApp(repository: repository));
+  runApp(PawlyBootstrap(repository: repository));
 }
 
-enum AppFlowState { splash, onboarding, login, signup, forgotPassword, addFirstPet, main }
+/// Render immediately while local storage opens; retry leaves user data intact.
+class PawlyBootstrap extends StatefulWidget {
+  final PawlyRepository repository;
+  const PawlyBootstrap({super.key, required this.repository});
+  @override
+  State<PawlyBootstrap> createState() => _PawlyBootstrapState();
+}
+
+class _PawlyBootstrapState extends State<PawlyBootstrap> {
+  late Future<void> _initialization = widget.repository.init();
+  @override
+  Widget build(BuildContext context) => FutureBuilder<void>(
+        future: _initialization,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.done &&
+              !snapshot.hasError) {
+            return PawlyApp(repository: widget.repository);
+          }
+          return MaterialApp(
+              theme: PawlyTheme.lightTheme,
+              darkTheme: PawlyTheme.darkTheme,
+              debugShowCheckedModeBanner: false,
+              home: snapshot.hasError
+                  ? Scaffold(
+                      body: SafeArea(
+                          child: Center(
+                              child: Padding(
+                                  padding: const EdgeInsets.all(24),
+                                  child: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        const Icon(Icons.pets, size: 40),
+                                        const SizedBox(height: 16),
+                                        const Text(
+                                            'We couldn’t open your pet records.',
+                                            style: TextStyle(
+                                                fontSize: 22,
+                                                fontWeight: FontWeight.w700)),
+                                        const SizedBox(height: 8),
+                                        const Text(
+                                            'Try opening Pawly again. Your saved records will stay on this device.'),
+                                        const SizedBox(height: 20),
+                                        FilledButton(
+                                            onPressed: () => setState(() {
+                                                  _initialization =
+                                                      widget.repository.init();
+                                                }),
+                                            child: const Text('Try again')),
+                                      ])))))
+                  : SplashScreen(onFinish: () {}));
+        },
+      );
+}
+
+enum AppFlowState {
+  splash,
+  onboarding,
+  login,
+  signup,
+  forgotPassword,
+  addFirstPet,
+  main
+}
 
 class PawlyApp extends StatefulWidget {
   final PawlyRepository repository;
@@ -67,28 +127,49 @@ class _PawlyAppState extends State<PawlyApp> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Pawly',
-      debugShowCheckedModeBanner: false,
-      theme: PawlyTheme.lightTheme,
-      home: _buildCurrentScreen(),
-    );
+    return ListenableBuilder(
+        listenable: widget.repository,
+        builder: (context, _) => MaterialApp(
+              title: 'Pawly',
+              debugShowCheckedModeBanner: false,
+              theme: PawlyTheme.forPalette(
+                  widget.repository.palette, Brightness.light),
+              darkTheme: PawlyTheme.forPalette(
+                  widget.repository.palette, Brightness.dark),
+              themeMode: widget.repository.themeMode,
+              builder: (context, child) => Center(
+                  child: ConstrainedBox(
+                      constraints: const BoxConstraints(maxWidth: 480),
+                      child: child!)),
+              home: AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 240),
+                  child: KeyedSubtree(
+                      key: ValueKey(_flowState), child: _buildCurrentScreen())),
+            ));
   }
 
   Widget _buildCurrentScreen() {
     switch (_flowState) {
       case AppFlowState.splash:
         return SplashScreen(
-          onFinish: () => _goTo(AppFlowState.onboarding),
+          onFinish: () => _goTo(widget.repository.onboardingComplete
+              ? (widget.repository.pets.isEmpty
+                  ? AppFlowState.login
+                  : AppFlowState.main)
+              : AppFlowState.onboarding),
         );
 
       case AppFlowState.onboarding:
         return OnboardingScreen(
-          onFinish: () => _goTo(AppFlowState.login),
+          onFinish: () async {
+            await widget.repository.completeOnboarding();
+            if (mounted) _goTo(AppFlowState.login);
+          },
         );
 
       case AppFlowState.login:
         return LoginScreen(
+          repository: widget.repository,
           onLoginSuccess: () {
             if (widget.repository.pets.isEmpty) {
               _goTo(AppFlowState.addFirstPet);
@@ -98,7 +179,7 @@ class _PawlyAppState extends State<PawlyApp> {
           },
           onExploreDemo: () async {
             await widget.repository.seedDemoData();
-            _goTo(AppFlowState.main);
+            if (mounted) _goTo(AppFlowState.main);
           },
           onNavigateToSignup: () => _goTo(AppFlowState.signup),
           onNavigateToForgotPassword: () => _goTo(AppFlowState.forgotPassword),
@@ -106,6 +187,7 @@ class _PawlyAppState extends State<PawlyApp> {
 
       case AppFlowState.signup:
         return SignupScreen(
+          repository: widget.repository,
           onSignupSuccess: () => _goTo(AppFlowState.addFirstPet),
           onNavigateToLogin: () => _goTo(AppFlowState.login),
         );
@@ -117,9 +199,10 @@ class _PawlyAppState extends State<PawlyApp> {
 
       case AppFlowState.addFirstPet:
         return AddFirstPetScreen(
-          onPetCreated: (newPet) {
-            widget.repository.addPet(newPet);
-            _goTo(AppFlowState.main);
+          onBack: () => _goTo(AppFlowState.login),
+          onPetCreated: (newPet) async {
+            await widget.repository.addPet(newPet);
+            if (mounted) _goTo(AppFlowState.main);
           },
         );
 
@@ -152,7 +235,9 @@ class _PawlyMainScaffoldState extends State<PawlyMainScaffold> {
   void _push(Widget screen) {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (_) => screen),
+      MaterialPageRoute(
+          builder: (_) => ListenableBuilder(
+              listenable: widget.repository, builder: (_, __) => screen)),
     );
   }
 
@@ -171,13 +256,20 @@ class _PawlyMainScaffoldState extends State<PawlyMainScaffold> {
           repository: widget.repository,
           onSaved: () => Navigator.pop(context),
         )),
-        onOpenWeight: () => _push(WeightGrowthScreen(repository: widget.repository)),
-        onOpenVaccination: () => _push(VaccinationPassportScreen(repository: widget.repository)),
-        onOpenMedication: () => _push(MedicationScreen(repository: widget.repository)),
-        onOpenAppointments: () => _push(AppointmentsScreen(repository: widget.repository)),
-        onOpenMemories: () => _push(MemoriesScreen(repository: widget.repository)),
-        onOpenDocuments: () => _push(DocumentsScreen(repository: widget.repository)),
-        onOpenEmergencyCard: () => _push(EmergencyCardScreen(repository: widget.repository)),
+        onOpenWeight: () =>
+            _push(WeightGrowthScreen(repository: widget.repository)),
+        onOpenVaccination: () =>
+            _push(VaccinationPassportScreen(repository: widget.repository)),
+        onOpenMedication: () =>
+            _push(MedicationScreen(repository: widget.repository)),
+        onOpenAppointments: () =>
+            _push(AppointmentsScreen(repository: widget.repository)),
+        onOpenMemories: () =>
+            _push(MemoriesScreen(repository: widget.repository)),
+        onOpenDocuments: () =>
+            _push(DocumentsScreen(repository: widget.repository)),
+        onOpenEmergencyCard: () =>
+            _push(EmergencyCardScreen(repository: widget.repository)),
       ),
     );
   }
@@ -185,9 +277,9 @@ class _PawlyMainScaffoldState extends State<PawlyMainScaffold> {
   void _openAddPet() {
     _push(
       AddFirstPetScreen(
-        onPetCreated: (pet) {
-          widget.repository.addPet(pet);
-          Navigator.pop(context);
+        onPetCreated: (pet) async {
+          await widget.repository.addPet(pet);
+          if (mounted) Navigator.pop(context);
         },
       ),
     );
@@ -210,13 +302,19 @@ class _PawlyMainScaffoldState extends State<PawlyMainScaffold> {
                   repository: widget.repository,
                   onSaved: () => Navigator.pop(context),
                 )),
-                onOpenCareTab: () => setState(() => _currentDestination = PawlyNavDestination.care),
-                onOpenHealthTab: () => setState(() => _currentDestination = PawlyNavDestination.health),
+                onOpenCareTab: () => setState(
+                    () => _currentDestination = PawlyNavDestination.care),
+                onOpenHealthTab: () => setState(
+                    () => _currentDestination = PawlyNavDestination.health),
                 onOpenPetSpace: _openPetSpace,
-                onOpenAppointments: () => _push(AppointmentsScreen(repository: widget.repository)),
-                onOpenWeight: () => _push(WeightGrowthScreen(repository: widget.repository)),
-                onOpenSearch: () => _push(UniversalSearchScreen(repository: widget.repository)),
-                onOpenCalendar: () => _push(PetCalendarScreen(repository: widget.repository)),
+                onOpenAppointments: () =>
+                    _push(AppointmentsScreen(repository: widget.repository)),
+                onOpenWeight: () =>
+                    _push(WeightGrowthScreen(repository: widget.repository)),
+                onOpenSearch: () =>
+                    _push(UniversalSearchScreen(repository: widget.repository)),
+                onOpenCalendar: () =>
+                    _push(PetCalendarScreen(repository: widget.repository)),
               ),
 
               // 1: PETS
@@ -242,9 +340,12 @@ class _PawlyMainScaffoldState extends State<PawlyMainScaffold> {
                   repository: widget.repository,
                   onSaved: () => Navigator.pop(context),
                 )),
-                onOpenWeight: () => _push(WeightGrowthScreen(repository: widget.repository)),
-                onOpenVaccination: () => _push(VaccinationPassportScreen(repository: widget.repository)),
-                onOpenMedication: () => _push(MedicationScreen(repository: widget.repository)),
+                onOpenWeight: () =>
+                    _push(WeightGrowthScreen(repository: widget.repository)),
+                onOpenVaccination: () => _push(
+                    VaccinationPassportScreen(repository: widget.repository)),
+                onOpenMedication: () =>
+                    _push(MedicationScreen(repository: widget.repository)),
               ),
 
               // 4: MORE / SETTINGS

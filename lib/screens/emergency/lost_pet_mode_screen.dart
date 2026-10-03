@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import '../../repositories/pawly_repository.dart';
 import '../../theme/pawly_colors.dart';
 import '../../theme/pawly_typography.dart';
@@ -23,7 +24,7 @@ class LostPetModeScreen extends StatelessWidget {
         final isLost = repository.isLostPetModeEnabled;
 
         return Scaffold(
-          backgroundColor: PawlyColors.background,
+          backgroundColor: PawlyColors.resolve(context, PawlyColors.background),
           appBar: const PawlyAppBar(title: 'Lost Pet Alert Mode'),
           body: SingleChildScrollView(
             padding: const EdgeInsets.all(20),
@@ -33,10 +34,14 @@ class LostPetModeScreen extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: isLost ? PawlyColors.border : Colors.white,
+                    color: isLost
+                        ? PawlyColors.resolve(context, PawlyColors.border)
+                        : Colors.white,
                     borderRadius: AppTokens.rMd,
                     border: Border.all(
-                      color: isLost ? PawlyColors.error : PawlyColors.border,
+                      color: isLost
+                          ? PawlyColors.resolve(context, PawlyColors.error)
+                          : PawlyColors.resolve(context, PawlyColors.border),
                       width: isLost ? 1.5 : 1.0,
                     ),
                   ),
@@ -45,12 +50,19 @@ class LostPetModeScreen extends StatelessWidget {
                       Container(
                         padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
-                          color: isLost ? PawlyColors.alertRose : PawlyColors.border,
+                          color: isLost
+                              ? PawlyColors.resolve(
+                                  context, PawlyColors.alertRose)
+                              : PawlyColors.resolve(
+                                  context, PawlyColors.border),
                           shape: BoxShape.circle,
                         ),
                         child: Icon(
                           Icons.radar_rounded,
-                          color: isLost ? Colors.white : PawlyColors.secondary,
+                          color: isLost
+                              ? Colors.white
+                              : PawlyColors.resolve(
+                                  context, PawlyColors.secondary),
                           size: 24,
                         ),
                       ),
@@ -60,18 +72,29 @@ class LostPetModeScreen extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              isLost ? 'LOST PET BROADCAST ACTIVE' : 'Lost Pet Broadcast Inactive',
-                              style: PawlyTypography.titleSmall.copyWith(
-                                color: isLost ? PawlyColors.alertRose : PawlyColors.textPrimary,
+                              isLost
+                                  ? 'LOST PET BROADCAST ACTIVE'
+                                  : 'Lost Pet Broadcast Inactive',
+                              style: PawlyTypography.resolve(
+                                      context, PawlyTypography.titleSmall)
+                                  .copyWith(
+                                color: isLost
+                                    ? PawlyColors.resolve(
+                                        context, PawlyColors.alertRose)
+                                    : PawlyColors.resolve(
+                                        context, PawlyColors.textPrimary),
                                 fontWeight: FontWeight.w700,
                               ),
                             ),
                             Text(
                               isLost
-                                  ? 'Poster is public & ready to broadcast.'
+                                  ? 'Details are ready for you to copy and share.'
                                   : 'Turn on if ${pet?.name ?? "your pet"} is missing.',
-                              style: PawlyTypography.bodyMedium.copyWith(
-                                color: PawlyColors.secondary,
+                              style: PawlyTypography.resolve(
+                                      context, PawlyTypography.bodyMedium)
+                                  .copyWith(
+                                color: PawlyColors.resolve(
+                                    context, PawlyColors.secondary),
                               ),
                             ),
                           ],
@@ -79,7 +102,8 @@ class LostPetModeScreen extends StatelessWidget {
                       ),
                       Switch(
                         value: isLost,
-                        activeColor: PawlyColors.alertRose,
+                        activeColor:
+                            PawlyColors.resolve(context, PawlyColors.alertRose),
                         onChanged: (val) => repository.toggleLostPetMode(val),
                       ),
                     ],
@@ -90,12 +114,17 @@ class LostPetModeScreen extends StatelessWidget {
                 // Shareable Lost Pet Poster Card
                 Container(
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: PawlyColors.resolve(context, PawlyColors.surface),
                     borderRadius: BorderRadius.circular(24),
-                    border: Border.all(color: PawlyColors.alertRose, width: 3),
+                    border: Border.all(
+                        color:
+                            PawlyColors.resolve(context, PawlyColors.alertRose),
+                        width: 3),
                     boxShadow: [
                       BoxShadow(
-                        color: PawlyColors.alertRose.withOpacity(0.12),
+                        color:
+                            PawlyColors.resolve(context, PawlyColors.alertRose)
+                                .withOpacity(0.12),
                         blurRadius: 24,
                         offset: const Offset(0, 8),
                       ),
@@ -107,13 +136,16 @@ class LostPetModeScreen extends StatelessWidget {
                       // Header Alert Bar
                       Container(
                         width: double.infinity,
-                        color: PawlyColors.alertRose,
+                        color:
+                            PawlyColors.resolve(context, PawlyColors.alertRose),
                         padding: const EdgeInsets.symmetric(vertical: 14),
                         child: Column(
                           children: [
                             Text(
                               'LOST PET REWARD',
-                              style: PawlyTypography.headlineSmall.copyWith(
+                              style: PawlyTypography.resolve(
+                                      context, PawlyTypography.headlineSmall)
+                                  .copyWith(
                                 color: Colors.white,
                                 fontWeight: FontWeight.w900,
                                 letterSpacing: 2.0,
@@ -121,7 +153,9 @@ class LostPetModeScreen extends StatelessWidget {
                             ),
                             Text(
                               'PLEASE HELP BRING ${pet?.name.toUpperCase()} HOME',
-                              style: PawlyTypography.eyebrow.copyWith(
+                              style: PawlyTypography.resolve(
+                                      context, PawlyTypography.eyebrow)
+                                  .copyWith(
                                 color: Colors.white.withOpacity(0.9),
                                 fontWeight: FontWeight.w700,
                                 letterSpacing: 1.0,
@@ -134,12 +168,16 @@ class LostPetModeScreen extends StatelessWidget {
                       // Pet Big Photo
                       AspectRatio(
                         aspectRatio: 16 / 11,
-                        child: Image.network(
-                          pet?.imageUrl ?? '',
-                          fit: BoxFit.cover,
+                        child: Image(
+                          image: pawlyImageProvider(pet?.imageUrl ?? ''),
+                          fit: BoxFit.contain,
                           errorBuilder: (_, __, ___) => Container(
-                            color: PawlyColors.border,
-                            child: const Icon(Icons.pets_rounded, size: 60, color: PawlyColors.tertiary),
+                            color: PawlyColors.resolve(
+                                context, PawlyColors.border),
+                            child: Icon(Icons.pets_rounded,
+                                size: 60,
+                                color: PawlyColors.resolve(
+                                    context, PawlyColors.tertiary)),
                           ),
                         ),
                       ),
@@ -151,74 +189,129 @@ class LostPetModeScreen extends StatelessWidget {
                           children: [
                             Text(
                               pet?.name ?? 'Pet',
-                              style: PawlyTypography.headlineSmall.copyWith(
-                                color: PawlyColors.deepEspresso,
+                              style: PawlyTypography.resolve(
+                                      context, PawlyTypography.headlineSmall)
+                                  .copyWith(
+                                color: PawlyColors.resolve(
+                                    context, PawlyColors.deepEspresso),
                                 fontWeight: FontWeight.w800,
                               ),
                             ),
                             const SizedBox(height: 4),
                             Text(
                               '${pet?.breed} • ${pet?.gender} • ${pet?.weightKg} kg',
-                              style: PawlyTypography.bodyMedium.copyWith(
-                                color: PawlyColors.secondary,
+                              style: PawlyTypography.resolve(
+                                      context, PawlyTypography.bodyMedium)
+                                  .copyWith(
+                                color: PawlyColors.resolve(
+                                    context, PawlyColors.secondary),
                                 fontWeight: FontWeight.w600,
                               ),
                             ),
                             const SizedBox(height: 16),
-
                             Container(
                               padding: const EdgeInsets.all(14),
                               decoration: BoxDecoration(
-                                color: PawlyColors.background,
+                                color: PawlyColors.resolve(
+                                    context, PawlyColors.background),
                                 borderRadius: BorderRadius.circular(16),
                               ),
                               child: Column(
                                 children: [
                                   Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
                                     children: [
-                                      Text('Microchip:', style: PawlyTypography.bodyMedium.copyWith(color: PawlyColors.secondary)),
-                                      Text(
-                                        pet?.microchipId.isNotEmpty == true ? pet!.microchipId : 'Registered',
-                                        style: PawlyTypography.bodyMedium.copyWith(fontWeight: FontWeight.w700),
-                                      ),
+                                      Flexible(
+                                          child: Text('Microchip:',
+                                              style: PawlyTypography.resolve(
+                                                      context,
+                                                      PawlyTypography
+                                                          .bodyMedium)
+                                                  .copyWith(
+                                                      color: PawlyColors.resolve(
+                                                          context,
+                                                          PawlyColors
+                                                              .secondary)))),
+                                      Flexible(
+                                          child: Text(
+                                        pet?.microchipId.isNotEmpty == true
+                                            ? pet!.microchipId
+                                            : 'Registered',
+                                        style: PawlyTypography.resolve(context,
+                                                PawlyTypography.bodyMedium)
+                                            .copyWith(
+                                                fontWeight: FontWeight.w700),
+                                      )),
                                     ],
                                   ),
                                   const SizedBox(height: 6),
                                   Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
                                     children: [
-                                      Text('Contact:', style: PawlyTypography.bodyMedium.copyWith(color: PawlyColors.secondary)),
-                                      Text(
+                                      Flexible(
+                                          child: Text('Contact:',
+                                              style: PawlyTypography.resolve(
+                                                      context,
+                                                      PawlyTypography
+                                                          .bodyMedium)
+                                                  .copyWith(
+                                                      color: PawlyColors.resolve(
+                                                          context,
+                                                          PawlyColors
+                                                              .secondary)))),
+                                      Flexible(
+                                          child: Text(
                                         card.emergencyContactName,
-                                        style: PawlyTypography.bodyMedium.copyWith(fontWeight: FontWeight.w700),
-                                      ),
+                                        style: PawlyTypography.resolve(context,
+                                                PawlyTypography.bodyMedium)
+                                            .copyWith(
+                                                fontWeight: FontWeight.w700),
+                                      )),
                                     ],
                                   ),
                                   const SizedBox(height: 6),
                                   Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
                                     children: [
-                                      Text('Phone:', style: PawlyTypography.bodyMedium.copyWith(color: PawlyColors.secondary)),
-                                      Text(
+                                      Flexible(
+                                          child: Text('Phone:',
+                                              style: PawlyTypography.resolve(
+                                                      context,
+                                                      PawlyTypography
+                                                          .bodyMedium)
+                                                  .copyWith(
+                                                      color: PawlyColors.resolve(
+                                                          context,
+                                                          PawlyColors
+                                                              .secondary)))),
+                                      Flexible(
+                                          child: Text(
                                         card.emergencyPhone,
-                                        style: PawlyTypography.titleSmall.copyWith(
+                                        style: PawlyTypography.resolve(context,
+                                                PawlyTypography.titleSmall)
+                                            .copyWith(
                                           fontWeight: FontWeight.w800,
-                                          color: PawlyColors.black,
+                                          color: PawlyColors.resolve(
+                                              context, PawlyColors.black),
                                         ),
-                                      ),
+                                      )),
                                     ],
                                   ),
                                 ],
                               ),
                             ),
                             const SizedBox(height: 16),
-
                             Text(
                               'If spotted or found, please call immediately. Approach gently as they may be scared.',
                               textAlign: TextAlign.center,
-                              style: PawlyTypography.bodyMedium.copyWith(
-                                color: PawlyColors.tertiary,
+                              style: PawlyTypography.resolve(
+                                      context, PawlyTypography.bodyMedium)
+                                  .copyWith(
+                                color: PawlyColors.resolve(
+                                    context, PawlyColors.tertiary),
                                 fontStyle: FontStyle.italic,
                               ),
                             ),
@@ -232,27 +325,35 @@ class LostPetModeScreen extends StatelessWidget {
 
                 // Broadcast actions
                 PawlyButton(
-                  text: 'Broadcast Digital Poster',
-                  
-                  onPressed: () {
+                  text: 'Copy Lost Pet Details',
+                  onPressed: () async {
+                    await Clipboard.setData(ClipboardData(
+                        text:
+                            'LOST PET: ${pet?.name}\n${pet?.animalType} · ${pet?.breed}\nMicrochip: ${pet?.microchipId}\nPlease contact ${card.emergencyContactName}: ${card.emergencyPhone}'));
+                    if (!context.mounted) return;
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
-                        content: Text('Lost Pet alert generated for ${pet?.name}. Share link copied!'),
+                        content: const Text(
+                            'Lost pet details copied. Paste them into your community message.'),
                         behavior: SnackBarBehavior.floating,
-                        backgroundColor: PawlyColors.alertRose,
+                        backgroundColor:
+                            PawlyColors.resolve(context, PawlyColors.alertRose),
                       ),
                     );
                   },
                 ),
                 const SizedBox(height: 12),
                 PawlyButton(
-                  text: 'Call Emergency Vet',
-                  
+                  text: 'Copy Vet Phone Number',
                   isSecondary: true,
-                  onPressed: () {
+                  onPressed: () async {
+                    await Clipboard.setData(
+                        ClipboardData(text: card.preferredVetPhone));
+                    if (!context.mounted) return;
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
-                        content: Text('Dialing ${card.preferredClinic} (${card.preferredVetPhone})...'),
+                        content: Text(
+                            'Vet phone number copied: ${card.preferredVetPhone}'),
                         behavior: SnackBarBehavior.floating,
                       ),
                     );

@@ -1,8 +1,12 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import '../theme/pawly_colors.dart';
 import '../theme/app_tokens.dart';
 import '../theme/pawly_typography.dart';
 import '../models/pet.dart';
+
+ImageProvider pawlyImageProvider(String path) =>
+    path.startsWith('assets/') ? AssetImage(path) : NetworkImage(path);
 
 // ─────────────────────────────────────────────────────────────────────────────
 // 1. PawlyAppBar
@@ -36,11 +40,16 @@ class PawlyAppBar extends StatelessWidget implements PreferredSizeWidget {
           padding: const EdgeInsets.symmetric(horizontal: 8),
           child: Row(
             children: [
-              if (showBack && (Navigator.canPop(context) || onBack != null)) ...[
+              if (showBack &&
+                  (Navigator.canPop(context) || onBack != null)) ...[
                 IconButton(
+                  tooltip: 'Back',
                   onPressed: onBack ?? () => Navigator.pop(context),
-                  icon: const Icon(Icons.arrow_back, color: PawlyColors.black, size: 22),
-                  constraints: const BoxConstraints(minWidth: 44, minHeight: 44),
+                  icon: Icon(Icons.arrow_back,
+                      color: PawlyColors.resolve(context, PawlyColors.black),
+                      size: 22),
+                  constraints:
+                      const BoxConstraints(minWidth: 44, minHeight: 44),
                   padding: EdgeInsets.zero,
                 ),
               ] else
@@ -48,7 +57,8 @@ class PawlyAppBar extends StatelessWidget implements PreferredSizeWidget {
               Expanded(
                 child: Text(
                   title,
-                  style: PawlyTypography.pageTitle,
+                  style: PawlyTypography.resolve(
+                      context, PawlyTypography.pageTitle),
                   overflow: TextOverflow.ellipsis,
                   maxLines: 1,
                 ),
@@ -74,7 +84,7 @@ class PawlyAppBar extends StatelessWidget implements PreferredSizeWidget {
 /// Old enum kept for backward compat
 enum PawlyButtonVariant { primary, secondary, clay }
 
-class PawlyButton extends StatelessWidget {
+class PawlyButton extends StatefulWidget {
   // New API
   final String? text;
   final bool isSecondary;
@@ -84,7 +94,7 @@ class PawlyButton extends StatelessWidget {
   final String? label;
   final PawlyButtonVariant? variant;
   final bool? isFullWidth;
-  final VoidCallback onPressed;
+  final FutureOr<void> Function() onPressed;
 
   const PawlyButton({
     super.key,
@@ -109,16 +119,38 @@ class PawlyButton extends StatelessWidget {
     this.isFullWidth,
   });
 
-  String get _resolvedLabel => text ?? label ?? '';
+  @override
+  State<PawlyButton> createState() => _PawlyButtonState();
+}
+
+class _PawlyButtonState extends State<PawlyButton> {
+  bool _busy = false;
+  Future<void> _run() async {
+    if (_busy) return;
+    setState(() => _busy = true);
+    try {
+      await widget.onPressed();
+    } catch (_) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+            content: Text('Could not save this change. Please try again.')));
+      }
+    } finally {
+      if (mounted) setState(() => _busy = false);
+    }
+  }
+
+  String get _resolvedLabel => widget.text ?? widget.label ?? '';
 
   bool get _isSecondaryResolved {
-    if (variant == PawlyButtonVariant.secondary || variant == PawlyButtonVariant.clay) return true;
-    return isSecondary;
+    if (widget.variant == PawlyButtonVariant.secondary ||
+        widget.variant == PawlyButtonVariant.clay) return true;
+    return widget.isSecondary;
   }
 
   bool get _isFullWidth {
-    if (isFullWidth != null) return isFullWidth!;
-    return !isSmall;
+    if (widget.isFullWidth != null) return widget.isFullWidth!;
+    return !widget.isSmall;
   }
 
   @override
@@ -127,26 +159,31 @@ class PawlyButton extends StatelessWidget {
     return SizedBox(
       width: _isFullWidth ? double.infinity : null,
       child: ElevatedButton(
-        onPressed: onPressed,
+        onPressed: _busy ? null : _run,
         style: ElevatedButton.styleFrom(
-          backgroundColor: useSecondary ? PawlyColors.surface : PawlyColors.black,
-          foregroundColor: useSecondary ? PawlyColors.black : PawlyColors.surface,
+          backgroundColor: useSecondary
+              ? Theme.of(context).colorScheme.surface
+              : Theme.of(context).colorScheme.primary,
+          foregroundColor: useSecondary
+              ? Theme.of(context).colorScheme.primary
+              : Theme.of(context).colorScheme.onPrimary,
           elevation: 0,
           padding: EdgeInsets.symmetric(
-            vertical: isSmall ? 10 : 16,
-            horizontal: isSmall ? 16 : 24,
+            vertical: widget.isSmall ? 10 : 16,
+            horizontal: widget.isSmall ? 16 : 24,
           ),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(AppTokens.r14),
             side: useSecondary
-                ? const BorderSide(color: PawlyColors.border)
+                ? BorderSide(
+                    color: PawlyColors.resolve(context, PawlyColors.border))
                 : BorderSide.none,
           ),
         ),
         child: Text(
-          _resolvedLabel,
+          _busy ? 'Working…' : _resolvedLabel,
           style: TextStyle(
-            fontSize: isSmall ? 13 : 15,
+            fontSize: widget.isSmall ? 13 : 15,
             fontWeight: FontWeight.w600,
           ),
         ),
@@ -181,9 +218,13 @@ class PawlyCard extends StatelessWidget {
     final card = Container(
       padding: padding,
       decoration: BoxDecoration(
-        color: backgroundColor ?? PawlyColors.surface,
+        color: backgroundColor ??
+            PawlyColors.resolve(context, PawlyColors.surface),
         borderRadius: borderRadius ?? BorderRadius.circular(AppTokens.r18),
-        border: Border.all(color: borderColor ?? PawlyColors.border, width: 1),
+        border: Border.all(
+            color:
+                borderColor ?? PawlyColors.resolve(context, PawlyColors.border),
+            width: 1),
       ),
       child: child,
     );
@@ -216,16 +257,29 @@ class PetAvatar extends StatelessWidget {
       decoration: BoxDecoration(
         shape: BoxShape.circle,
         border: isSelected
-            ? Border.all(color: PawlyColors.black, width: 2)
-            : Border.all(color: PawlyColors.border, width: 1),
+            ? Border.all(
+                color: PawlyColors.resolve(context, PawlyColors.black),
+                width: 2)
+            : Border.all(
+                color: PawlyColors.resolve(context, PawlyColors.border),
+                width: 1),
       ),
       child: ClipOval(
-        child: Image.network(
-          imageUrl,
-          fit: BoxFit.cover,
+        child: Image(
+          image: pawlyImageProvider(imageUrl),
+          fit: BoxFit.contain,
+          loadingBuilder: (context, child, progress) => progress == null
+              ? child
+              : Container(
+                  color: Theme.of(context).colorScheme.primaryContainer,
+                  child: Icon(Icons.pets,
+                      color: Theme.of(context).colorScheme.onPrimaryContainer,
+                      size: 24)),
           errorBuilder: (_, __, ___) => Container(
-            color: PawlyColors.surfaceWarm,
-            child: const Icon(Icons.pets, color: PawlyColors.tertiary, size: 20),
+            color: PawlyColors.resolve(context, PawlyColors.surfaceWarm),
+            child: Icon(Icons.pets,
+                color: PawlyColors.resolve(context, PawlyColors.tertiary),
+                size: 20),
           ),
         ),
       ),
@@ -284,10 +338,11 @@ class PetHeroImage extends StatelessWidget {
         child: Stack(
           fit: StackFit.expand,
           children: [
-            Image.network(
-              imageUrl,
-              fit: BoxFit.cover,
-              errorBuilder: (_, __, ___) => Container(color: PawlyColors.surfaceWarm),
+            Image(
+              image: pawlyImageProvider(imageUrl),
+              fit: BoxFit.contain,
+              errorBuilder: (_, __, ___) => Container(
+                  color: PawlyColors.resolve(context, PawlyColors.surfaceWarm)),
             ),
             Positioned(
               bottom: 0,
@@ -339,11 +394,14 @@ class SectionHeader extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(eyebrow.toUpperCase(), style: PawlyTypography.eyebrow),
+                Text(eyebrow.toUpperCase(),
+                    style: PawlyTypography.resolve(
+                        context, PawlyTypography.eyebrow)),
                 const SizedBox(height: 4),
                 Text(
                   title,
-                  style: PawlyTypography.sectionTitle,
+                  style: PawlyTypography.resolve(
+                      context, PawlyTypography.sectionTitle),
                   overflow: TextOverflow.ellipsis,
                   maxLines: 2,
                 ),
@@ -374,14 +432,15 @@ class TagChip extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(AppTokens.pill),
-        border: Border.all(color: PawlyColors.border),
+        border:
+            Border.all(color: PawlyColors.resolve(context, PawlyColors.border)),
       ),
       child: Text(
         label,
-        style: const TextStyle(
+        style: TextStyle(
           fontSize: 12,
           fontWeight: FontWeight.w500,
-          color: PawlyColors.charcoal,
+          color: PawlyColors.resolve(context, PawlyColors.charcoal),
         ),
       ),
     );
@@ -409,33 +468,33 @@ class StatusBadge extends StatelessWidget {
     this.variant,
   });
 
-  Color get _bg {
+  Color _bg(BuildContext context) {
     if (backgroundColor != null) return backgroundColor!;
     switch (variant) {
       case PawlyBadgeVariant.alert:
-        return PawlyColors.alertLight;
+        return PawlyColors.resolve(context, PawlyColors.alertLight);
       case PawlyBadgeVariant.sage:
-        return const Color(0xFFDFEFE3);
+        return PawlyColors.resolve(context, PawlyColors.surfaceWarm);
       case PawlyBadgeVariant.honey:
-        return const Color(0xFFFFF0D6);
+        return PawlyColors.resolve(context, PawlyColors.surfaceWarm);
       case PawlyBadgeVariant.slate:
       default:
-        return PawlyColors.surfaceWarm;
+        return PawlyColors.resolve(context, PawlyColors.surfaceWarm);
     }
   }
 
-  Color get _fg {
+  Color _fg(BuildContext context) {
     if (textColor != null) return textColor!;
     switch (variant) {
       case PawlyBadgeVariant.alert:
-        return PawlyColors.alert;
+        return PawlyColors.resolve(context, PawlyColors.alert);
       case PawlyBadgeVariant.sage:
-        return const Color(0xFF2E7D4F);
+        return PawlyColors.resolve(context, PawlyColors.secondary);
       case PawlyBadgeVariant.honey:
-        return const Color(0xFF8A6200);
+        return PawlyColors.resolve(context, PawlyColors.secondary);
       case PawlyBadgeVariant.slate:
       default:
-        return PawlyColors.secondary;
+        return PawlyColors.resolve(context, PawlyColors.secondary);
     }
   }
 
@@ -444,7 +503,7 @@ class StatusBadge extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
-        color: _bg,
+        color: _bg(context),
         borderRadius: BorderRadius.circular(AppTokens.pill),
       ),
       child: Text(
@@ -452,7 +511,7 @@ class StatusBadge extends StatelessWidget {
         style: TextStyle(
           fontSize: 11,
           fontWeight: FontWeight.w600,
-          color: _fg,
+          color: _fg(context),
         ),
       ),
     );
@@ -502,18 +561,20 @@ class EmptyStateView extends StatelessWidget {
             Icon(
               icon ?? Icons.pets_outlined,
               size: 36,
-              color: PawlyColors.tertiary,
+              color: PawlyColors.resolve(context, PawlyColors.tertiary),
             ),
             const SizedBox(height: 12),
             Text(
               title,
-              style: PawlyTypography.titleMedium,
+              style:
+                  PawlyTypography.resolve(context, PawlyTypography.titleMedium),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 6),
             Text(
               subtitle,
-              style: PawlyTypography.bodyMedium,
+              style:
+                  PawlyTypography.resolve(context, PawlyTypography.bodyMedium),
               textAlign: TextAlign.center,
             ),
             if (_ctaLabel != null && _ctaAction != null) ...[
@@ -536,6 +597,8 @@ class EmptyStateView extends StatelessWidget {
 // ─────────────────────────────────────────────────────────────────────────────
 class CareTimelineItem extends StatelessWidget {
   final String time;
+  final String? petImageUrl;
+  final String? petName;
   final String title;
   final String? subtitle;
   final bool isCompleted;
@@ -548,6 +611,8 @@ class CareTimelineItem extends StatelessWidget {
   const CareTimelineItem({
     super.key,
     required this.time,
+    this.petImageUrl,
+    this.petName,
     required this.title,
     this.subtitle,
     required this.isCompleted,
@@ -568,14 +633,37 @@ class CareTimelineItem extends StatelessWidget {
           // Time column
           SizedBox(
             width: 52,
-            child: Text(
-              time,
-              style: TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.w600,
-                color: isCompleted ? PawlyColors.tertiary : PawlyColors.secondary,
-              ),
-            ),
+            child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  if (petImageUrl != null) ...[
+                    Semantics(
+                        label: 'Care for ${petName ?? "your pet"}',
+                        image: true,
+                        child: ClipRRect(
+                            borderRadius: BorderRadius.circular(12),
+                            child: SizedBox(
+                                width: 44,
+                                height: 44,
+                                child: Image(
+                                    image: pawlyImageProvider(petImageUrl!),
+                                    fit: BoxFit.contain,
+                                    errorBuilder: (_, __, ___) => const Icon(
+                                        Icons.pets_outlined,
+                                        size: 24))))),
+                    const SizedBox(height: 6),
+                  ],
+                  Text(
+                    time,
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      color: isCompleted
+                          ? PawlyColors.resolve(context, PawlyColors.tertiary)
+                          : PawlyColors.resolve(context, PawlyColors.secondary),
+                    ),
+                  )
+                ]),
           ),
           const SizedBox(width: 10),
           // Content
@@ -589,7 +677,9 @@ class CareTimelineItem extends StatelessWidget {
                     fontSize: 15,
                     fontWeight: FontWeight.w500,
                     decoration: isCompleted ? TextDecoration.lineThrough : null,
-                    color: isCompleted ? PawlyColors.tertiary : PawlyColors.charcoal,
+                    color: isCompleted
+                        ? PawlyColors.resolve(context, PawlyColors.tertiary)
+                        : PawlyColors.resolve(context, PawlyColors.charcoal),
                   ),
                   overflow: TextOverflow.ellipsis,
                   maxLines: 2,
@@ -598,7 +688,8 @@ class CareTimelineItem extends StatelessWidget {
                   const SizedBox(height: 2),
                   Text(
                     subtitle!,
-                    style: PawlyTypography.caption,
+                    style: PawlyTypography.resolve(
+                        context, PawlyTypography.caption),
                     overflow: TextOverflow.ellipsis,
                     maxLines: 1,
                   ),
@@ -607,7 +698,8 @@ class CareTimelineItem extends StatelessWidget {
                   const SizedBox(height: 2),
                   Text(
                     'By ${assignedTo!}',
-                    style: PawlyTypography.caption,
+                    style: PawlyTypography.resolve(
+                        context, PawlyTypography.caption),
                   ),
                 ],
               ],
@@ -617,35 +709,41 @@ class CareTimelineItem extends StatelessWidget {
           // Actions: Delete & Toggle
           if (onDelete != null)
             IconButton(
-              icon: const Icon(Icons.delete_outline_rounded, size: 18, color: PawlyColors.tertiary),
+              icon: Icon(Icons.delete_outline_rounded,
+                  size: 18,
+                  color: PawlyColors.resolve(context, PawlyColors.tertiary)),
               padding: EdgeInsets.zero,
-              constraints: const BoxConstraints(minWidth: 28, minHeight: 28),
-              onPressed: onDelete,
+              constraints: const BoxConstraints(minWidth: 44, minHeight: 44),
+              tooltip: 'Delete routine',
+              onPressed: () async {
+                final confirmed = await showDialog<bool>(
+                    context: context,
+                    builder: (ctx) => AlertDialog(
+                            title: Text('Remove $title?'),
+                            content: const Text(
+                                'This removes the routine from your care schedule.'),
+                            actions: [
+                              TextButton(
+                                  onPressed: () => Navigator.pop(ctx, false),
+                                  child: const Text('Keep routine')),
+                              TextButton(
+                                  onPressed: () => Navigator.pop(ctx, true),
+                                  child: const Text('Remove'))
+                            ]));
+                if (confirmed == true) onDelete!();
+              },
             ),
-          // Toggle
-          GestureDetector(
-            onTap: onToggle,
-            child: Container(
-              width: 24,
-              height: 24,
-              margin: const EdgeInsets.only(top: 1),
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                border: Border.all(
-                  color: isCompleted ? PawlyColors.black : PawlyColors.border,
-                  width: 1.5,
-                ),
-                color: isCompleted ? PawlyColors.black : Colors.transparent,
-              ),
-              child: isCompleted
-                  ? const Icon(Icons.check, size: 13, color: Colors.white)
-                  : null,
-            ),
-          ),
+          // A real checkbox gives screen readers checked state and a 48px target.
+          Semantics(
+              label: title,
+              child:
+                  Checkbox(value: isCompleted, onChanged: (_) => onToggle())),
         ],
       ),
     );
-    return onTap != null ? GestureDetector(onTap: onTap, child: content) : content;
+    return onTap != null
+        ? GestureDetector(onTap: onTap, child: content)
+        : content;
   }
 }
 
@@ -699,8 +797,12 @@ class PetSwitcher extends StatelessWidget {
                       pet.name,
                       style: TextStyle(
                         fontSize: 11,
-                        fontWeight: isSelected ? FontWeight.w700 : FontWeight.w400,
-                        color: isSelected ? PawlyColors.black : PawlyColors.secondary,
+                        fontWeight:
+                            isSelected ? FontWeight.w700 : FontWeight.w400,
+                        color: isSelected
+                            ? PawlyColors.black
+                            : PawlyColors.resolve(
+                                context, PawlyColors.secondary),
                       ),
                     ),
                   ],
@@ -719,17 +821,24 @@ class PetSwitcher extends StatelessWidget {
                     height: 48,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      border: Border.all(color: PawlyColors.border, width: 1),
-                      color: PawlyColors.surfaceWarm,
+                      border: Border.all(
+                          color:
+                              PawlyColors.resolve(context, PawlyColors.border),
+                          width: 1),
+                      color:
+                          PawlyColors.resolve(context, PawlyColors.surfaceWarm),
                     ),
-                    child: const Icon(Icons.add, color: PawlyColors.secondary, size: 20),
+                    child: Icon(Icons.add,
+                        color:
+                            PawlyColors.resolve(context, PawlyColors.secondary),
+                        size: 20),
                   ),
                   const SizedBox(height: 4),
-                  const Text(
+                  Text(
                     'Add',
                     style: TextStyle(
                       fontSize: 11,
-                      color: PawlyColors.tertiary,
+                      color: PawlyColors.resolve(context, PawlyColors.tertiary),
                       fontWeight: FontWeight.w400,
                     ),
                   ),
@@ -815,19 +924,22 @@ class MetricBubble extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         if (icon != null) ...[
-          Icon(icon, size: 18, color: PawlyColors.secondary),
+          Icon(icon,
+              size: 18,
+              color: PawlyColors.resolve(context, PawlyColors.secondary)),
           const SizedBox(height: 4),
         ],
         Text(
           value,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 20,
             fontWeight: FontWeight.w700,
-            color: PawlyColors.black,
+            color: PawlyColors.resolve(context, PawlyColors.black),
           ),
         ),
         const SizedBox(height: 2),
-        Text(label, style: PawlyTypography.caption),
+        Text(label,
+            style: PawlyTypography.resolve(context, PawlyTypography.caption)),
       ],
     );
   }
@@ -858,11 +970,11 @@ class PhotoOverlayBubble extends StatelessWidget {
         child: Stack(
           fit: StackFit.expand,
           children: [
-            Image.network(
-              imageUrl,
-              fit: BoxFit.cover,
-              errorBuilder: (_, __, ___) =>
-                  Container(color: PawlyColors.surfaceWarm),
+            Image(
+              image: pawlyImageProvider(imageUrl),
+              fit: BoxFit.contain,
+              errorBuilder: (_, __, ___) => Container(
+                  color: PawlyColors.resolve(context, PawlyColors.surfaceWarm)),
             ),
             if (caption != null)
               Positioned(
@@ -893,4 +1005,18 @@ class PhotoOverlayBubble extends StatelessWidget {
       ),
     );
   }
+}
+
+/// A keyboard-safe, scrollable sheet used by Pawly forms.
+class PawlySheet extends StatelessWidget {
+  final Widget child;
+  const PawlySheet({super.key, required this.child});
+  @override
+  Widget build(BuildContext context) => SafeArea(
+      top: false,
+      child: SingleChildScrollView(
+        padding: EdgeInsets.fromLTRB(
+            24, 8, 24, MediaQuery.of(context).viewInsets.bottom + 24),
+        child: child,
+      ));
 }

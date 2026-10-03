@@ -9,7 +9,8 @@ class AddHealthEventScreen extends StatefulWidget {
   final PawlyRepository repository;
   final VoidCallback onSaved;
 
-  const AddHealthEventScreen({super.key, required this.repository, required this.onSaved});
+  const AddHealthEventScreen(
+      {super.key, required this.repository, required this.onSaved});
 
   @override
   State<AddHealthEventScreen> createState() => _AddHealthEventScreenState();
@@ -18,19 +19,63 @@ class AddHealthEventScreen extends StatefulWidget {
 class _AddHealthEventScreenState extends State<AddHealthEventScreen> {
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _notesController = TextEditingController();
-  final TextEditingController _vetController = TextEditingController(text: 'Dr. Sarah Ramos, DVM');
-  final TextEditingController _clinicController = TextEditingController(text: 'CityVet Wellness Center');
+  final TextEditingController _vetController = TextEditingController();
+  final TextEditingController _clinicController = TextEditingController();
 
   String _eventType = 'Checkup';
-  final List<String> _types = const ['Checkup', 'Vaccination', 'Medication', 'Procedure', 'Dentistry', 'Observation'];
+  final List<String> _types = [
+    'Checkup',
+    'Vaccination',
+    'Medication',
+    'Procedure',
+    'Dentistry',
+    'Observation'
+  ];
 
-  void _handleSave() {
+  String? _error;
+  bool _saving = false;
+  @override
+  void dispose() {
+    for (final controller in [
+      _titleController,
+      _notesController,
+      _vetController,
+      _clinicController
+    ]) {
+      controller.dispose();
+    }
+    super.dispose();
+  }
+
+  Future<void> _handleSave() async {
+    if (_saving) return;
     final title = _titleController.text.trim();
-    if (title.isEmpty) return;
+    if (title.isEmpty) {
+      setState(() => _error = 'Give this health record a title.');
+      return;
+    }
+    setState(() {
+      _saving = true;
+      _error = null;
+    });
 
     final now = DateTime.now();
-    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-    final dateStr = '${months[now.month - 1]} ${now.day.toString().padLeft(2, '0')}, ${now.year}';
+    const months = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec'
+    ];
+    final dateStr =
+        '${months[now.month - 1]} ${now.day.toString().padLeft(2, '0')}, ${now.year}';
 
     final petId = widget.repository.selectedPetId.isNotEmpty
         ? widget.repository.selectedPetId
@@ -47,18 +92,26 @@ class _AddHealthEventScreenState extends State<AddHealthEventScreen> {
       clinic: _clinicController.text.trim(),
     );
 
-    widget.repository.addHealthEvent(event);
-    widget.onSaved();
+    try {
+      await widget.repository.addHealthEvent(event);
+      if (mounted) widget.onSaved();
+    } catch (_) {
+      if (mounted) {
+        setState(() => _error = 'Couldn’t save this record. Please try again.');
+      }
+    } finally {
+      if (mounted) setState(() => _saving = false);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: PawlyColors.background,
+      backgroundColor: PawlyColors.resolve(context, PawlyColors.background),
       appBar: AppBar(
         title: const Text('Log Health Event'),
         leading: IconButton(
-          icon:  const Icon(Icons.close_rounded),
+          icon: const Icon(Icons.close_rounded),
           onPressed: () => Navigator.of(context).pop(),
         ),
       ),
@@ -68,7 +121,15 @@ class _AddHealthEventScreenState extends State<AddHealthEventScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text('Event Type', style: PawlyTypography.labelLarge),
+              if (_error != null)
+                Padding(
+                    padding: const EdgeInsets.only(bottom: 16),
+                    child: Text(_error!,
+                        style: TextStyle(
+                            color: Theme.of(context).colorScheme.error))),
+              Text('Event Type',
+                  style: PawlyTypography.resolve(
+                      context, PawlyTypography.labelLarge)),
               const SizedBox(height: 10),
               Wrap(
                 spacing: 8,
@@ -79,75 +140,112 @@ class _AddHealthEventScreenState extends State<AddHealthEventScreen> {
                     label: Text(t),
                     selected: isSelected,
                     onSelected: (_) => setState(() => _eventType = t),
-                    backgroundColor: PawlyColors.surface,
-                    selectedColor: PawlyColors.surfaceWarm,
+                    backgroundColor:
+                        PawlyColors.resolve(context, PawlyColors.surface),
+                    selectedColor: PawlyColors.black,
                     labelStyle: TextStyle(
                       fontSize: 12,
-                      fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-                      color: isSelected ? Colors.white : PawlyColors.charcoal,
+                      fontWeight:
+                          isSelected ? FontWeight.w700 : FontWeight.w500,
+                      color: isSelected
+                          ? Colors.white
+                          : PawlyColors.resolve(context, PawlyColors.charcoal),
                     ),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(16),
                       side: BorderSide(
-                        color: isSelected ? PawlyColors.surfaceWarm : PawlyColors.border,
+                        color: isSelected
+                            ? PawlyColors.resolve(
+                                context, PawlyColors.surfaceWarm)
+                            : PawlyColors.resolve(context, PawlyColors.border),
                       ),
                     ),
                   );
                 }).toList(),
               ),
-
               const SizedBox(height: 24),
-
-              const Text('Event Title *', style: PawlyTypography.labelLarge),
+              Text('Event Title *',
+                  style: PawlyTypography.resolve(
+                      context, PawlyTypography.labelLarge)),
               const SizedBox(height: 8),
               TextField(
                 controller: _titleController,
                 decoration: InputDecoration(
-                  hintText: 'e.g. Annual physical, Core DHPP booster, Cytology exam',
+                  hintText:
+                      'e.g. Annual physical, Core DHPP booster, Cytology exam',
                   filled: true,
-                  fillColor: PawlyColors.surface,
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: const BorderSide(color: PawlyColors.border)),
-                  enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: const BorderSide(color: PawlyColors.border)),
+                  fillColor: PawlyColors.resolve(context, PawlyColors.surface),
+                  contentPadding:
+                      const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
+                  border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide: BorderSide(
+                          color: PawlyColors.resolve(
+                              context, PawlyColors.border))),
+                  enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide: BorderSide(
+                          color: PawlyColors.resolve(
+                              context, PawlyColors.border))),
                 ),
               ),
-
               const SizedBox(height: 20),
-
-              const Text('Clinical Notes & Observations', style: PawlyTypography.labelLarge),
+              Text('Clinical Notes & Observations',
+                  style: PawlyTypography.resolve(
+                      context, PawlyTypography.labelLarge)),
               const SizedBox(height: 8),
               TextField(
                 controller: _notesController,
                 maxLines: 3,
                 decoration: InputDecoration(
-                  hintText: 'e.g. Normal vitals, ears clear, no adverse reaction observed.',
+                  hintText:
+                      'e.g. Normal vitals, ears clear, no adverse reaction observed.',
                   filled: true,
-                  fillColor: PawlyColors.surface,
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: const BorderSide(color: PawlyColors.border)),
-                  enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: const BorderSide(color: PawlyColors.border)),
+                  fillColor: PawlyColors.resolve(context, PawlyColors.surface),
+                  contentPadding:
+                      const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
+                  border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide: BorderSide(
+                          color: PawlyColors.resolve(
+                              context, PawlyColors.border))),
+                  enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide: BorderSide(
+                          color: PawlyColors.resolve(
+                              context, PawlyColors.border))),
                 ),
               ),
-
               const SizedBox(height: 20),
-
               Row(
                 children: [
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text('Veterinarian', style: PawlyTypography.labelLarge),
+                        Text('Veterinarian',
+                            style: PawlyTypography.resolve(
+                                context, PawlyTypography.labelLarge)),
                         const SizedBox(height: 8),
                         TextField(
                           controller: _vetController,
                           decoration: InputDecoration(
                             hintText: 'Dr. Sarah Ramos',
                             filled: true,
-                            fillColor: PawlyColors.surface,
-                            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: const BorderSide(color: PawlyColors.border)),
-                            enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: const BorderSide(color: PawlyColors.border)),
+                            fillColor: PawlyColors.resolve(
+                                context, PawlyColors.surface),
+                            contentPadding: const EdgeInsets.symmetric(
+                                horizontal: 16, vertical: 14),
+                            border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(16),
+                                borderSide: BorderSide(
+                                    color: PawlyColors.resolve(
+                                        context, PawlyColors.border))),
+                            enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(16),
+                                borderSide: BorderSide(
+                                    color: PawlyColors.resolve(
+                                        context, PawlyColors.border))),
                           ),
                         ),
                       ],
@@ -158,17 +256,29 @@ class _AddHealthEventScreenState extends State<AddHealthEventScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text('Clinic', style: PawlyTypography.labelLarge),
+                        Text('Clinic',
+                            style: PawlyTypography.resolve(
+                                context, PawlyTypography.labelLarge)),
                         const SizedBox(height: 8),
                         TextField(
                           controller: _clinicController,
                           decoration: InputDecoration(
                             hintText: 'CityVet Center',
                             filled: true,
-                            fillColor: PawlyColors.surface,
-                            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: const BorderSide(color: PawlyColors.border)),
-                            enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: const BorderSide(color: PawlyColors.border)),
+                            fillColor: PawlyColors.resolve(
+                                context, PawlyColors.surface),
+                            contentPadding: const EdgeInsets.symmetric(
+                                horizontal: 16, vertical: 14),
+                            border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(16),
+                                borderSide: BorderSide(
+                                    color: PawlyColors.resolve(
+                                        context, PawlyColors.border))),
+                            enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(16),
+                                borderSide: BorderSide(
+                                    color: PawlyColors.resolve(
+                                        context, PawlyColors.border))),
                           ),
                         ),
                       ],
@@ -176,12 +286,9 @@ class _AddHealthEventScreenState extends State<AddHealthEventScreen> {
                   ),
                 ],
               ),
-
               const SizedBox(height: 32),
-
-              PawlyButton(text: 'Save Health Event',
-                
-                
+              PawlyButton(
+                text: _saving ? 'Saving…' : 'Save Health Event',
                 variant: PawlyButtonVariant.clay,
                 onPressed: _handleSave,
               ),

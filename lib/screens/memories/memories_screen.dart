@@ -19,7 +19,8 @@ class MemoriesScreen extends StatelessWidget {
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (_) => _AddMemorySheet(repository: repository),
+      builder: (_) =>
+          SingleChildScrollView(child: _AddMemorySheet(repository: repository)),
     );
   }
 
@@ -32,11 +33,13 @@ class MemoriesScreen extends StatelessWidget {
         final memories = repository.memoriesForPet(repository.selectedPetId);
 
         return Scaffold(
-          backgroundColor: PawlyColors.background,
+          backgroundColor: PawlyColors.resolve(context, PawlyColors.background),
           appBar: PawlyAppBar(
             title: 'Memories & Milestones',
             trailing: IconButton(
-              icon:  const Icon(Icons.add_photo_alternate_rounded, color: PawlyColors.black, size: 20),
+              icon: Icon(Icons.add_photo_alternate_rounded,
+                  color: PawlyColors.resolve(context, PawlyColors.black),
+                  size: 20),
               onPressed: () => _showAddMemoryModal(context),
             ),
           ),
@@ -59,9 +62,9 @@ class MemoriesScreen extends StatelessWidget {
                 SliverFillRemaining(
                   hasScrollBody: false,
                   child: EmptyStateView(
-                    
                     title: 'No Memories Captured',
-                    subtitle: 'Save adoption milestones, puppyhood memories, and adventures with ${pet?.name ?? "your pet"}.',
+                    subtitle:
+                        'Save adoption milestones, puppyhood memories, and adventures with ${pet?.name ?? "your pet"}.',
                     actionLabel: 'Capture First Memory',
                     onAction: () => _showAddMemoryModal(context),
                   ),
@@ -99,9 +102,10 @@ class _MemoryCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: PawlyColors.surface,
+        color: PawlyColors.resolve(context, PawlyColors.surface),
         borderRadius: AppTokens.rMd,
-        border: Border.all(color: PawlyColors.border),
+        border:
+            Border.all(color: PawlyColors.resolve(context, PawlyColors.border)),
       ),
       clipBehavior: Clip.antiAlias,
       child: Column(
@@ -112,13 +116,16 @@ class _MemoryCard extends StatelessWidget {
             children: [
               AspectRatio(
                 aspectRatio: 16 / 10,
-                child: Image.network(
-                  memory.imageUrl,
-                  fit: BoxFit.cover,
+                child: Image(
+                  image: pawlyImageProvider(memory.imageUrl),
+                  fit: BoxFit.contain,
                   errorBuilder: (context, error, stackTrace) => Container(
-                    color: PawlyColors.border,
-                    child: const Center(
-                      child: Icon(Icons.broken_image_rounded, color: PawlyColors.tertiary, size: 40),
+                    color: PawlyColors.resolve(context, PawlyColors.border),
+                    child: Center(
+                      child: Icon(Icons.broken_image_rounded,
+                          color: PawlyColors.resolve(
+                              context, PawlyColors.tertiary),
+                          size: 40),
                     ),
                   ),
                 ),
@@ -127,14 +134,17 @@ class _MemoryCard extends StatelessWidget {
                 top: 14,
                 left: 14,
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                   decoration: BoxDecoration(
-                    color: PawlyColors.deepEspresso.withOpacity(0.75),
+                    color: PawlyColors.black.withOpacity(0.75),
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: Text(
                     memory.milestoneType,
-                    style: PawlyTypography.eyebrow.copyWith(
+                    style: PawlyTypography.resolve(
+                            context, PawlyTypography.eyebrow)
+                        .copyWith(
                       color: Colors.white,
                       fontWeight: FontWeight.w700,
                     ),
@@ -156,16 +166,22 @@ class _MemoryCard extends StatelessWidget {
                     Expanded(
                       child: Text(
                         memory.title,
-                        style: PawlyTypography.titleMedium.copyWith(
+                        style: PawlyTypography.resolve(
+                                context, PawlyTypography.titleMedium)
+                            .copyWith(
                           fontWeight: FontWeight.w700,
-                          color: PawlyColors.textPrimary,
+                          color: PawlyColors.resolve(
+                              context, PawlyColors.textPrimary),
                         ),
                       ),
                     ),
                     Text(
                       memory.date,
-                      style: PawlyTypography.eyebrow.copyWith(
-                        color: PawlyColors.secondary,
+                      style: PawlyTypography.resolve(
+                              context, PawlyTypography.eyebrow)
+                          .copyWith(
+                        color:
+                            PawlyColors.resolve(context, PawlyColors.secondary),
                       ),
                     ),
                   ],
@@ -174,8 +190,11 @@ class _MemoryCard extends StatelessWidget {
                   const SizedBox(height: 8),
                   Text(
                     memory.caption,
-                    style: PawlyTypography.bodyMedium.copyWith(
-                      color: PawlyColors.secondary,
+                    style: PawlyTypography.resolve(
+                            context, PawlyTypography.bodyMedium)
+                        .copyWith(
+                      color:
+                          PawlyColors.resolve(context, PawlyColors.secondary),
                       height: 1.4,
                     ),
                   ),
@@ -202,7 +221,7 @@ class _AddMemorySheetState extends State<_AddMemorySheet> {
   final _titleController = TextEditingController();
   final _captionController = TextEditingController();
   String _selectedMilestone = 'Milestone';
-  String _selectedImageUrl = 'https://images.unsplash.com/photo-1548199973-03cce0bbc87b?auto=format&fit=crop&w=800&q=80';
+  String _selectedImageUrl = 'assets/pets/maple.png';
 
   final List<String> _milestones = [
     'Milestone',
@@ -214,10 +233,10 @@ class _AddMemorySheetState extends State<_AddMemorySheet> {
   ];
 
   final List<String> _presetPhotos = [
-    'https://images.unsplash.com/photo-1548199973-03cce0bbc87b?auto=format&fit=crop&w=800&q=80',
-    'https://images.unsplash.com/photo-1517849845537-4d257902454a?auto=format&fit=crop&w=800&q=80',
-    'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&w=800&q=80',
-    'https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&w=800&q=80',
+    'assets/pets/maple.png',
+    'assets/pets/finn.png',
+    'assets/pets/cleo.png',
+    'assets/pets/pippin.png',
   ];
 
   @override
@@ -227,12 +246,17 @@ class _AddMemorySheetState extends State<_AddMemorySheet> {
     super.dispose();
   }
 
-  void _save() {
+  Future<void> _save() async {
     final title = _titleController.text.trim();
-    if (title.isEmpty) return;
+    if (title.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Give your memory a title.')));
+      return;
+    }
 
     final now = DateTime.now();
-    final dateStr = '${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}';
+    final dateStr =
+        '${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}';
 
     final entry = MemoryEntry(
       id: 'mem_${DateTime.now().millisecondsSinceEpoch}',
@@ -244,18 +268,19 @@ class _AddMemorySheetState extends State<_AddMemorySheet> {
       milestoneType: _selectedMilestone,
     );
 
-    widget.repository.addMemory(entry);
-    Navigator.pop(context);
+    await widget.repository.addMemory(entry);
+    if (mounted) Navigator.pop(context);
   }
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: const BoxDecoration(
-        color: PawlyColors.surface,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+      decoration: BoxDecoration(
+        color: PawlyColors.resolve(context, PawlyColors.surface),
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
       ),
-      padding: EdgeInsets.fromLTRB(20, 20, 20, MediaQuery.of(context).viewInsets.bottom + 24),
+      padding: EdgeInsets.fromLTRB(
+          20, 20, 20, MediaQuery.of(context).viewInsets.bottom + 24),
       child: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -266,7 +291,7 @@ class _AddMemorySheetState extends State<_AddMemorySheet> {
                 width: 40,
                 height: 4,
                 decoration: BoxDecoration(
-                  color: PawlyColors.border,
+                  color: PawlyColors.resolve(context, PawlyColors.border),
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
@@ -274,15 +299,18 @@ class _AddMemorySheetState extends State<_AddMemorySheet> {
             const SizedBox(height: 18),
             Text(
               'Add New Memory',
-              style: PawlyTypography.titleMedium.copyWith(fontWeight: FontWeight.w700),
+              style:
+                  PawlyTypography.resolve(context, PawlyTypography.titleMedium)
+                      .copyWith(fontWeight: FontWeight.w700),
             ),
             const SizedBox(height: 16),
 
             // Select image preset
             Text(
               'SELECT PHOTO',
-              style: PawlyTypography.eyebrow.copyWith(
-                color: PawlyColors.secondary,
+              style: PawlyTypography.resolve(context, PawlyTypography.eyebrow)
+                  .copyWith(
+                color: PawlyColors.resolve(context, PawlyColors.secondary),
                 fontWeight: FontWeight.w700,
               ),
             ),
@@ -303,10 +331,14 @@ class _AddMemorySheetState extends State<_AddMemorySheet> {
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(
-                          color: isSelected ? PawlyColors.black : Colors.transparent,
+                          color: isSelected
+                              ? PawlyColors.black
+                              : Colors.transparent,
                           width: 2.5,
                         ),
-                        image: DecorationImage(image: NetworkImage(url), fit: BoxFit.cover),
+                        image: DecorationImage(
+                            image: pawlyImageProvider(url),
+                            fit: BoxFit.contain),
                       ),
                     ),
                   );
@@ -333,9 +365,14 @@ class _AddMemorySheetState extends State<_AddMemorySheet> {
                   label: Text(m),
                   selected: isSelected,
                   selectedColor: PawlyColors.black.withOpacity(0.15),
-                  backgroundColor: PawlyColors.background,
-                  labelStyle: PawlyTypography.eyebrow.copyWith(
-                    color: isSelected ? PawlyColors.black : PawlyColors.textPrimary,
+                  backgroundColor:
+                      PawlyColors.resolve(context, PawlyColors.background),
+                  labelStyle:
+                      PawlyTypography.resolve(context, PawlyTypography.eyebrow)
+                          .copyWith(
+                    color: isSelected
+                        ? PawlyColors.black
+                        : PawlyColors.resolve(context, PawlyColors.textPrimary),
                     fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
                   ),
                   onSelected: (val) {
@@ -358,7 +395,6 @@ class _AddMemorySheetState extends State<_AddMemorySheet> {
 
             PawlyButton(
               text: 'Save to Timeline',
-              
               onPressed: _save,
             ),
           ],

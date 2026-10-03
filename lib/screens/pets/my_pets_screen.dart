@@ -23,7 +23,7 @@ class MyPetsScreen extends StatelessWidget {
     final pets = repository.pets;
 
     return Scaffold(
-      backgroundColor: PawlyColors.background,
+      backgroundColor: PawlyColors.resolve(context, PawlyColors.background),
       body: SafeArea(
         bottom: false,
         child: CustomScrollView(
@@ -34,13 +34,19 @@ class MyPetsScreen extends StatelessWidget {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Expanded(
+                    Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('FAMILY COMPANIONS', style: PawlyTypography.eyebrow, overflow: TextOverflow.ellipsis),
-                          SizedBox(height: 2),
-                          Text('My Pets', style: PawlyTypography.displayMedium, overflow: TextOverflow.ellipsis),
+                          Text('FAMILY COMPANIONS',
+                              style: PawlyTypography.resolve(
+                                  context, PawlyTypography.eyebrow),
+                              overflow: TextOverflow.ellipsis),
+                          const SizedBox(height: 2),
+                          Text('My Pets',
+                              style: PawlyTypography.resolve(
+                                  context, PawlyTypography.displayMedium),
+                              overflow: TextOverflow.ellipsis),
                         ],
                       ),
                     ),
@@ -54,13 +60,12 @@ class MyPetsScreen extends StatelessWidget {
                 ),
               ),
             ),
-
             if (pets.isEmpty)
               SliverFillRemaining(
                 child: EmptyStateView(
-                  
                   title: 'No pets added yet',
-                  subtitle: 'Add your first companion to begin tracking care and health.',
+                  subtitle:
+                      'Add your first companion to begin tracking care and health.',
                   buttonLabel: 'Add First Pet',
                   onButtonPressed: onOpenAddPet,
                 ),
@@ -72,8 +77,9 @@ class MyPetsScreen extends StatelessWidget {
                   delegate: SliverChildBuilderDelegate(
                     (context, index) {
                       final pet = pets[index];
-                      final nextRoutine = repository.allRoutines
-                          .where((r) => r.petId == pet.id && !r.isCompleted)
+                      final nextRoutine = repository
+                          .routinesForDate(DateTime.now(), petId: pet.id)
+                          .where((r) => !r.isCompleted)
                           .toList();
 
                       return _PetCollectionCard(
@@ -118,80 +124,17 @@ class _PetCollectionCard extends StatelessWidget {
           children: [
             // Expressive Pet Photography Banner (8px top radius)
             ClipRRect(
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(AppTokens.md)),
-              child: SizedBox(
-                height: 190,
-                width: double.infinity,
-                child: Stack(
-                  fit: StackFit.expand,
-                  children: [
-                    Image.network(
-                      pet.imageUrl,
-                      fit: BoxFit.cover,
-                      errorBuilder: (_, __, ___) => Container(
-                        color: PawlyColors.border,
-                        child: const Icon(Icons.pets, size: 44, color: PawlyColors.charcoal),
-                      ),
-                    ),
-                    DecoratedBox(
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          begin: Alignment.topCenter,
-                          end: Alignment.bottomCenter,
-                          colors: [
-                            Colors.black.withOpacity(0.35),
-                            Colors.transparent,
-                            Colors.black.withOpacity(0.65),
-                          ],
-                          stops: const [0.0, 0.5, 1.0],
-                        ),
-                      ),
-                    ),
-                    Positioned(
-                      top: 12,
-                      right: 12,
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                        decoration: BoxDecoration(
-                          color: Colors.black.withOpacity(0.65),
-                          borderRadius: AppTokens.rSm,
-                          border: Border.all(color: Colors.white24, width: 0.8),
-                        ),
-                        child: Text(
-                          pet.category.toUpperCase(),
-                          style: const TextStyle(
-                            fontSize: 10,
-                            fontWeight: FontWeight.w800,
-                            letterSpacing: 0.6,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ),
-                    ),
-                    if (pet.nickname.isNotEmpty)
-                      Positioned(
-                        bottom: 12,
-                        left: 14,
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 3),
-                          decoration: BoxDecoration(
-                            color: Colors.black.withOpacity(0.65),
-                            borderRadius: AppTokens.rSm,
-                            border: Border.all(color: Colors.white12, width: 0.8),
-                          ),
-                          child: Text(
-                            '“${pet.nickname}”',
-                            style: const TextStyle(
-                              fontSize: 12,
-                              fontStyle: FontStyle.italic,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ),
-                      ),
-                  ],
-                ),
+              borderRadius: const BorderRadius.vertical(
+                  top: Radius.circular(AppTokens.md)),
+              child: AspectRatio(
+                aspectRatio: 1,
+                child: ColoredBox(
+                    color: Theme.of(context).colorScheme.primaryContainer,
+                    child: Image(
+                        image: pawlyImageProvider(pet.imageUrl),
+                        fit: BoxFit.contain,
+                        errorBuilder: (_, __, ___) =>
+                            const Center(child: Icon(Icons.pets, size: 44)))),
               ),
             ),
 
@@ -205,30 +148,40 @@ class _PetCollectionCard extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Column(
+                      Flexible(
+                          child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(pet.name, style: PawlyTypography.titleLarge),
+                          Text(pet.name,
+                              style: PawlyTypography.resolve(
+                                  context, PawlyTypography.titleLarge)),
                           const SizedBox(height: 2),
                           Text(
                             '${pet.breed} • ${pet.ageYears.toStringAsFixed(pet.ageYears.truncateToDouble() == pet.ageYears ? 0 : 1)} yrs • ${pet.gender}',
-                            style: PawlyTypography.bodyMedium,
+                            style: PawlyTypography.resolve(
+                                context, PawlyTypography.bodyMedium),
                           ),
                         ],
-                      ),
+                      )),
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 9, vertical: 4),
                         decoration: BoxDecoration(
-                          color: PawlyColors.border,
+                          color:
+                              PawlyColors.resolve(context, PawlyColors.border),
                           borderRadius: AppTokens.rSm,
-                          border: Border.all(color: PawlyColors.border, width: 0.8),
+                          border: Border.all(
+                              color: PawlyColors.resolve(
+                                  context, PawlyColors.border),
+                              width: 0.8),
                         ),
                         child: Text(
                           '${pet.weightKg} kg',
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 11,
                             fontWeight: FontWeight.w800,
-                            color: PawlyColors.black,
+                            color:
+                                PawlyColors.resolve(context, PawlyColors.black),
                           ),
                         ),
                       ),
@@ -239,29 +192,41 @@ class _PetCollectionCard extends StatelessWidget {
 
                   // Next routine row
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 9),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 9),
                     decoration: BoxDecoration(
-                      color: PawlyColors.surfaceWarm,
+                      color:
+                          PawlyColors.resolve(context, PawlyColors.surfaceWarm),
                       borderRadius: AppTokens.rSm,
-                      border: Border.all(color: PawlyColors.border, width: 0.8),
+                      border: Border.all(
+                          color:
+                              PawlyColors.resolve(context, PawlyColors.border),
+                          width: 0.8),
                     ),
                     child: Row(
                       children: [
-                        const Icon(Icons.alarm, size: 14, color: PawlyColors.black),
+                        Icon(Icons.alarm,
+                            size: 14,
+                            color: PawlyColors.resolve(
+                                context, PawlyColors.black)),
                         const SizedBox(width: 8),
                         Expanded(
                           child: Text(
                             nextCareText,
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 12,
                               fontWeight: FontWeight.w700,
-                              color: PawlyColors.black,
+                              color: PawlyColors.resolve(
+                                  context, PawlyColors.black),
                             ),
                           ),
                         ),
-                        const Icon(Icons.arrow_forward_ios_rounded, size: 10, color: PawlyColors.tertiary),
+                        Icon(Icons.arrow_forward_ios_rounded,
+                            size: 10,
+                            color: PawlyColors.resolve(
+                                context, PawlyColors.tertiary)),
                       ],
                     ),
                   ),

@@ -18,9 +18,10 @@ class AddAppointmentScreen extends StatefulWidget {
 }
 
 class _AddAppointmentScreenState extends State<AddAppointmentScreen> {
-  final _purposeController = TextEditingController(text: 'Annual Wellness Exam');
-  final _clinicController = TextEditingController(text: 'Oak Valley Veterinary Hospital');
-  final _vetController = TextEditingController(text: 'Dr. Sarah Jenkins, DVM');
+  final _purposeController =
+      TextEditingController(text: 'Annual Wellness Exam');
+  final _clinicController = TextEditingController();
+  final _vetController = TextEditingController();
   final _notesController = TextEditingController();
 
   DateTime _selectedDate = DateTime.now().add(const Duration(days: 7));
@@ -44,11 +45,18 @@ class _AddAppointmentScreenState extends State<AddAppointmentScreen> {
     super.dispose();
   }
 
-  void _submit() {
-    if (_purposeController.text.trim().isEmpty) return;
+  Future<void> _submit() async {
+    if (_purposeController.text.trim().isEmpty ||
+        widget.repository.selectedPet == null) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text('Choose a pet and enter a visit purpose.')));
+      return;
+    }
 
-    final formattedDate = '${_selectedDate.year}-${_selectedDate.month.toString().padLeft(2, '0')}-${_selectedDate.day.toString().padLeft(2, '0')}';
-    final formattedTime = '${_selectedTime.hour.toString().padLeft(2, '0')}:${_selectedTime.minute.toString().padLeft(2, '0')}';
+    final formattedDate =
+        '${_selectedDate.year}-${_selectedDate.month.toString().padLeft(2, '0')}-${_selectedDate.day.toString().padLeft(2, '0')}';
+    final formattedTime =
+        '${_selectedTime.hour.toString().padLeft(2, '0')}:${_selectedTime.minute.toString().padLeft(2, '0')}';
 
     final appt = Appointment(
       id: 'appt_${DateTime.now().millisecondsSinceEpoch}',
@@ -56,29 +64,29 @@ class _AddAppointmentScreenState extends State<AddAppointmentScreen> {
       date: formattedDate,
       time: formattedTime,
       purpose: _purposeController.text.trim(),
-      clinic: _clinicController.text.trim().isEmpty ? 'Primary Veterinary Clinic' : _clinicController.text.trim(),
-      vetName: _vetController.text.trim().isEmpty ? 'Attending Veterinarian' : _vetController.text.trim(),
+      clinic: _clinicController.text.trim(),
+      vetName: _vetController.text.trim(),
       notes: _notesController.text.trim(),
     );
 
-    widget.repository.addAppointment(appt);
+    await widget.repository.addAppointment(appt);
 
     // Also populate default prep items for this appointment
-    widget.repository.addVetPrepItem(
+    await widget.repository.addVetPrepItem(
       VetPrepItem(
         id: 'prep_${DateTime.now().millisecondsSinceEpoch}_1',
         appointmentId: appt.id,
-        text: 'Fast 8 hours before appointment if blood work is needed',
+        text: 'Ask the clinic whether any preparation is needed',
       ),
     );
-    widget.repository.addVetPrepItem(
+    await widget.repository.addVetPrepItem(
       VetPrepItem(
         id: 'prep_${DateTime.now().millisecondsSinceEpoch}_2',
         appointmentId: appt.id,
         text: 'Bring current medication containers',
       ),
     );
-    widget.repository.addVetPrepItem(
+    await widget.repository.addVetPrepItem(
       VetPrepItem(
         id: 'prep_${DateTime.now().millisecondsSinceEpoch}_3',
         appointmentId: appt.id,
@@ -86,7 +94,7 @@ class _AddAppointmentScreenState extends State<AddAppointmentScreen> {
       ),
     );
 
-    Navigator.pop(context);
+    if (mounted) Navigator.pop(context);
   }
 
   @override
@@ -94,19 +102,22 @@ class _AddAppointmentScreenState extends State<AddAppointmentScreen> {
     final pet = widget.repository.selectedPet;
 
     return Scaffold(
-      backgroundColor: PawlyColors.background,
+      backgroundColor: PawlyColors.resolve(context, PawlyColors.background),
       appBar: AppBar(
-        backgroundColor: PawlyColors.surface,
+        backgroundColor: PawlyColors.resolve(context, PawlyColors.surface),
         elevation: 0,
         leading: IconButton(
-          icon:  const Icon(Icons.arrow_back_ios_new_rounded, color: PawlyColors.textPrimary, size: 20),
+          icon: Icon(Icons.arrow_back_ios_new_rounded,
+              color: PawlyColors.resolve(context, PawlyColors.textPrimary),
+              size: 20),
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
           'Book Vet Visit',
-          style: PawlyTypography.titleMedium.copyWith(
+          style: PawlyTypography.resolve(context, PawlyTypography.titleMedium)
+              .copyWith(
             fontWeight: FontWeight.w700,
-            color: PawlyColors.textPrimary,
+            color: PawlyColors.resolve(context, PawlyColors.textPrimary),
           ),
         ),
       ),
@@ -119,27 +130,35 @@ class _AddAppointmentScreenState extends State<AddAppointmentScreen> {
             Container(
               padding: const EdgeInsets.all(14),
               decoration: BoxDecoration(
-                color: PawlyColors.surface,
+                color: PawlyColors.resolve(context, PawlyColors.surface),
                 borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: PawlyColors.border),
+                border: Border.all(
+                    color: PawlyColors.resolve(context, PawlyColors.border)),
               ),
               child: Row(
                 children: [
                   PawlyPetAvatar(imageUrl: pet?.imageUrl ?? '', size: 36),
                   const SizedBox(width: 12),
-                  Column(
+                  Flexible(
+                      child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
                         'Scheduling for ${pet?.name ?? "Pet"}',
-                        style: PawlyTypography.titleSmall.copyWith(fontWeight: FontWeight.w700),
+                        style: PawlyTypography.resolve(
+                                context, PawlyTypography.titleSmall)
+                            .copyWith(fontWeight: FontWeight.w700),
                       ),
                       Text(
                         '${pet?.breed ?? ""} • ${pet?.species ?? ""}',
-                        style: PawlyTypography.bodyMedium.copyWith(color: PawlyColors.secondary),
+                        style: PawlyTypography.resolve(
+                                context, PawlyTypography.bodyMedium)
+                            .copyWith(
+                                color: PawlyColors.resolve(
+                                    context, PawlyColors.secondary)),
                       ),
                     ],
-                  ),
+                  )),
                 ],
               ),
             ),
@@ -148,8 +167,10 @@ class _AddAppointmentScreenState extends State<AddAppointmentScreen> {
             // Quick Purpose Pills
             Text(
               'REASON FOR VISIT',
-              style: PawlyTypography.labelMedium.copyWith(
-                color: PawlyColors.secondary,
+              style:
+                  PawlyTypography.resolve(context, PawlyTypography.labelMedium)
+                      .copyWith(
+                color: PawlyColors.resolve(context, PawlyColors.secondary),
                 fontWeight: FontWeight.w700,
                 letterSpacing: 1.1,
               ),
@@ -164,9 +185,14 @@ class _AddAppointmentScreenState extends State<AddAppointmentScreen> {
                   label: Text(p),
                   selected: isSelected,
                   selectedColor: PawlyColors.black.withOpacity(0.15),
-                  backgroundColor: PawlyColors.surface,
-                  labelStyle: PawlyTypography.eyebrow.copyWith(
-                    color: isSelected ? PawlyColors.black : PawlyColors.textPrimary,
+                  backgroundColor:
+                      PawlyColors.resolve(context, PawlyColors.surface),
+                  labelStyle:
+                      PawlyTypography.resolve(context, PawlyTypography.eyebrow)
+                          .copyWith(
+                    color: isSelected
+                        ? PawlyColors.black
+                        : PawlyColors.resolve(context, PawlyColors.textPrimary),
                     fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
                   ),
                   onSelected: (val) {
@@ -191,8 +217,10 @@ class _AddAppointmentScreenState extends State<AddAppointmentScreen> {
             // Date and Time Pickers
             Text(
               'DATE & TIME',
-              style: PawlyTypography.labelMedium.copyWith(
-                color: PawlyColors.secondary,
+              style:
+                  PawlyTypography.resolve(context, PawlyTypography.labelMedium)
+                      .copyWith(
+                color: PawlyColors.resolve(context, PawlyColors.secondary),
                 fontWeight: FontWeight.w700,
                 letterSpacing: 1.1,
               ),
@@ -215,20 +243,30 @@ class _AddAppointmentScreenState extends State<AddAppointmentScreen> {
                     },
                     borderRadius: BorderRadius.circular(16),
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 14),
                       decoration: BoxDecoration(
-                        color: PawlyColors.surface,
+                        color:
+                            PawlyColors.resolve(context, PawlyColors.surface),
                         borderRadius: BorderRadius.circular(16),
-                        border: Border.all(color: PawlyColors.border),
+                        border: Border.all(
+                            color: PawlyColors.resolve(
+                                context, PawlyColors.border)),
                       ),
                       child: Row(
                         children: [
-                          const Icon(Icons.calendar_month_rounded, color: PawlyColors.black, size: 20),
+                          Icon(Icons.calendar_month_rounded,
+                              color: PawlyColors.resolve(
+                                  context, PawlyColors.black),
+                              size: 20),
                           const SizedBox(width: 10),
-                          Text(
+                          Flexible(
+                              child: Text(
                             '${_selectedDate.year}-${_selectedDate.month.toString().padLeft(2, '0')}-${_selectedDate.day.toString().padLeft(2, '0')}',
-                            style: PawlyTypography.bodyMedium.copyWith(fontWeight: FontWeight.w600),
-                          ),
+                            style: PawlyTypography.resolve(
+                                    context, PawlyTypography.bodyMedium)
+                                .copyWith(fontWeight: FontWeight.w600),
+                          )),
                         ],
                       ),
                     ),
@@ -248,20 +286,30 @@ class _AddAppointmentScreenState extends State<AddAppointmentScreen> {
                     },
                     borderRadius: BorderRadius.circular(16),
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 14),
                       decoration: BoxDecoration(
-                        color: PawlyColors.surface,
+                        color:
+                            PawlyColors.resolve(context, PawlyColors.surface),
                         borderRadius: BorderRadius.circular(16),
-                        border: Border.all(color: PawlyColors.border),
+                        border: Border.all(
+                            color: PawlyColors.resolve(
+                                context, PawlyColors.border)),
                       ),
                       child: Row(
                         children: [
-                          const Icon(Icons.access_time_rounded, color: PawlyColors.black, size: 20),
+                          Icon(Icons.access_time_rounded,
+                              color: PawlyColors.resolve(
+                                  context, PawlyColors.black),
+                              size: 20),
                           const SizedBox(width: 10),
-                          Text(
+                          Flexible(
+                              child: Text(
                             _selectedTime.format(context),
-                            style: PawlyTypography.bodyMedium.copyWith(fontWeight: FontWeight.w600),
-                          ),
+                            style: PawlyTypography.resolve(
+                                    context, PawlyTypography.bodyMedium)
+                                .copyWith(fontWeight: FontWeight.w600),
+                          )),
                         ],
                       ),
                     ),
@@ -274,8 +322,10 @@ class _AddAppointmentScreenState extends State<AddAppointmentScreen> {
             // Clinic & Doctor
             Text(
               'CLINIC & VETERINARIAN',
-              style: PawlyTypography.labelMedium.copyWith(
-                color: PawlyColors.secondary,
+              style:
+                  PawlyTypography.resolve(context, PawlyTypography.labelMedium)
+                      .copyWith(
+                color: PawlyColors.resolve(context, PawlyColors.secondary),
                 fontWeight: FontWeight.w700,
                 letterSpacing: 1.1,
               ),
@@ -310,7 +360,6 @@ class _AddAppointmentScreenState extends State<AddAppointmentScreen> {
 
             PawlyButton(
               text: 'Save Appointment',
-              
               onPressed: _submit,
             ),
             const SizedBox(height: 40),

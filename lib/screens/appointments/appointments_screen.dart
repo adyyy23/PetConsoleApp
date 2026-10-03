@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import '../../models/care_schedule.dart';
 import '../../models/models.dart';
 import '../../repositories/pawly_repository.dart';
 import '../../theme/pawly_colors.dart';
@@ -22,21 +24,27 @@ class AppointmentsScreen extends StatelessWidget {
       listenable: repository,
       builder: (context, _) {
         final pet = repository.selectedPet;
-        final appointments = repository.appointmentsForPet(repository.selectedPetId);
-        final upcoming = appointments.where((a) => !a.isCompleted).toList();
+        final appointments =
+            repository.appointmentsForPet(repository.selectedPetId);
+        final upcoming = appointments.where((a) => !a.isCompleted).toList()
+          ..sort((a, b) => (CareSchedule.parseDate(a.date) ?? DateTime(1900))
+              .compareTo(CareSchedule.parseDate(b.date) ?? DateTime(1900)));
         final past = appointments.where((a) => a.isCompleted).toList();
 
         return Scaffold(
-          backgroundColor: PawlyColors.background,
+          backgroundColor: PawlyColors.resolve(context, PawlyColors.background),
           appBar: PawlyAppBar(
             title: 'Veterinary Visits',
             trailing: IconButton(
-              icon:  const Icon(Icons.add, color: PawlyColors.black, size: 20),
+              icon: Icon(Icons.add,
+                  color: PawlyColors.resolve(context, PawlyColors.black),
+                  size: 20),
               onPressed: () {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (_) => AddAppointmentScreen(repository: repository),
+                    builder: (_) =>
+                        AddAppointmentScreen(repository: repository),
                   ),
                 );
               },
@@ -61,15 +69,16 @@ class AppointmentsScreen extends StatelessWidget {
                 SliverFillRemaining(
                   hasScrollBody: false,
                   child: EmptyStateView(
-                    
                     title: 'No Appointments Logged',
-                    subtitle: 'Schedule routine exams, vaccinations, or dental checkups for ${pet?.name ?? 'your pet'}.',
+                    subtitle:
+                        'Schedule routine exams, vaccinations, or dental checkups for ${pet?.name ?? 'your pet'}.',
                     actionLabel: 'Schedule Visit',
                     onAction: () {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (_) => AddAppointmentScreen(repository: repository),
+                          builder: (_) =>
+                              AddAppointmentScreen(repository: repository),
                         ),
                       );
                     },
@@ -78,10 +87,12 @@ class AppointmentsScreen extends StatelessWidget {
               else ...[
                 // Upcoming Hero Section
                 if (upcoming.isNotEmpty) ...[
-                  const SliverToBoxAdapter(
+                  SliverToBoxAdapter(
                     child: Padding(
-                      padding: EdgeInsets.fromLTRB(20, 16, 20, 8),
-                      child: Text('NEXT UPCOMING VISIT', style: PawlyTypography.eyebrow),
+                      padding: const EdgeInsets.fromLTRB(20, 16, 20, 8),
+                      child: Text('NEXT UPCOMING VISIT',
+                          style: PawlyTypography.resolve(
+                              context, PawlyTypography.eyebrow)),
                     ),
                   ),
                   SliverToBoxAdapter(
@@ -102,16 +113,19 @@ class AppointmentsScreen extends StatelessWidget {
                           );
                         },
                         onMarkCompleted: () {
-                          repository.toggleAppointmentCompleted(upcoming.first.id);
+                          repository
+                              .toggleAppointmentCompleted(upcoming.first.id);
                         },
                       ),
                     ),
                   ),
                   if (upcoming.length > 1) ...[
-                    const SliverToBoxAdapter(
+                    SliverToBoxAdapter(
                       child: Padding(
-                        padding: EdgeInsets.fromLTRB(20, 24, 20, 8),
-                        child: Text('OTHER SCHEDULED VISITS', style: PawlyTypography.eyebrow),
+                        padding: const EdgeInsets.fromLTRB(20, 24, 20, 8),
+                        child: Text('OTHER SCHEDULED VISITS',
+                            style: PawlyTypography.resolve(
+                                context, PawlyTypography.eyebrow)),
                       ),
                     ),
                     SliverList(
@@ -119,10 +133,12 @@ class AppointmentsScreen extends StatelessWidget {
                         (context, index) {
                           final item = upcoming[index + 1];
                           return Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 20, vertical: 4),
                             child: _AppointmentCard(
                               appointment: item,
-                              onToggleComplete: () => repository.toggleAppointmentCompleted(item.id),
+                              onToggleComplete: () => repository
+                                  .toggleAppointmentCompleted(item.id),
                               onPrepTap: () {
                                 Navigator.push(
                                   context,
@@ -145,10 +161,12 @@ class AppointmentsScreen extends StatelessWidget {
 
                 // Past History Section
                 if (past.isNotEmpty) ...[
-                  const SliverToBoxAdapter(
+                  SliverToBoxAdapter(
                     child: Padding(
-                      padding: EdgeInsets.fromLTRB(20, 28, 20, 8),
-                      child: Text('PAST CONSULTATIONS', style: PawlyTypography.eyebrow),
+                      padding: const EdgeInsets.fromLTRB(20, 28, 20, 8),
+                      child: Text('PAST CONSULTATIONS',
+                          style: PawlyTypography.resolve(
+                              context, PawlyTypography.eyebrow)),
                     ),
                   ),
                   SliverList(
@@ -156,10 +174,12 @@ class AppointmentsScreen extends StatelessWidget {
                       (context, index) {
                         final item = past[index];
                         return Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 20, vertical: 4),
                           child: _AppointmentCard(
                             appointment: item,
-                            onToggleComplete: () => repository.toggleAppointmentCompleted(item.id),
+                            onToggleComplete: () =>
+                                repository.toggleAppointmentCompleted(item.id),
                           ),
                         );
                       },
@@ -195,9 +215,9 @@ class _UpcomingVisitHeroCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // Parse date parts for editorial date block
-    final parts = appointment.date.split(' ');
-    final month = parts.isNotEmpty ? parts[0] : 'UPCOMING';
-    final day = parts.length > 1 ? parts[1].replaceAll(',', '') : '';
+    final date = CareSchedule.parseDate(appointment.date);
+    final month = date == null ? 'VISIT' : DateFormat('MMM').format(date);
+    final day = date == null ? '' : date.day.toString();
 
     return PawlyCard(
       padding: const EdgeInsets.all(18),
@@ -245,15 +265,17 @@ class _UpcomingVisitHeroCard extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 6,
                       children: [
                         Text(
                           appointment.time,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.w800,
-                            color: PawlyColors.black,
+                            color:
+                                PawlyColors.resolve(context, PawlyColors.black),
                           ),
                         ),
                         const StatusBadge(label: 'Confirmed'),
@@ -262,12 +284,14 @@ class _UpcomingVisitHeroCard extends StatelessWidget {
                     const SizedBox(height: 4),
                     Text(
                       appointment.purpose,
-                      style: PawlyTypography.titleMedium,
+                      style: PawlyTypography.resolve(
+                          context, PawlyTypography.titleMedium),
                     ),
                     const SizedBox(height: 2),
                     Text(
                       '${appointment.clinic} • ${appointment.vetName}',
-                      style: PawlyTypography.bodyMedium,
+                      style: PawlyTypography.resolve(
+                          context, PawlyTypography.bodyMedium),
                     ),
                   ],
                 ),
@@ -279,18 +303,23 @@ class _UpcomingVisitHeroCard extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: PawlyColors.surfaceWarm,
+                color: PawlyColors.resolve(context, PawlyColors.surfaceWarm),
                 borderRadius: AppTokens.rSm,
-                border: Border.all(color: PawlyColors.border, width: 0.8),
+                border: Border.all(
+                    color: PawlyColors.resolve(context, PawlyColors.border),
+                    width: 0.8),
               ),
               child: Row(
                 children: [
-                  const Icon(Icons.info_outline_rounded, color: PawlyColors.black, size: 15),
+                  Icon(Icons.info_outline_rounded,
+                      color: PawlyColors.resolve(context, PawlyColors.black),
+                      size: 15),
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
                       appointment.notes,
-                      style: PawlyTypography.bodyMedium,
+                      style: PawlyTypography.resolve(
+                          context, PawlyTypography.bodyMedium),
                     ),
                   ),
                 ],
@@ -303,7 +332,6 @@ class _UpcomingVisitHeroCard extends StatelessWidget {
               Expanded(
                 child: PawlyButton(
                   text: 'Visit Prep Checklist',
-                  
                   isSecondary: true,
                   onPressed: onPrepTap,
                 ),
@@ -311,15 +339,20 @@ class _UpcomingVisitHeroCard extends StatelessWidget {
               const SizedBox(width: 8),
               IconButton(
                 style: IconButton.styleFrom(
-                  backgroundColor: PawlyColors.border,
+                  backgroundColor:
+                      PawlyColors.resolve(context, PawlyColors.border),
                   shape: RoundedRectangleBorder(
                     borderRadius: AppTokens.rSm,
-                    side: const BorderSide(color: PawlyColors.border),
+                    side: BorderSide(
+                        color:
+                            PawlyColors.resolve(context, PawlyColors.border)),
                   ),
                   padding: const EdgeInsets.all(12),
                 ),
                 tooltip: 'Mark Completed',
-                icon: const Icon(Icons.check_rounded, color: PawlyColors.black, size: 18),
+                icon: Icon(Icons.check_rounded,
+                    color: PawlyColors.resolve(context, PawlyColors.black),
+                    size: 18),
                 onPressed: onMarkCompleted,
               ),
             ],
@@ -351,12 +384,18 @@ class _AppointmentCard extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: appointment.isCompleted ? PawlyColors.border : PawlyColors.black,
+              color: appointment.isCompleted
+                  ? PawlyColors.resolve(context, PawlyColors.border)
+                  : PawlyColors.resolve(context, PawlyColors.black),
               borderRadius: AppTokens.rSm,
             ),
             child: Icon(
-              appointment.isCompleted ? Icons.check : Icons.calendar_today_outlined,
-              color: appointment.isCompleted ? PawlyColors.tertiary : Colors.white,
+              appointment.isCompleted
+                  ? Icons.check
+                  : Icons.calendar_today_outlined,
+              color: appointment.isCompleted
+                  ? PawlyColors.resolve(context, PawlyColors.tertiary)
+                  : Colors.white,
               size: 16,
             ),
           ),
@@ -371,38 +410,51 @@ class _AppointmentCard extends StatelessWidget {
                     Expanded(
                       child: Text(
                         appointment.purpose,
-                        style: PawlyTypography.titleSmall.copyWith(
-                          color: appointment.isCompleted ? PawlyColors.tertiary : PawlyColors.black,
-                          decoration: appointment.isCompleted ? TextDecoration.lineThrough : null,
+                        style: PawlyTypography.resolve(
+                                context, PawlyTypography.titleSmall)
+                            .copyWith(
+                          color: appointment.isCompleted
+                              ? PawlyColors.resolve(
+                                  context, PawlyColors.tertiary)
+                              : PawlyColors.resolve(context, PawlyColors.black),
+                          decoration: appointment.isCompleted
+                              ? TextDecoration.lineThrough
+                              : null,
                         ),
                       ),
                     ),
                     Text(
                       appointment.date,
-                      style: PawlyTypography.caption,
+                      style: PawlyTypography.resolve(
+                          context, PawlyTypography.caption),
                     ),
                   ],
                 ),
                 const SizedBox(height: 2),
                 Text(
                   '${appointment.clinic} • ${appointment.vetName}',
-                  style: PawlyTypography.bodyMedium,
+                  style: PawlyTypography.resolve(
+                      context, PawlyTypography.bodyMedium),
                 ),
                 if (!appointment.isCompleted && onPrepTap != null) ...[
                   const SizedBox(height: 8),
                   GestureDetector(
                     onTap: onPrepTap,
-                    child: const Row(
+                    child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Icon(Icons.playlist_add_check_rounded, color: PawlyColors.black, size: 14),
-                        SizedBox(width: 4),
+                        Icon(Icons.playlist_add_check_rounded,
+                            color:
+                                PawlyColors.resolve(context, PawlyColors.black),
+                            size: 14),
+                        const SizedBox(width: 4),
                         Text(
                           'Pre-Visit Prep',
                           style: TextStyle(
                             fontSize: 11,
                             fontWeight: FontWeight.w700,
-                            color: PawlyColors.black,
+                            color:
+                                PawlyColors.resolve(context, PawlyColors.black),
                             decoration: TextDecoration.underline,
                           ),
                         ),

@@ -1,141 +1,68 @@
 import 'package:flutter/material.dart';
-import '../../theme/pawly_colors.dart';
-import '../../theme/pawly_typography.dart';
-import '../../theme/app_tokens.dart';
+import '../../repositories/pawly_repository.dart';
 import '../../widgets/widgets.dart';
 
 class SignupScreen extends StatefulWidget {
-  final VoidCallback onSignupSuccess;
-  final VoidCallback onNavigateToLogin;
-
-  const SignupScreen({
-    super.key,
-    required this.onSignupSuccess,
-    required this.onNavigateToLogin,
-  });
-
+  final PawlyRepository repository;
+  final VoidCallback onSignupSuccess, onNavigateToLogin;
+  const SignupScreen(
+      {super.key,
+      required this.repository,
+      required this.onSignupSuccess,
+      required this.onNavigateToLogin});
   @override
   State<SignupScreen> createState() => _SignupScreenState();
 }
 
 class _SignupScreenState extends State<SignupScreen> {
-  final TextEditingController _nameController = TextEditingController();
-  final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
+  final _name = TextEditingController();
+  String? _error;
+  bool _saving = false;
+  @override
+  void dispose() {
+    _name.dispose();
+    super.dispose();
+  }
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: PawlyColors.background,
-      appBar: PawlyAppBar(
-        title: '',
-        onBack: widget.onNavigateToLogin,
-        showBottomBorder: false,
-      ),
+  Widget build(BuildContext context) => Scaffold(
+      appBar: AppBar(
+          title: const Text('Your local profile'),
+          leading: IconButton(
+              icon: const Icon(Icons.arrow_back),
+              onPressed: widget.onNavigateToLogin)),
       body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text('Create your\nPawly account.', style: PawlyTypography.displayMedium),
-              const SizedBox(height: 8),
-              const Text(
-                'Join pet parents organizing daily routines, health records, and memories in one place.',
-                style: PawlyTypography.bodyLarge,
-              ),
-
-              const SizedBox(height: 28),
-
-              const Text('YOUR NAME', style: PawlyTypography.eyebrow),
-              const SizedBox(height: 6),
-              TextField(
-                controller: _nameController,
-                style: PawlyTypography.bodyLarge,
-                decoration: InputDecoration(
-                  hintText: 'e.g. Lady Liberty',
-                  filled: true,
-                  fillColor: Colors.white,
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-                  border: OutlineInputBorder(borderRadius: AppTokens.rMd, borderSide: const BorderSide(color: PawlyColors.border)),
-                  enabledBorder: OutlineInputBorder(borderRadius: AppTokens.rMd, borderSide: const BorderSide(color: PawlyColors.border)),
-                  focusedBorder: OutlineInputBorder(borderRadius: AppTokens.rMd, borderSide: const BorderSide(color: PawlyColors.black, width: 1.5)),
-                ),
-              ),
-
-              const SizedBox(height: 18),
-
-              const Text('EMAIL ADDRESS', style: PawlyTypography.eyebrow),
-              const SizedBox(height: 6),
-              TextField(
-                controller: _emailController,
-                keyboardType: TextInputType.emailAddress,
-                style: PawlyTypography.bodyLarge,
-                decoration: InputDecoration(
-                  hintText: 'you@example.com',
-                  filled: true,
-                  fillColor: Colors.white,
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-                  border: OutlineInputBorder(borderRadius: AppTokens.rMd, borderSide: const BorderSide(color: PawlyColors.border)),
-                  enabledBorder: OutlineInputBorder(borderRadius: AppTokens.rMd, borderSide: const BorderSide(color: PawlyColors.border)),
-                  focusedBorder: OutlineInputBorder(borderRadius: AppTokens.rMd, borderSide: const BorderSide(color: PawlyColors.black, width: 1.5)),
-                ),
-              ),
-
-              const SizedBox(height: 18),
-
-              const Text('PASSWORD', style: PawlyTypography.eyebrow),
-              const SizedBox(height: 6),
-              TextField(
-                controller: _passwordController,
-                obscureText: true,
-                style: PawlyTypography.bodyLarge,
-                decoration: InputDecoration(
-                  hintText: 'Create a password',
-                  filled: true,
-                  fillColor: Colors.white,
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-                  border: OutlineInputBorder(borderRadius: AppTokens.rMd, borderSide: const BorderSide(color: PawlyColors.border)),
-                  enabledBorder: OutlineInputBorder(borderRadius: AppTokens.rMd, borderSide: const BorderSide(color: PawlyColors.border)),
-                  focusedBorder: OutlineInputBorder(borderRadius: AppTokens.rMd, borderSide: const BorderSide(color: PawlyColors.black, width: 1.5)),
-                ),
-              ),
-
-              const SizedBox(height: 28),
-
-              PawlyButton(text: 'Create Account',
-                
-                onPressed: widget.onSignupSuccess,
-                
-              ),
-
-              const SizedBox(height: 24),
-
-              Center(
-                child: Wrap(
-                  alignment: WrapAlignment.center,
-                  crossAxisAlignment: WrapCrossAlignment.center,
-                  children: [
-                    const Text('Already have an account? ', style: PawlyTypography.bodyMedium),
-                    GestureDetector(
-                      onTap: widget.onNavigateToLogin,
-                      child: const Text(
-                        'Sign in',
-                        style: TextStyle(
-                          color: PawlyColors.black,
-                          fontWeight: FontWeight.w700,
-                          fontSize: 13,
-                          decoration: TextDecoration.underline,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
+          child: ListView(padding: const EdgeInsets.all(24), children: [
+        const Text('Let’s make this yours.',
+            style: TextStyle(fontSize: 30, fontWeight: FontWeight.w800)),
+        const SizedBox(height: 12),
+        const Text(
+            'Pawly saves your pet care on this device. Start with your name.'),
+        const SizedBox(height: 24),
+        TextField(
+            controller: _name,
+            decoration:
+                InputDecoration(labelText: 'Your name', errorText: _error)),
+        const SizedBox(height: 24),
+        PawlyButton(
+            text: _saving ? 'Saving…' : 'Create my local profile',
+            onPressed: () async {
+              if (_saving) return;
+              if (_name.text.trim().isEmpty) {
+                setState(() => _error = 'Enter your name.');
+                return;
+              }
+              setState(() => _saving = true);
+              try {
+                await widget.repository.updateUser(_name.text);
+                if (mounted) widget.onSignupSuccess();
+              } catch (_) {
+                if (mounted) {
+                  setState(() => _error = 'Couldn’t save. Please try again.');
+                }
+              } finally {
+                if (mounted) setState(() => _saving = false);
+              }
+            }),
+      ])));
 }

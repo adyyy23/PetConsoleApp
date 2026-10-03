@@ -34,12 +34,14 @@ class HealthScreen extends StatelessWidget {
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (ctx) => StatefulBuilder(
-        builder: (ctx, setModalState) => Container(
-          decoration: const BoxDecoration(
-            color: PawlyColors.surface,
-            borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+        builder: (ctx, setModalState) => SingleChildScrollView(
+            child: Container(
+          decoration: BoxDecoration(
+            color: PawlyColors.resolve(context, PawlyColors.surface),
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
           ),
-          padding: EdgeInsets.fromLTRB(20, 16, 20, MediaQuery.of(ctx).viewInsets.bottom + 24),
+          padding: EdgeInsets.fromLTRB(
+              20, 16, 20, MediaQuery.of(ctx).viewInsets.bottom + 24),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -49,7 +51,7 @@ class HealthScreen extends StatelessWidget {
                   width: 36,
                   height: 4,
                   decoration: BoxDecoration(
-                    color: PawlyColors.border,
+                    color: PawlyColors.resolve(context, PawlyColors.border),
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),
@@ -57,10 +59,13 @@ class HealthScreen extends StatelessWidget {
               const SizedBox(height: 16),
               Text(
                 'Log Observation for ${repository.activePet.name}',
-                style: PawlyTypography.titleMedium,
+                style: PawlyTypography.resolve(
+                    context, PawlyTypography.titleMedium),
               ),
               const SizedBox(height: 14),
-              const Text('APPETITE', style: PawlyTypography.eyebrow),
+              Text('APPETITE',
+                  style: PawlyTypography.resolve(
+                      context, PawlyTypography.eyebrow)),
               const SizedBox(height: 6),
               Wrap(
                 spacing: 8,
@@ -69,19 +74,25 @@ class HealthScreen extends StatelessWidget {
                   return GestureDetector(
                     onTap: () => setModalState(() => appetite = val),
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 6),
                       decoration: BoxDecoration(
                         color: isSelected ? PawlyColors.black : Colors.white,
                         borderRadius: AppTokens.rSm,
                         border: Border.all(
-                          color: isSelected ? PawlyColors.black : PawlyColors.border,
+                          color: isSelected
+                              ? PawlyColors.black
+                              : PawlyColors.resolve(
+                                  context, PawlyColors.border),
                           width: 1.0,
                         ),
                       ),
                       child: Text(
                         val,
                         style: TextStyle(
-                          color: isSelected ? Colors.white : PawlyColors.black,
+                          color: isSelected
+                              ? Colors.white
+                              : PawlyColors.resolve(context, PawlyColors.black),
                           fontWeight: FontWeight.w700,
                           fontSize: 12,
                         ),
@@ -91,7 +102,9 @@ class HealthScreen extends StatelessWidget {
                 }).toList(),
               ),
               const SizedBox(height: 12),
-              const Text('ENERGY LEVEL', style: PawlyTypography.eyebrow),
+              Text('ENERGY LEVEL',
+                  style: PawlyTypography.resolve(
+                      context, PawlyTypography.eyebrow)),
               const SizedBox(height: 6),
               Wrap(
                 spacing: 8,
@@ -100,19 +113,25 @@ class HealthScreen extends StatelessWidget {
                   return GestureDetector(
                     onTap: () => setModalState(() => energy = val),
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 6),
                       decoration: BoxDecoration(
                         color: isSelected ? PawlyColors.black : Colors.white,
                         borderRadius: AppTokens.rSm,
                         border: Border.all(
-                          color: isSelected ? PawlyColors.black : PawlyColors.border,
+                          color: isSelected
+                              ? PawlyColors.black
+                              : PawlyColors.resolve(
+                                  context, PawlyColors.border),
                           width: 1.0,
                         ),
                       ),
                       child: Text(
                         val,
                         style: TextStyle(
-                          color: isSelected ? Colors.white : PawlyColors.black,
+                          color: isSelected
+                              ? Colors.white
+                              : PawlyColors.resolve(context, PawlyColors.black),
                           fontWeight: FontWeight.w700,
                           fontSize: 12,
                         ),
@@ -124,23 +143,32 @@ class HealthScreen extends StatelessWidget {
               const SizedBox(height: 14),
               TextField(
                 controller: notesController,
-                style: PawlyTypography.bodyLarge,
+                style:
+                    PawlyTypography.resolve(context, PawlyTypography.bodyLarge),
                 decoration: InputDecoration(
                   hintText: 'Any symptom notes or observations...',
-                  hintStyle: PawlyTypography.bodyMedium,
+                  hintStyle: PawlyTypography.resolve(
+                      context, PawlyTypography.bodyMedium),
                   filled: true,
-                  fillColor: PawlyColors.surfaceWarm,
+                  fillColor:
+                      PawlyColors.resolve(context, PawlyColors.surfaceWarm),
                   border: OutlineInputBorder(
                     borderRadius: AppTokens.rMd,
-                    borderSide: const BorderSide(color: PawlyColors.border),
+                    borderSide: BorderSide(
+                        color:
+                            PawlyColors.resolve(context, PawlyColors.border)),
                   ),
                   enabledBorder: OutlineInputBorder(
                     borderRadius: AppTokens.rMd,
-                    borderSide: const BorderSide(color: PawlyColors.border),
+                    borderSide: BorderSide(
+                        color:
+                            PawlyColors.resolve(context, PawlyColors.border)),
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: AppTokens.rMd,
-                    borderSide: const BorderSide(color: PawlyColors.black, width: 1.5),
+                    borderSide: BorderSide(
+                        color: PawlyColors.resolve(context, PawlyColors.black),
+                        width: 1.5),
                   ),
                 ),
               ),
@@ -149,11 +177,25 @@ class HealthScreen extends StatelessWidget {
                 width: double.infinity,
                 child: PawlyButton(
                   text: 'Save Observation Note',
-                  onPressed: () {
+                  onPressed: () async {
                     final now = DateTime.now();
-                    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-                    final dateStr = '${months[now.month - 1]} ${now.day.toString().padLeft(2, '0')}, ${now.year}';
-                    repository.addSymptomNote(SymptomNote(
+                    const months = [
+                      'Jan',
+                      'Feb',
+                      'Mar',
+                      'Apr',
+                      'May',
+                      'Jun',
+                      'Jul',
+                      'Aug',
+                      'Sep',
+                      'Oct',
+                      'Nov',
+                      'Dec'
+                    ];
+                    final dateStr =
+                        '${months[now.month - 1]} ${now.day.toString().padLeft(2, '0')}, ${now.year}';
+                    await repository.addSymptomNote(SymptomNote(
                       id: 'sym_${DateTime.now().millisecondsSinceEpoch}',
                       petId: repository.activePet.id,
                       date: dateStr,
@@ -162,16 +204,16 @@ class HealthScreen extends StatelessWidget {
                       stool: stool,
                       skin: skin,
                       notes: notesController.text.trim().isEmpty
-                          ? 'Observed normal behavior and good health.'
+                          ? ''
                           : notesController.text.trim(),
                     ));
-                    Navigator.pop(ctx);
+                    if (ctx.mounted) Navigator.pop(ctx);
                   },
                 ),
               ),
             ],
           ),
-        ),
+        )),
       ),
     );
   }
@@ -183,7 +225,7 @@ class HealthScreen extends StatelessWidget {
     final symptomNotes = repository.activePetSymptomNotes;
 
     return Scaffold(
-      backgroundColor: PawlyColors.background,
+      backgroundColor: PawlyColors.resolve(context, PawlyColors.background),
       body: SafeArea(
         bottom: false,
         child: CustomScrollView(
@@ -198,9 +240,16 @@ class HealthScreen extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('MEDICAL & WELLNESS • ${activePet.name.toUpperCase()}', style: PawlyTypography.eyebrow, overflow: TextOverflow.ellipsis),
+                          Text(
+                              'MEDICAL & WELLNESS • ${activePet.name.toUpperCase()}',
+                              style: PawlyTypography.resolve(
+                                  context, PawlyTypography.eyebrow),
+                              overflow: TextOverflow.ellipsis),
                           const SizedBox(height: 2),
-                          const Text('Health Records', style: PawlyTypography.displayMedium, overflow: TextOverflow.ellipsis),
+                          Text('Health Records',
+                              style: PawlyTypography.resolve(
+                                  context, PawlyTypography.displayMedium),
+                              overflow: TextOverflow.ellipsis),
                         ],
                       ),
                     ),
@@ -234,7 +283,8 @@ class HealthScreen extends StatelessWidget {
                       child: _QuickHealthShortcut(
                         icon: Icons.shield_outlined,
                         label: 'Passport',
-                        value: '${repository.activePetVaccinations.length} Vaccines',
+                        value:
+                            '${repository.activePetVaccinations.length} Vaccines',
                         onTap: onOpenVaccination,
                       ),
                     ),
@@ -243,7 +293,8 @@ class HealthScreen extends StatelessWidget {
                       child: _QuickHealthShortcut(
                         icon: Icons.medication_outlined,
                         label: 'Meds',
-                        value: '${repository.activePetMedications.length} Active',
+                        value:
+                            '${repository.activePetMedications.length} Active',
                         onTap: onOpenMedication,
                       ),
                     ),
@@ -261,7 +312,12 @@ class HealthScreen extends StatelessWidget {
                   title: 'Daily Notes',
                   action: TextButton(
                     onPressed: () => _showAddObservationSheet(context),
-                    child: const Text('+ Log Note', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: PawlyColors.black)),
+                    child: Text('+ Log Note',
+                        style: TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                            color: PawlyColors.resolve(
+                                context, PawlyColors.black))),
                   ),
                 ),
               ),
@@ -282,44 +338,64 @@ class HealthScreen extends StatelessWidget {
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                Row(
+                                Flexible(
+                                    child: Row(
                                   children: [
-                                    const Icon(Icons.note_alt_outlined, size: 15, color: PawlyColors.black),
+                                    Icon(Icons.note_alt_outlined,
+                                        size: 15,
+                                        color: PawlyColors.resolve(
+                                            context, PawlyColors.black)),
                                     const SizedBox(width: 6),
-                                    Text(
+                                    Flexible(
+                                        child: Text(
                                       note.date,
-                                      style: const TextStyle(
+                                      style: TextStyle(
                                         fontSize: 12,
                                         fontWeight: FontWeight.w800,
-                                        color: PawlyColors.black,
+                                        color: PawlyColors.resolve(
+                                            context, PawlyColors.black),
                                       ),
-                                    ),
+                                    )),
                                   ],
-                                ),
+                                )),
                                 Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 8, vertical: 2),
                                   decoration: BoxDecoration(
-                                    color: PawlyColors.border,
+                                    color: PawlyColors.resolve(
+                                        context, PawlyColors.border),
                                     borderRadius: AppTokens.rSm,
-                                    border: Border.all(color: PawlyColors.border, width: 0.8),
+                                    border: Border.all(
+                                        color: PawlyColors.resolve(
+                                            context, PawlyColors.border),
+                                        width: 0.8),
                                   ),
                                   child: Text(
                                     'Energy: ${note.energy}',
-                                    style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: PawlyColors.black),
+                                    style: TextStyle(
+                                        fontSize: 11,
+                                        fontWeight: FontWeight.w700,
+                                        color: PawlyColors.resolve(
+                                            context, PawlyColors.black)),
                                   ),
                                 ),
                               ],
                             ),
                             const SizedBox(height: 8),
-                            Text(note.notes, style: PawlyTypography.bodyLarge),
+                            Text(note.notes,
+                                style: PawlyTypography.resolve(
+                                    context, PawlyTypography.bodyLarge)),
                             const SizedBox(height: 10),
                             Wrap(
                               spacing: 8,
                               children: [
-                                _SymptomPill(label: 'Appetite: ${note.appetite}'),
+                                _SymptomPill(
+                                    label: 'Appetite: ${note.appetite}'),
                                 _SymptomPill(label: 'Stool: ${note.stool}'),
                                 if (note.skin != 'Clear')
-                                  _SymptomPill(label: 'Skin: ${note.skin}', isAlert: true),
+                                  _SymptomPill(
+                                      label: 'Skin: ${note.skin}',
+                                      isAlert: true),
                               ],
                             ),
                           ],
@@ -332,10 +408,12 @@ class HealthScreen extends StatelessWidget {
             ),
 
             // Timeline Header
-            const SliverToBoxAdapter(
+            SliverToBoxAdapter(
               child: Padding(
-                padding: EdgeInsets.fromLTRB(20, 20, 20, 10),
-                child: Text('CLINICAL & HEALTH STORY', style: PawlyTypography.eyebrow),
+                padding: const EdgeInsets.fromLTRB(20, 20, 20, 10),
+                child: Text('CLINICAL & HEALTH STORY',
+                    style: PawlyTypography.resolve(
+                        context, PawlyTypography.eyebrow)),
               ),
             ),
 
@@ -343,9 +421,9 @@ class HealthScreen extends StatelessWidget {
             if (events.isEmpty)
               SliverFillRemaining(
                 child: EmptyStateView(
-                  
                   title: 'No health records yet',
-                  subtitle: 'Keep a clean medical history of checkups, vaccines, and dosages.',
+                  subtitle:
+                      'Keep a clean medical history of checkups, vaccines, and dosages.',
                   buttonLabel: 'Record First Event',
                   onButtonPressed: onOpenAddHealthEvent,
                 ),
@@ -365,28 +443,40 @@ class HealthScreen extends StatelessWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
                                   StatusBadge(label: item.type),
-                                  Text(
+                                  Flexible(
+                                      child: Text(
                                     item.date,
-                                    style: PawlyTypography.caption,
-                                  ),
+                                    style: PawlyTypography.resolve(
+                                        context, PawlyTypography.caption),
+                                  )),
                                 ],
                               ),
                               const SizedBox(height: 8),
-                              Text(item.title, style: PawlyTypography.titleSmall),
+                              Text(item.title,
+                                  style: PawlyTypography.resolve(
+                                      context, PawlyTypography.titleSmall)),
                               const SizedBox(height: 4),
-                              Text(item.notes, style: PawlyTypography.bodyMedium),
+                              Text(item.notes,
+                                  style: PawlyTypography.resolve(
+                                      context, PawlyTypography.bodyMedium)),
                               const SizedBox(height: 8),
                               Row(
                                 children: [
-                                  const Icon(Icons.verified_user_outlined, size: 13, color: PawlyColors.black),
+                                  Icon(Icons.verified_user_outlined,
+                                      size: 13,
+                                      color: PawlyColors.resolve(
+                                          context, PawlyColors.black)),
                                   const SizedBox(width: 6),
-                                  Text(
+                                  Flexible(
+                                      child: Text(
                                     '${item.veterinarian}${item.clinic.isNotEmpty ? ' • ${item.clinic}' : ''}',
-                                    style: PawlyTypography.caption,
-                                  ),
+                                    style: PawlyTypography.resolve(
+                                        context, PawlyTypography.caption),
+                                  )),
                                 ],
                               ),
                             ],
@@ -416,10 +506,14 @@ class _SymptomPill extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
       decoration: BoxDecoration(
-        color: isAlert ? PawlyColors.border : PawlyColors.border,
+        color: isAlert
+            ? PawlyColors.resolve(context, PawlyColors.border)
+            : PawlyColors.resolve(context, PawlyColors.border),
         borderRadius: AppTokens.rXs,
         border: Border.all(
-          color: isAlert ? PawlyColors.error.withOpacity(0.3) : PawlyColors.border,
+          color: isAlert
+              ? PawlyColors.resolve(context, PawlyColors.error).withOpacity(0.3)
+              : PawlyColors.resolve(context, PawlyColors.border),
           width: 0.8,
         ),
       ),
@@ -428,7 +522,9 @@ class _SymptomPill extends StatelessWidget {
         style: TextStyle(
           fontSize: 11,
           fontWeight: FontWeight.w600,
-          color: isAlert ? PawlyColors.error : PawlyColors.black,
+          color: isAlert
+              ? PawlyColors.resolve(context, PawlyColors.error)
+              : PawlyColors.resolve(context, PawlyColors.black),
         ),
       ),
     );
@@ -460,25 +556,28 @@ class _QuickHealthShortcut extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(6),
               decoration: BoxDecoration(
-                color: PawlyColors.border,
+                color: PawlyColors.resolve(context, PawlyColors.border),
                 borderRadius: AppTokens.rSm,
               ),
-              child: Icon(icon, size: 16, color: PawlyColors.black),
+              child: Icon(icon,
+                  size: 16,
+                  color: PawlyColors.resolve(context, PawlyColors.black)),
             ),
             const SizedBox(height: 8),
             Text(
               label.toUpperCase(),
-              style: PawlyTypography.eyebrow.copyWith(fontSize: 9),
+              style: PawlyTypography.resolve(context, PawlyTypography.eyebrow)
+                  .copyWith(fontSize: 9),
             ),
             const SizedBox(height: 2),
             Text(
               value,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 13,
                 fontWeight: FontWeight.w800,
-                color: PawlyColors.black,
+                color: PawlyColors.resolve(context, PawlyColors.black),
                 letterSpacing: -0.2,
               ),
             ),
