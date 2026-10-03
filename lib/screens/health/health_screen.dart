@@ -219,7 +219,10 @@ class HealthScreen extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) => AnimatedBuilder(
+      animation: repository, builder: (context, _) => _buildRecords(context));
+
+  Widget _buildRecords(BuildContext context) {
     final activePet = repository.activePet;
     final events = repository.activePetHealthEvents;
     final symptomNotes = repository.activePetSymptomNotes;
@@ -264,6 +267,17 @@ class HealthScreen extends StatelessWidget {
               ),
             ),
 
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.only(bottom: 16),
+                child: PetSwitcher(
+                  pets: repository.pets,
+                  selectedPetId: repository.selectedPetId,
+                  onPetSelected: repository.selectPet,
+                ),
+              ),
+            ),
+
             // Top Metric Cards (Weight, Passport, Medications - 8px cards)
             SliverToBoxAdapter(
               child: Padding(
@@ -294,7 +308,7 @@ class HealthScreen extends StatelessWidget {
                         icon: Icons.medication_outlined,
                         label: 'Meds',
                         value:
-                            '${repository.activePetMedications.length} Active',
+                            '${repository.activePetMedications.where((med) => med.isActive).length} Active',
                         onTap: onOpenMedication,
                       ),
                     ),

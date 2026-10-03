@@ -1,3 +1,4 @@
+import '../../widgets/passport/pawly_passport.dart';
 import 'package:flutter/material.dart';
 import '../../theme/pawly_colors.dart';
 import '../../theme/pawly_typography.dart';
@@ -191,200 +192,21 @@ class VaccinationPassportScreen extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Passport Certificate Header Card
-                  Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.all(22),
-                    decoration: BoxDecoration(
-                      color: PawlyColors.black,
-                      borderRadius: BorderRadius.circular(24),
-                      boxShadow: [
-                        BoxShadow(
-                          color: PawlyColors.resolve(context, PawlyColors.black)
-                              .withOpacity(0.2),
-                          blurRadius: 16,
-                          offset: const Offset(0, 6),
-                        ),
-                      ],
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            const Flexible(
-                                child: Text(
-                              'CANINE HEALTH PASSPORT',
-                              style: TextStyle(
-                                fontSize: 11,
-                                fontWeight: FontWeight.w800,
-                                letterSpacing: 1.0,
-                                color: Colors.white70,
-                              ),
-                            )),
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 10, vertical: 4),
-                              decoration: BoxDecoration(
-                                color: PawlyColors.resolve(
-                                        context, PawlyColors.surface)
-                                    .withOpacity(0.2),
-                                borderRadius: BorderRadius.circular(16),
-                              ),
-                              child: const Text(
-                                'IMMUNIZED',
-                                style: TextStyle(
-                                    fontSize: 10,
-                                    fontWeight: FontWeight.w800,
-                                    color: Colors.white),
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 16),
-                        Text(
-                          pet.name.toUpperCase(),
-                          style: const TextStyle(
-                            fontSize: 26,
-                            fontWeight: FontWeight.w900,
-                            letterSpacing: -0.5,
-                            color: Colors.white,
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          '${pet.breed} • Microchip: ${pet.microchipNumber.isNotEmpty ? pet.microchipNumber : "Verified"}',
-                          style: TextStyle(
-                              fontSize: 13,
-                              color: Colors.white.withOpacity(0.85)),
-                        ),
-                      ],
-                    ),
-                  ),
-
-                  const SizedBox(height: 24),
-                  Text('RECORDED VACCINATIONS',
-                      style: PawlyTypography.resolve(
-                          context, PawlyTypography.eyebrow)),
-                  const SizedBox(height: 12),
-
-                  if (vaccines.isEmpty)
-                    EmptyStateView(
-                      title: 'No vaccines logged',
-                      subtitle:
-                          'Add core boosters to keep an official digital record.',
-                      buttonLabel: 'Add Vaccine Record',
-                      onButtonPressed: () => _openAddVaccineDialog(context),
-                    )
-                  else
-                    ...vaccines.map((v) {
-                      PawlyBadgeVariant badgeVariant;
-                      String statusLabel;
-
-                      switch (v.effectiveStatus) {
-                        case VaccineStatus.current:
-                          badgeVariant = PawlyBadgeVariant.sage;
-                          statusLabel = 'CURRENT';
-                          break;
-                        case VaccineStatus.dueSoon:
-                          badgeVariant = PawlyBadgeVariant.honey;
-                          statusLabel = 'DUE SOON';
-                          break;
-                        case VaccineStatus.overdue:
-                          badgeVariant = PawlyBadgeVariant.alert;
-                          statusLabel = 'OVERDUE';
-                          break;
-                      }
-
-                      return Container(
-                        margin: const EdgeInsets.only(bottom: 12),
-                        padding: const EdgeInsets.all(18),
-                        decoration: BoxDecoration(
-                          color:
-                              PawlyColors.resolve(context, PawlyColors.surface),
-                          borderRadius: BorderRadius.circular(20),
-                          border: Border.all(
-                              color: PawlyColors.resolve(
-                                  context, PawlyColors.border)),
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Flexible(
-                                    child: Text(v.vaccineName,
-                                        style: PawlyTypography.resolve(context,
-                                            PawlyTypography.titleMedium))),
-                                StatusBadge(
-                                    label: statusLabel, variant: badgeVariant),
-                              ],
-                            ),
-                            const SizedBox(height: 8),
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text('Given on',
-                                          style: TextStyle(
-                                              fontSize: 11,
-                                              color: PawlyColors.resolve(
-                                                  context,
-                                                  PawlyColors.tertiary))),
-                                      const SizedBox(height: 2),
-                                      Text(v.dateAdministered,
-                                          style: TextStyle(
-                                              fontSize: 13,
-                                              fontWeight: FontWeight.w700,
-                                              color: PawlyColors.resolve(
-                                                  context,
-                                                  PawlyColors.charcoal))),
-                                    ],
-                                  ),
-                                ),
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text('Next Booster Due',
-                                          style: TextStyle(
-                                              fontSize: 11,
-                                              color: PawlyColors.resolve(
-                                                  context,
-                                                  PawlyColors.tertiary))),
-                                      const SizedBox(height: 2),
-                                      Text(v.nextDueDate,
-                                          style: TextStyle(
-                                              fontSize: 13,
-                                              fontWeight: FontWeight.w700,
-                                              color: PawlyColors.resolve(
-                                                  context, PawlyColors.black))),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 10),
-                            Text(
-                              '${v.clinic} • ${v.veterinarian}',
-                              style: TextStyle(
-                                  fontSize: 12,
-                                  color: PawlyColors.resolve(
-                                      context, PawlyColors.secondary)),
-                            ),
-                          ],
-                        ),
-                      );
-                    }),
-
+                  PawlyPassport(
+                      pet: pet,
+                      ownerName: repository.user.name,
+                      vaccines: vaccines),
+                  const SizedBox(height: 18),
+                  Text(
+                      '${vaccines.length} vaccination records · ${vaccines.where((v) => v.effectiveStatus != VaccineStatus.current).length} boosters need attention',
+                      style: TextStyle(
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
+                          fontSize: 12)),
+                  const SizedBox(height: 8),
+                  const Text(
+                      'Keep your pet’s identity and vaccine history together. This is a personal record; your clinic provides official documents.',
+                      style: TextStyle(fontSize: 12)),
                   const SizedBox(height: 20),
-
                   PawlyButton(
                     text: 'Add Vaccine to Passport',
                     onPressed: () => _openAddVaccineDialog(context),

@@ -129,7 +129,7 @@ class _PetCollectionCard extends StatelessWidget {
               child: AspectRatio(
                 aspectRatio: 1,
                 child: ColoredBox(
-                    color: Theme.of(context).colorScheme.primaryContainer,
+                    color: Colors.transparent,
                     child: Image(
                         image: pawlyImageProvider(pet.imageUrl),
                         fit: BoxFit.contain,

@@ -22,9 +22,9 @@ Choose **Demo Enter** to explore example pets Maple, Cleo, and Finn. A personal 
 - Multiple pet profiles, personality details, allergies, and optional personal photo URLs.
 - Daily care checklist with dated completions, recurrence, category filters, and calendar browsing.
 - Today / Upcoming / Completed reminders across the pet family, including booster dates and veterinary visits.
-- Health events, owner observation notes, vaccine records, and prescribed medication notes.
+- Health events, owner observation notes, a passport booklet with identity and vaccination pages, and prescribed medication records with pet photos.
 - Veterinary appointments and a saved preparation checklist.
-- Weight history with a chart and chronological records.
+- Weight history with a chart, chronological records, and an animated 3D-style weigh-in buddy. Tap the illustrated scale to open the real Log Weight form; its number shows the saved measurement. The artwork is a raster render, not a live 3D mesh or connected scale.
 - Memories and a combined timeline of health, vaccination, weight, and personal moments.
 - Document metadata notes, per-pet emergency details, and copyable emergency / lost-pet information.
 - Saved caregiver contacts and universal record search.
@@ -32,7 +32,7 @@ Choose **Demo Enter** to explore example pets Maple, Cleo, and Finn. A personal 
 
 ## Design
 
-Black-and-white is the default: white canvas, black actions, soft gray surfaces, and charcoal dark mode. Users may choose Lavender, Ocean Blue, or Rose accents in Settings, independently of light/dark/system appearance. Both choices persist. Pet photography stays in natural color against neutral backgrounds. Images use contain sizing to show the entire source photograph. Square frames on home and pet collections match the bundled portraits, preventing side bars. The home has a prominent photograph and a separate caption, and pet profiles reserve space for back navigation.
+Black-and-white is the default: white canvas, black actions, soft gray surfaces, and charcoal dark mode. Users may choose Lavender, Ocean Blue, or Rose accents in Settings, independently of light/dark/system appearance. Both choices persist. Demo pets use a consistent collection of original 3D-style portraits with transparent backgrounds and natural fur colors. Personal photo URLs remain original; automatic 3D conversion is not implemented. Images use contain sizing to show the entire source image. Square frames on home and pet collections match the bundled portraits, preventing side bars. The home has a prominent pet portrait and a separate caption, and pet profiles reserve space for back navigation.
 
 The lightweight paw splash respects reduced-motion settings. Interactive onboarding demonstrates choosing a companion and completing daily care. Shared buttons await asynchronous actions, prevent repeated submission, and provide failure feedback.
 

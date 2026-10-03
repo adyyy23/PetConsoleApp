@@ -204,7 +204,38 @@ class MedicationScreen extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('ACTIVE MEDICATIONS',
+                  PawlyCard(
+                      child: Row(children: [
+                    SizedBox(
+                        width: 84,
+                        height: 84,
+                        child: Image(
+                            image: pawlyImageProvider(pet.imageUrl),
+                            fit: BoxFit.contain,
+                            errorBuilder: (_, __, ___) =>
+                                const Icon(Icons.pets_outlined))),
+                    const SizedBox(width: 16),
+                    Expanded(
+                        child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                          Text(pet.name,
+                              style: const TextStyle(
+                                  fontSize: 24, fontWeight: FontWeight.w700)),
+                          const SizedBox(height: 6),
+                          Text(
+                              '${medications.where((m) => m.isActive).length} active medication records',
+                              style: TextStyle(
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .onSurfaceVariant)),
+                          const SizedBox(height: 4),
+                          const Text('Their prescribed care, kept close.',
+                              style: TextStyle(fontSize: 12))
+                        ])),
+                  ])),
+                  const SizedBox(height: 24),
+                  Text('MEDICATION RECORDS',
                       style: PawlyTypography.resolve(
                           context, PawlyTypography.eyebrow)),
                   const SizedBox(height: 12),
@@ -235,14 +266,17 @@ class MedicationScreen extends StatelessWidget {
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
                                 children: [
+                                  PetAvatar(imageUrl: pet.imageUrl, radius: 20),
+                                  const SizedBox(width: 10),
                                   Flexible(
                                       child: Text(m.name,
                                           style: PawlyTypography.resolve(
                                               context,
                                               PawlyTypography.titleMedium))),
-                                  const StatusBadge(
-                                    label: 'Active',
-                                  ),
+                                  const SizedBox(width: 8),
+                                  StatusBadge(
+                                      label:
+                                          m.isActive ? 'Active' : 'Completed'),
                                 ],
                               ),
                               const SizedBox(height: 6),

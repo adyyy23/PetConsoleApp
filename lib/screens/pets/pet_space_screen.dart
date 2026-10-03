@@ -451,9 +451,7 @@ class _PetSpaceScreenState extends State<PetSpaceScreen> {
                           aspectRatio: 1,
                           child: Container(
                               width: double.infinity,
-                              color: Theme.of(context)
-                                  .colorScheme
-                                  .primaryContainer,
+                              color: Colors.transparent,
                               child: Image(
                                   image: pawlyImageProvider(pet.imageUrl),
                                   fit: BoxFit.contain,

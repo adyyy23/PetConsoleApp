@@ -118,7 +118,7 @@ class HomeScreen extends StatelessWidget {
                                     borderRadius: const BorderRadius.vertical(
                                         top: Radius.circular(18)),
                                     child: ColoredBox(
-                                        color: scheme.primaryContainer,
+                                        color: Colors.transparent,
                                         child: AspectRatio(
                                             aspectRatio: 1,
                                             child: Image(

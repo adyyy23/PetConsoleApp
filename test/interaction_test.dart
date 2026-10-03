@@ -1,3 +1,6 @@
+import 'package:pawly/screens/health/health_screen.dart';
+import 'package:pawly/widgets/passport/pawly_passport.dart';
+import 'package:pawly/widgets/pet_weigh_in.dart';
 import 'package:pawly/screens/care/care_screen.dart';
 import 'package:pawly/theme/pawly_palette.dart';
 import 'dart:async';
@@ -70,6 +73,75 @@ void main() {
         scrollable: find.byType(Scrollable).first);
     expect(find.text('Salmon Pate Lunch'), findsOneWidget);
     expect(find.text('Evening Sunset Walk'), findsNothing);
+  });
+  testWidgets('Health switcher changes records and shortcut pet',
+      (tester) async {
+    final repo = PawlyRepository();
+    await repo.init();
+    await repo.seedDemoData();
+    String? openedPet;
+    await tester.pumpWidget(MaterialApp(
+        theme: PawlyTheme.lightTheme,
+        home: HealthScreen(
+            repository: repo,
+            onOpenAddHealthEvent: () {},
+            onOpenWeight: () => openedPet = repo.activePet.name,
+            onOpenVaccination: () {},
+            onOpenMedication: () {})));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Cleo'));
+    await tester.pumpAndSettle();
+    expect(find.text('MEDICAL & WELLNESS • CLEO'), findsOneWidget);
+    expect(find.text('4.2 kg'), findsOneWidget);
+    await tester.tap(find.text('4.2 kg'));
+    expect(openedPet, 'Cleo');
+    expect(tester.takeException(), isNull);
+  });
+  testWidgets('Passport opens identity and persisted vaccine pages',
+      (tester) async {
+    tester.view.physicalSize = const Size(320, 640);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    final repo = PawlyRepository();
+    await repo.init();
+    await repo.seedDemoData();
+    final vaccines = repo.activePetVaccinations;
+    await tester.pumpWidget(MaterialApp(
+        theme: PawlyTheme.lightTheme,
+        home: Scaffold(
+            body: SingleChildScrollView(
+                child: PawlyPassport(
+                    pet: repo.activePet,
+                    ownerName: repo.user.name,
+                    vaccines: vaccines)))));
+    await tester.tap(find.text('Open passport'));
+    await tester.pumpAndSettle();
+    expect(find.text('Identity page'), findsOneWidget);
+    expect(find.text(repo.activePet.microchipNumber), findsOneWidget);
+    await tester.ensureVisible(find.byTooltip('Next passport page'));
+    await tester.tap(find.byTooltip('Next passport page'));
+    await tester.pumpAndSettle();
+    expect(find.text(vaccines.first.vaccineName), findsOneWidget);
+    expect(find.text('IMMUNIZED'), findsNothing);
+    await tester.ensureVisible(find.byTooltip('Close passport'));
+    await tester.tap(find.byTooltip('Close passport'));
+    await tester.pumpAndSettle();
+    expect(find.text('Open passport'), findsOneWidget);
+  });
+  testWidgets('Scale illustration opens the real weigh-in action',
+      (tester) async {
+    var opened = false;
+    await tester.pumpWidget(MaterialApp(
+        theme: PawlyTheme.lightTheme,
+        home: Scaffold(
+            body: PetWeighIn(
+                pet: SampleData.initialPets.first,
+                onLogWeight: () => opened = true))));
+    await tester.tap(find.byType(InkWell).first);
+    await tester.pumpAndSettle();
+    expect(opened, true);
+    expect(tester.takeException(), isNull);
   });
   testWidgets('Async action prevents duplicate taps and re-enables after save',
       (tester) async {

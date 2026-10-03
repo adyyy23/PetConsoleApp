@@ -1,3 +1,4 @@
+import '../../widgets/pet_weigh_in.dart';
 import 'package:flutter/material.dart';
 import '../../theme/pawly_colors.dart';
 import '../../theme/pawly_typography.dart';
@@ -223,6 +224,8 @@ class _WeightGrowthScreenState extends State<WeightGrowthScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              PetWeighIn(pet: pet, onLogWeight: _openAddWeightDialog),
+              const SizedBox(height: 16),
               // Hero Weight Card (8px Card)
               PawlyCard(
                 padding: const EdgeInsets.all(20),
