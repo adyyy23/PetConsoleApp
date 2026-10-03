@@ -109,6 +109,8 @@ class HomeScreen extends StatelessWidget {
                           : const Duration(milliseconds: 220),
                       child: PawlyCard(
                           key: ValueKey(pet.id),
+                          backgroundColor: Colors.transparent,
+                          borderColor: Colors.transparent,
                           padding: EdgeInsets.zero,
                           onTap: () => onOpenPetSpace(pet.id),
                           child: Column(
