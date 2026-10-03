@@ -34,7 +34,7 @@ Choose **Demo Enter** to explore example pets Maple, Cleo, and Finn. A personal 
 
 Black-and-white is the default: white canvas, black actions, soft gray surfaces, and charcoal dark mode. Users may choose Lavender, Ocean Blue, or Rose accents in Settings, independently of light/dark/system appearance. Both choices persist. Demo pets use a consistent collection of original 3D-style portraits with transparent backgrounds and natural fur colors. Personal photo URLs remain original; automatic 3D conversion is not implemented. Images use contain sizing to show the entire source image. Square frames on home and pet collections match the bundled portraits, preventing side bars. The home has a prominent pet portrait and a separate caption, and pet profiles reserve space for back navigation.
 
-The lightweight paw splash respects reduced-motion settings. Interactive onboarding demonstrates choosing a companion and completing daily care. Shared buttons await asynchronous actions, prevent repeated submission, and provide failure feedback.
+The lightweight paw splash respects reduced-motion settings. After the splash, Pawly opens saved pet records directly, or the local welcome screen on a new device; there is no introductory slideshow. Shared buttons await asynchronous actions, prevent repeated submission, and provide failure feedback.
 
 ## Storage and scope
 

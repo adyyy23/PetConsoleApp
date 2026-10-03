@@ -16,7 +16,7 @@ void main() {
   });
 
   testWidgets(
-      'Pawly complete user flow: Splash -> Onboarding -> Login -> Home -> Tabs navigation',
+      'Pawly complete user flow: Splash -> Login -> Home -> Tabs navigation',
       (WidgetTester tester) async {
     SharedPreferences.setMockInitialValues({});
     final repository = PawlyRepository();
@@ -31,12 +31,8 @@ void main() {
     await tester.pump(const Duration(milliseconds: 1500));
     await tester.pump(const Duration(milliseconds: 300));
 
-    // 1. Verify Onboarding
-    expect(find.textContaining('Everything about them.'), findsOneWidget);
-
-    // Tap "Skip" on Onboarding to proceed to Login
-    await tester.tap(find.text('Skip'));
-    await tester.pumpAndSettle();
+    // Fresh installs skip the introductory slideshow.
+    expect(find.textContaining('Everything about them.'), findsNothing);
 
     // 2. Verify Login Screen
     expect(find.textContaining('Welcome\nback to Pawly'), findsOneWidget);
@@ -156,7 +152,6 @@ void main() {
 
     await tester.pumpWidget(PawlyApp(repository: repository));
     await tester.pump(const Duration(milliseconds: 1800));
-    await tester.tap(find.text('Skip'));
     await tester.pumpAndSettle();
     await tester.ensureVisible(find.text('Demo Enter'));
     await tester.tap(find.text('Demo Enter'));

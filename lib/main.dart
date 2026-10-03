@@ -16,7 +16,6 @@ import 'screens/health/health_screen.dart';
 import 'screens/home/home_screen.dart';
 import 'screens/medication/medication_screen.dart';
 import 'screens/memories/memories_screen.dart';
-import 'screens/onboarding/onboarding_screen.dart';
 import 'screens/pets/add_first_pet_screen.dart';
 import 'screens/pets/my_pets_screen.dart';
 import 'screens/pets/pet_space_screen.dart';
@@ -99,15 +98,7 @@ class _PawlyBootstrapState extends State<PawlyBootstrap> {
       );
 }
 
-enum AppFlowState {
-  splash,
-  onboarding,
-  login,
-  signup,
-  forgotPassword,
-  addFirstPet,
-  main
-}
+enum AppFlowState { splash, login, signup, forgotPassword, addFirstPet, main }
 
 class PawlyApp extends StatefulWidget {
   final PawlyRepository repository;
@@ -152,19 +143,9 @@ class _PawlyAppState extends State<PawlyApp> {
     switch (_flowState) {
       case AppFlowState.splash:
         return SplashScreen(
-          onFinish: () => _goTo(widget.repository.onboardingComplete
-              ? (widget.repository.pets.isEmpty
-                  ? AppFlowState.login
-                  : AppFlowState.main)
-              : AppFlowState.onboarding),
-        );
-
-      case AppFlowState.onboarding:
-        return OnboardingScreen(
-          onFinish: () async {
-            await widget.repository.completeOnboarding();
-            if (mounted) _goTo(AppFlowState.login);
-          },
+          onFinish: () => _goTo(widget.repository.pets.isEmpty
+              ? AppFlowState.login
+              : AppFlowState.main),
         );
 
       case AppFlowState.login:
