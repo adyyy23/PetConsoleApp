@@ -1,6 +1,6 @@
 # Pawly — Dedicated Mobile Companion for Pets & Their Humans 🐾
 
-Pawly is a production-quality, mobile-first pet care and digital health passport application built with **Flutter 3.24.3** & **Dart 3.5.3**.
+Pawly is a mobile-first pet care and digital health passport application built with **Flutter 3.24.3** & **Dart 3.5.3**.
 
 Rethought from the ground up from the legacy web dashboard into an intimate, warm companion mobile application. Inspired by the editorial elegance, confident typography, full-width photography, and tactile visual cards of modern mobile design references (*Box Box Club*), Pawly creates an original visual identity with deep forest greens, warm clays, creamy tones, and human typography.
 
